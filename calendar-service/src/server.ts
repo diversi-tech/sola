@@ -1,31 +1,18 @@
+import { supabase } from './config/supabase.js';
 
-// 1. מעקפי רשת ותעודות אבטחה לסביבת הפיתוח
-// ==========================================
-// מאפשר ל-Node.js לעקוף חסימות תעודת אבטחה מקומיות (של סינוני אינטרנט) ב-Fetch
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
-// מכריח את Node.js לתת עדיפות לכתובות IPv4 כדי למנוע שגיאות "fetch failed" ברשתות ביתיות
-import dns from 'dns';
-if (dns && dns.setDefaultResultOrder) {
-  dns.setDefaultResultOrder('ipv4first');
+async function testConnection() {
+  try {
+    const { data, error } = await supabase.from('users_profile').select('*');
+    if (error) {
+      console.log('❌ החיבור נכשל:', error.message ?? error);
+      return;
+    }
+    console.log('✅ החיבור הצליח');
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.log('❌ החיבור נכשל:', msg);
+  }
 }
 
-// ==========================================
-// 2. ייבוא האפליקציה והגדרת השרת
-// ==========================================
-import app from './app.js';
-import * as dotenv from 'dotenv';
-
-// טעינת משתני סביבה (למקרה שנרצה להשתמש בפורט מה-.env)
-dotenv.config();
-
-// הגדרת הפורט שעליו ירוץ השרת (ברירת מחדל 3000 אם לא הוגדר ב-.env)
-const PORT = process.env.PORT || 3000;
-
-// הפעלת השרת והקשבה לבקשות נכנסות
-app.listen(PORT, () => {
-  console.log('==================================================');
-  console.log(`🚀 השרת רץ בהצלחה ומחובר ל-Supabase!`);
-  console.log(`🌍 זמין בכתובת המקומית: http://localhost:${PORT}`);
-  console.log('==================================================');
-});
+// הרצת פונקציית הבדיקה
+testConnection();
