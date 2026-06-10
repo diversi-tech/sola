@@ -9,18 +9,18 @@ export const sendError = (res: Response, message: string, statusCode: number = 5
 };
 
 
-export const sendBadRequest = (res: Response, message: string = 'נתונים לא תקינים או חסרים') => {
+export const sendBadRequest = (res: Response, message: string = 'Invalid or missing data') => {
   return sendError(res, message, 400);
 };
 
-export const sendUnauthorized = (res: Response, message: string = 'משתמש לא מורשה, יש להתחבר מחדש') => {
+export const sendUnauthorized = (res: Response, message: string = 'Unauthorized, please log in again') => {
   return sendError(res, message, 401);
 };
 
-export const sendForbidden = (res: Response, message: string = 'אין לך הרשאות גישה למשאב זה') => {
+export const sendForbidden = (res: Response, message: string = 'You do not have permission to access this resource') => {
   return sendError(res, message, 403);
 };
 
-export const sendNotFound = (res: Response, message: string = 'המשאב המבוקש לא נמצא') => {
+export const sendNotFound = (res: Response, message: string = 'The requested resource was not found') => {
   return sendError(res, message, 404);
 };
