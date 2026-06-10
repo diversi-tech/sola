@@ -1,38 +1,77 @@
 import { Request, Response } from 'express';
 import * as audioService from '../services/audio.service';
+import * as integrationService from '../services/error-handler.service.ts';
 
-export const processAudioRequest = (req: Request, res: Response): void => {
+export const processAudioRequest = async (req: Request, res: Response): Promise<void> => {
+  
+  let currentUserId: string | undefined = req.body?.userId;
+
   try {
-    //  בדיקת קיום קובץ
     if (!req.file) {
-      res.status(400).json({ error: 'Bad Request: No audio file provided.' });
+      const errorMessage = 'Bad Request: No audio file provided.';
+      
+      await integrationService.handleProcessResult({
+        userId: currentUserId || 'unknown',
+        message: errorMessage,
+        status: "error"
+      });
+
+      res.status(400).json({ error: errorMessage });
       return;
     }
 
-    // חילוץ ה-userId מה-Body של הבקשה
-    const { userId } = req.body;
-    if (!userId) {
-      res.status(400).json({ error: 'Bad Request: Missing userId.' });
+    if (!currentUserId) {
+      const errorMessage = 'Bad Request: Missing userId.';
+      
+      await integrationService.handleProcessResult({
+        userId: 'unknown',
+        message: errorMessage,
+        status: "error"
+      });
+
+      res.status(400).json({ error: errorMessage });
       return;
     }
 
-    //  בדיקת גודל קובץ (מקסימום 25MB)
     const MAX_SIZE_BYTES = 25 * 1024 * 1024;
     if (req.file.size > MAX_SIZE_BYTES) {
-      res.status(413).json({ error: 'Payload Too Large: Limit is 25MB.' });
+      const errorMessage = 'Payload Too Large: Audio file exceeds 25MB limit.';
+      
+      await integrationService.handleProcessResult({
+        userId: currentUserId,
+        message: errorMessage,
+        status: "error"
+      });
+
+      res.status(413).json({ error: errorMessage });
       return;
     }
 
-    //  הפעלת ה-Service ברקע ללא המתנה (ללא await)
-    audioService.handleAudioProcessingPipeline(req.file, { userId }).catch(err => {
-      console.error('Background processing error:', err);
+
+    const transcriptionResult = await audioService.handleAudioProcessingPipeline(req.file, { userId: currentUserId });
+
+    await integrationService.handleProcessResult({
+      userId: currentUserId,
+      text: transcriptionResult,
+      status: "success"
     });
 
-    //  תשובה מהירה לבוט
-    res.status(202).json({ message: 'Audio processing started.' });
+    res.status(200).json({ 
+      status: 'success',
+      text: transcriptionResult 
+    });
 
-  } catch (error) {
-    console.error('Controller error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+  } catch (error: any) {
+    console.error('Controller caught an error:', error);
+
+    const errorMessage = error?.message || 'Audio processing failed during transcription.';
+
+    await integrationService.handleProcessResult({
+      userId: currentUserId || 'unknown',
+      message: errorMessage,
+      status: "error"
+    });
+
+    res.status(500).json({ error: errorMessage });
   }
 };
