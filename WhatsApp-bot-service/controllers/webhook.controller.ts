@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { checkVerifyToken, processWebhookEvent } from '../services/webhook.services';
 
 // GET (verify webhook with Meta)
-export const verifymetaWebhook = (req: Request, res: Response) => {
+export const verifyMetaWebhook = (req: Request, res: Response) => {
     const mode = req.query['hub.mode'] as string;
     const token = req.query['hub.verify_token'] as string;
     const challenge = req.query['hub.challenge'] as string;

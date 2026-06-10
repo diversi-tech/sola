@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { verifymetaWebhook, receiveWebhookEvent } from '../controllers/webhook.controller';
+import { verifyMetaWebhook, receiveWebhookEvent } from '../controllers/webhook.controller';
 
 const router = Router();
 
 
-router.get('/', verifymetaWebhook);
+router.get('/', verifyMetaWebhook);
 
 
 router.post('/', receiveWebhookEvent);
