@@ -1,29 +1,24 @@
 import streamifier from 'streamifier';
 import FormData from 'form-data';
 import axios from 'axios';
-import * as integrationService from './integration.service';
 
-export const handleAudioProcessingPipeline = async (file: any, userData: any) => {
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
+
+export const handleAudioProcessingPipeline = async (file: any, userData: any): Promise<string> => {
+    if (!process.env.GROQ_API_KEY) {
+        throw new Error("Configuration Error: GROQ_API_KEY is not defined.");
+    }
+
+    const audioStream = streamifier.createReadStream(file.buffer);
+
     try {
-        const audioStream = streamifier.createReadStream(file.buffer);
-        const transcriptionText = await transcribeAudio(audioStream);
-
-        await integrationService.handleProcessResult({
-            userId: userData.userId,
-            text: transcriptionText,
-            status: "success"
-        });
-        
-    } catch (error) {
-        console.error("Pipeline Error:", error);
-        
-        await integrationService.handleProcessResult({
-            userId: userData.userId,
-            message: "Audio processing error",
-            status: "error"
-        });
+        return await transcribeAudio(audioStream);
+    } catch (error: any) {
+        console.error("Pipeline Error:", error.message);
+        throw error;
     }
 };
+
 const transcribeAudio = async (audioStream: any): Promise<string> => {
     const form = new FormData();
     
@@ -38,11 +33,6 @@ const transcribeAudio = async (audioStream: any): Promise<string> => {
         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
     };
 
-    const response = await axios.post(
-        'https://api.groq.com/openai/v1/audio/transcriptions',
-        form,
-        { headers: headers }
-    );
-
+    const response = await axios.post(GROQ_API_URL, form, { headers });
     return response.data.text;
 };
