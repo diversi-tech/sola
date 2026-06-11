@@ -1,12 +1,35 @@
 export const checkVerifyToken = (mode: string, token: string): boolean => {
-    const verifyToken = process.env.VERIFY_TOKEN;
-    return mode === 'subscribe' && token === verifyToken;
+  const verification_token = process.env.VERIFY_TOKEN;
+  return mode === 'subscribe' && token === verification_token;
 };
 
-
+const WHATSAPP_BUSINESS = 'whatsapp_business_account';
 export const processWebhookEvent = (body: any) => {
-    //todo:
-    // כאן בהמשך הספרינט אנחנו נוסיף את הקוד שמפרק את ההודעה,
-    // שולח למסד הנתונים של Supabase, או מחזיר תשובה למשתמש.
-    console.log(':envelope_with_arrow: Received webhook event in service:', JSON.stringify(body, null, 2));
-}
+    
+    console.log(': Received webhook event in service:', JSON.stringify(body, null, 2));
+
+    if (body.object === WHATSAPP_BUSINESS) {
+        
+        const messages = body.entry?.[0]?.changes?.[0]?.value?.messages;
+
+        
+       if (messages?.length) {
+            const message = messages[0];
+            
+            const extractedPhoneNumber = message.from; 
+
+            if (typeof extractedPhoneNumber === 'string' && extractedPhoneNumber.trim() !== '') {
+                
+                
+                let senderPhoneNumber = extractedPhoneNumber; 
+                
+                console.log("✅ Success! Extracted phone number:", senderPhoneNumber);
+                
+                return senderPhoneNumber;
+                
+            } else {
+                console.error("❌ Validation failed: Phone number is missing or invalid");
+            }
+        }
+    }
+};
