@@ -1,8 +1,8 @@
 
 import { Router, Request, Response } from 'express';
-import { verifyPhoneHandler } from '../controllers/authorization.controller.js';
+import { loginHandler } from '../controllers/authorization.controller.js';
 
 const router = Router();
-router.post('/verify-phone',verifyPhoneHandler);
+router.post('/login',loginHandler);
 
 export default router;
