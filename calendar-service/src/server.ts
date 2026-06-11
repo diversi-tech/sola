@@ -2,9 +2,12 @@ import { supabase } from './config/supabase.js';
 
 async function testConnection() {
   try {
-    const { data, error } = await supabase.from('users_profile').select('*');
+    const { data, error } = await supabase.from('Meeting').select('*');
     if (error) {
-      console.log('❌ החיבור נכשל:', error.message ?? error);
+      console.log('❌ החיבור נכשל (object):', error);
+      try {
+        console.log('❌ פרטי שגיאה:', JSON.stringify(error));
+      } catch (_) {}
       return;
     }
     console.log('✅ החיבור הצליח');
@@ -16,3 +19,4 @@ async function testConnection() {
 
 // הרצת פונקציית הבדיקה
 testConnection();
+
