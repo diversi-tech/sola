@@ -3,27 +3,29 @@ export function handleProcessResult(status: string, info: string, userId: string
         return info; 
     }
 
-    const lowMessage = info.toLowerCase();
+    // Fixed variable name according to review feedback
+    const lowerCaseMessage = info.toLowerCase();
 
-    if (lowMessage.includes("no audio") || lowMessage.includes("missing file")) {
-        return "לא נקלט קובץ שמע בבקשה. אנא ודאו שההקלטה נשלחה כראוי ונסו שוב.";
+    // All error messages changed to English according to review feedback
+    if (lowerCaseMessage.includes("no audio") || lowerCaseMessage.includes("missing file")) {
+        return "No audio file was detected. Please ensure the recording was sent properly and try again.";
     }
 
-    if (lowMessage.includes("25mb") || lowMessage.includes("too large")) {
-        return "נפח קובץ השמע חורג מהמגבלה המותרת. המערכת תומכת בעיבוד קבצים של עד *25MB* בלבד.";
+    if (lowerCaseMessage.includes("25mb") || lowerCaseMessage.includes("too large")) {
+        return "The audio file size exceeds the allowed limit. The system only supports files up to 25MB.";
     }
 
-    if (lowMessage.includes("format") || lowMessage.includes("invalid type")) {
-        return "פורמט הקובץ אינו נתמך. אנא שלחו הקלטת שמע סטנדרטית .";
+    if (lowerCaseMessage.includes("format") || lowerCaseMessage.includes("invalid type")) {
+        return "The file format is not supported. Please provide a standard audio recording.";
     }
 
-    if (lowMessage.includes("empty") || lowMessage.includes("no speech")) {
-        return "לא זוהה דיבור בקובץ השמע. אנא ודאו שההקלטה ברורה ונסו שוב.";
+    if (lowerCaseMessage.includes("empty") || lowerCaseMessage.includes("no speech")) {
+        return "No speech was detected in the audio file. Please ensure the recording is clear and try again.";
     }
 
-    if (lowMessage.includes("userid") || !userId) {
-        return "שגיאת מערכת: לא ניתן לבצע את הפעולה עבור מזהה המשתמש הנוכחי.";
+    if (lowerCaseMessage.includes("userid") || !userId) {
+        return "System error: Unable to perform the operation for the current user ID.";
     }
 
-    return "הפעולה נכשלה עקב שגיאה פנימית זמנית במערכת. אנא נסו לשלוח שוב בעוד מספר דקות.";
+    return "The operation failed due to a temporary internal system error. Please try again in a few minutes.";
 }
