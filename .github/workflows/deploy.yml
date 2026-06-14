@@ -13,7 +13,7 @@ concurrency:
 env:
   PROJECT_NAME: sola
   PUBLISH_DIR: packages/frontend/build
-  BUILD_CMD: npm ci && CI=false npm run build --workspace=packages/frontend
+  BUILD_CMD: npm ci && npm run build --workspace=packages/shared && CI=false npm run build --workspace=packages/frontend
 
 jobs:
   deploy:
@@ -64,6 +64,7 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
+          set +e
           LOG="$( { [ -f build.log ] && tail -c 2500 build.log; [ -f deploy.log ] && { echo; echo '--- deploy ---'; tail -c 800 deploy.log; }; } 2>/dev/null )"
           [ -z "$LOG" ] && LOG="(no logs captured)"
           MSG=$(printf '❌ *%s* — build FAILED\n• branch: `%s`\n• %s by %s\n```\n%s\n```' "$PROJECT_NAME" "$GITHUB_REF_NAME" "${GITHUB_SHA:0:7}" "$GITHUB_ACTOR" "$LOG")
