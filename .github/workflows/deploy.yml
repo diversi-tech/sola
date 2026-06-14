@@ -1,0 +1,70 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+# ── Per-project config (the only lines that differ between repos) ──
+env:
+  PROJECT_NAME: sola
+  PUBLISH_DIR: packages/frontend/build
+  BUILD_CMD: npm ci && CI=false npm run build --workspace=packages/frontend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Notify build started
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          MSG=$(printf '🟡 *%s* — build started\n• branch: `%s`\n• %s by %s' "$PROJECT_NAME" "$GITHUB_REF_NAME" "${GITHUB_SHA:0:7}" "$GITHUB_ACTOR")
+          curl -s -X POST "$SLACK_WEBHOOK_URL" -H 'Content-Type: application/json' --data "$(jq -n --arg t "$MSG" '{text:$t}')"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build
+        shell: bash
+        run: |
+          set -eo pipefail
+          eval "$BUILD_CMD" 2>&1 | tee build.log
+
+      - name: Deploy to Cloudflare Pages
+        if: success()
+        id: deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -eo pipefail
+          npx wrangler@3 pages project create "$PROJECT_NAME" --production-branch=main 2>/dev/null || true
+          npx wrangler@3 pages deploy "$PUBLISH_DIR" --project-name="$PROJECT_NAME" --branch="$GITHUB_REF_NAME" 2>&1 | tee deploy.log
+          URL=$(grep -oE 'https://[a-z0-9.-]+\.pages\.dev' deploy.log | tail -1)
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Notify success
+        if: success()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          MSG=$(printf '✅ *%s* — deployed\n• branch: `%s`\n• %s' "$PROJECT_NAME" "$GITHUB_REF_NAME" "${{ steps.deploy.outputs.url }}")
+          curl -s -X POST "$SLACK_WEBHOOK_URL" -H 'Content-Type: application/json' --data "$(jq -n --arg t "$MSG" '{text:$t}')"
+
+      - name: Notify failure with error
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          LOG="$( { [ -f build.log ] && tail -c 2500 build.log; [ -f deploy.log ] && { echo; echo '--- deploy ---'; tail -c 800 deploy.log; }; } 2>/dev/null )"
+          [ -z "$LOG" ] && LOG="(no logs captured)"
+          MSG=$(printf '❌ *%s* — build FAILED\n• branch: `%s`\n• %s by %s\n```\n%s\n```' "$PROJECT_NAME" "$GITHUB_REF_NAME" "${GITHUB_SHA:0:7}" "$GITHUB_ACTOR" "$LOG")
+          curl -s -X POST "$SLACK_WEBHOOK_URL" -H 'Content-Type: application/json' --data "$(jq -n --arg t "$MSG" '{text:$t}')"
