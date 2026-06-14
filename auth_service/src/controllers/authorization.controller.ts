@@ -1,34 +1,23 @@
 import { Request, Response, NextFunction } from 'express';
-import { isUserAuthorized } from '../services/authorization.service.js';
 import { HttpStatusCode } from '../types/httpStatusCodes.js';
+import { sendErrorResponse, sendSuccessResponse } from '../utils/response.util.js';
+import { authenticateUser } from '../services/authorization.service.js';
 
 export const loginHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const phoneNumber = req.body.phoneNumber;
 
     if (!phoneNumber || !phoneNumber.startsWith('+')) {
-      res.status(HttpStatusCode.BAD_REQUEST).json({ 
-        IsSucceeded: false, 
-        statusCode: HttpStatusCode.BAD_REQUEST, 
-        message: "Phone number is required and must start with '+'" 
-      });
+      sendErrorResponse(res, HttpStatusCode.BAD_REQUEST, "Phone number is required and must start with '+'");
       return;
     }
 
-    const authorized = await isUserAuthorized(phoneNumber);
+    const user = await authenticateUser(phoneNumber);
 
-    if (authorized) {
-      res.status(HttpStatusCode.OK).json({ 
-        IsSucceeded: true, 
-        statusCode: HttpStatusCode.OK, 
-        message: "User is authorized" 
-      });
+    if (user) {
+      sendSuccessResponse(res, HttpStatusCode.OK, "User is authorized", { phoneNumber, userId: user.ID });
     } else {
-      res.status(HttpStatusCode.UNAUTHORIZED).json({ 
-        IsSucceeded: false, 
-        statusCode: HttpStatusCode.UNAUTHORIZED, 
-        message: "User is not authorized" 
-      });
+      sendErrorResponse(res, HttpStatusCode.UNAUTHORIZED, "User is not authorized");
     }
   } catch (error) {
     next(error);

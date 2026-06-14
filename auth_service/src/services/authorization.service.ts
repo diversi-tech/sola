@@ -13,8 +13,8 @@ const getUserByPhone = async (phoneNumber: string) => {
   return data;
 };
 
-export const isUserAuthorized = async (phoneNumber: string): Promise<boolean> => {
+export const authenticateUser = async (phoneNumber: string) => {
   const user = await getUserByPhone(phoneNumber);
-  
-  return user !== null;
+
+  return user; 
 };
