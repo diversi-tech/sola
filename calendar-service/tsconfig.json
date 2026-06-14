@@ -1,20 +1,20 @@
 {
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    "target": "ES2020",// לאיזה גירסה לקמפל את js
-    "module": "nodenext",//כך נוכל להשתמש בimport וexport בשיטת ESM
-    "rootDir": "./src",//תקיית מקור הקוד
-    "outDir": "./dist",//תקיית היעד של הקוד המוקמפל
-    "strict": true,//הפעלת כל האופציות של בדיקת טיפוסים
+    "target": "ES2020",
+    "module": "nodenext",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "strict": true,
     "esModuleInterop": true,
    
     // Environment Settings
     "types": [],
 
     // Other Outputs
-    "sourceMap": true,  //לצורך דיבוג, מראה את הקובץ ts לפני הקימפול
-    "declaration": true,  //מציג השלמה אוטומטית ובדיקת טיפוסים על סמך הקבצים האלו
-    "declarationMap": true, //מקשרת בין קבצי הטיפוסים לבין קבצי ה-TypeScript המקוריים
+    "sourceMap": true,  
+    "declaration": true,  
+    "declarationMap": true, 
 
     // Recommended Options
     "isolatedModules": true,
