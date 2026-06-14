@@ -3,10 +3,8 @@ export function handleProcessResult(status: string, info: string, userId: string
         return info; 
     }
 
-    // Fixed variable name according to review feedback
     const lowerCaseMessage = info.toLowerCase();
 
-    // All error messages changed to English according to review feedback
     if (lowerCaseMessage.includes("no audio") || lowerCaseMessage.includes("missing file")) {
         return "No audio file was detected. Please ensure the recording was sent properly and try again.";
     }
