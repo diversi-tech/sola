@@ -1,4 +1,5 @@
 import axios from 'axios'; 
+const META_API_BASE_URL = 'https://graph.facebook.com/v18.0';
 export const checkVerifyToken = (mode: string, token: string): boolean => {
   const verification_token = process.env.VERIFY_TOKEN;
   return mode === 'subscribe' && token === verification_token;
@@ -12,12 +13,13 @@ const sendReadReceipt = async (messageId: string): Promise<void> => {
   const phoneNumberId = process.env.META_PHONE_NUMBER_ID;
 
   if (!accessToken || !phoneNumberId) {
-    console.error("❌ Missing Meta credentials in environment variables");
+    console.error(" Missing Meta credentials in environment variables");
     return;
   }
 
   try {
-    const url = `https://graph.facebook.com/v18.0/${phoneNumberId}/messages`;
+    const url = `${META_API_BASE_URL}/${phoneNumberId}/messages`;
+   
     
     const payload = {
       messaging_product: "whatsapp",
@@ -32,9 +34,9 @@ const sendReadReceipt = async (messageId: string): Promise<void> => {
       }
     });
 
-    console.log(`✅ Read receipt sent successfully for message ID: ${messageId}`);
+    console.log(` Read receipt sent successfully for message ID: ${messageId}`);
   } catch (error) {
-    console.error("⚠️ Failed to send read receipt to Meta (Bot is still running):", error);
+    console.error(" Failed to send read receipt to Meta (Bot is still running):", error);
   }
 };
 
@@ -61,12 +63,12 @@ export const processWebhookEvent = (body: any) => {
                 
                 let senderPhoneNumber = extractedPhoneNumber; 
                 
-                console.log("✅ Success! Extracted phone number:", senderPhoneNumber);
+                console.log(" Success! Extracted phone number:", senderPhoneNumber);
                 
                 return senderPhoneNumber;
                 
             } else {
-                console.error("❌ Validation failed: Phone number is missing or invalid");
+                console.error(" Validation failed: Phone number is missing or invalid");
             }
         }
     }
