@@ -11,7 +11,7 @@ concurrency:
 
 # ── Per-project config (the only lines that differ between repos) ──
 env:
-  PROJECT_NAME: sola
+  PROJECT_NAME: sola-security
   PUBLISH_DIR: packages/frontend/build
   BUILD_CMD: npm ci && npm run build --workspace=packages/shared && CI=false npm run build --workspace=packages/frontend
 
@@ -21,12 +21,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Compute team label
+        run: |
+          case "$GITHUB_REF_NAME" in
+            main) TEAM="production" ;;
+            *-[0-9]|*-[0-9][0-9]) TEAM="Team ${GITHUB_REF_NAME##*-}" ;;
+            *) TEAM="$GITHUB_REF_NAME" ;;
+          esac
+          echo "TEAM=$TEAM" >> "$GITHUB_ENV"
+
       - name: Notify build started
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          MSG=$(printf '🟡 *%s* — build started\n• branch: `%s`\n• %s by %s' "$PROJECT_NAME" "$GITHUB_REF_NAME" "${GITHUB_SHA:0:7}" "$GITHUB_ACTOR")
-          curl -s -X POST "$SLACK_WEBHOOK_URL" -H 'Content-Type: application/json' --data "$(jq -n --arg t "$MSG" '{text:$t}')"
+          set +e
+          TITLE="🟡 $PROJECT_NAME · $TEAM"
+          BODY=$(printf '*Build started* · branch `%s`\n`%s` by %s' "$GITHUB_REF_NAME" "${GITHUB_SHA:0:7}" "$GITHUB_ACTOR")
+          curl -s -X POST "$SLACK_WEBHOOK_URL" -H 'Content-Type: application/json' \
+            --data "$(jq -n --arg t "$TITLE" --arg b "$BODY" '{blocks:[{type:"header",text:{type:"plain_text",text:$t,emoji:true}},{type:"section",text:{type:"mrkdwn",text:$b}}]}')"
 
       - uses: actions/setup-node@v4
         with:
@@ -48,7 +60,13 @@ jobs:
           set -eo pipefail
           npx wrangler@3 pages project create "$PROJECT_NAME" --production-branch=main 2>/dev/null || true
           npx wrangler@3 pages deploy "$PUBLISH_DIR" --project-name="$PROJECT_NAME" --branch="$GITHUB_REF_NAME" 2>&1 | tee deploy.log
-          URL=$(grep -oE 'https://[a-z0-9.-]+\.pages\.dev' deploy.log | tail -1)
+          SUB=$(curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$PROJECT_NAME" | jq -r '.result.subdomain')
+          if [ "$GITHUB_REF_NAME" = "main" ]; then
+            URL="https://$SUB"
+          else
+            ALIAS=$(printf '%s' "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//' | cut -c1-28)
+            URL="https://$ALIAS.$SUB"
+          fi
           echo "url=$URL" >> "$GITHUB_OUTPUT"
 
       - name: Notify success
@@ -56,8 +74,11 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          MSG=$(printf '✅ *%s* — deployed\n• branch: `%s`\n• %s' "$PROJECT_NAME" "$GITHUB_REF_NAME" "${{ steps.deploy.outputs.url }}")
-          curl -s -X POST "$SLACK_WEBHOOK_URL" -H 'Content-Type: application/json' --data "$(jq -n --arg t "$MSG" '{text:$t}')"
+          set +e
+          TITLE="✅ $PROJECT_NAME · $TEAM"
+          BODY=$(printf '*Deployed* · branch `%s`\n<%s>\n`%s` by %s' "$GITHUB_REF_NAME" "${{ steps.deploy.outputs.url }}" "${GITHUB_SHA:0:7}" "$GITHUB_ACTOR")
+          curl -s -X POST "$SLACK_WEBHOOK_URL" -H 'Content-Type: application/json' \
+            --data "$(jq -n --arg t "$TITLE" --arg b "$BODY" '{blocks:[{type:"header",text:{type:"plain_text",text:$t,emoji:true}},{type:"section",text:{type:"mrkdwn",text:$b}}]}')"
 
       - name: Notify failure with error
         if: failure()
@@ -65,7 +86,9 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           set +e
-          LOG="$( { [ -f build.log ] && tail -c 2500 build.log; [ -f deploy.log ] && { echo; echo '--- deploy ---'; tail -c 800 deploy.log; }; } 2>/dev/null )"
+          LOG="$( { [ -f build.log ] && tail -c 2000 build.log; [ -f deploy.log ] && { echo; echo '--- deploy ---'; tail -c 500 deploy.log; }; } 2>/dev/null )"
           [ -z "$LOG" ] && LOG="(no logs captured)"
-          MSG=$(printf '❌ *%s* — build FAILED\n• branch: `%s`\n• %s by %s\n```\n%s\n```' "$PROJECT_NAME" "$GITHUB_REF_NAME" "${GITHUB_SHA:0:7}" "$GITHUB_ACTOR" "$LOG")
-          curl -s -X POST "$SLACK_WEBHOOK_URL" -H 'Content-Type: application/json' --data "$(jq -n --arg t "$MSG" '{text:$t}')"
+          TITLE="❌ $PROJECT_NAME · $TEAM"
+          BODY=$(printf '*Build FAILED* · branch `%s`\n`%s` by %s' "$GITHUB_REF_NAME" "${GITHUB_SHA:0:7}" "$GITHUB_ACTOR")
+          curl -s -X POST "$SLACK_WEBHOOK_URL" -H 'Content-Type: application/json' \
+            --data "$(jq -n --arg t "$TITLE" --arg b "$BODY" --arg log "$LOG" '{blocks:[{type:"header",text:{type:"plain_text",text:$t,emoji:true}},{type:"section",text:{type:"mrkdwn",text:$b}},{type:"section",text:{type:"mrkdwn",text:("```\n"+$log+"\n```")}}]}')"
