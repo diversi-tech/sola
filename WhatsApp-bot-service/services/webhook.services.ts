@@ -25,6 +25,23 @@ export const processWebhookEvent = (body: any) => {
                 
                 console.log("✅ Success! Extracted phone number:", senderPhoneNumber);
                 
+            
+                const messageType = message.type;
+                console.log(`🔍 Classifying message content type: ${messageType}`);
+
+                if (messageType === 'text') {
+                    console.log(" Message type is text. Proceeding to Task 8 path.");
+                  
+                    
+                } else if (messageType === 'audio') {
+                    console.log(" Message type is audio. Switching to Task 9 transcription path.");
+                   
+                    
+                } else {
+                    console.log(`⚠️ Unknown message type received: ${messageType}`);
+                }
+                
+               
                 return senderPhoneNumber;
                 
             } else {
