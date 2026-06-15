@@ -3,6 +3,7 @@ import { Response } from 'express';
 
 export enum HttpStatusCode {
   OK = 200,
+  CREATED = 201,
   BAD_REQUEST = 400,
   UNAUTHORIZED = 401,
   FORBIDDEN = 403,
@@ -13,6 +14,10 @@ export enum HttpStatusCode {
 
 export const sendSuccessResult = (res: Response, data: any, statusCode: HttpStatusCode = HttpStatusCode.OK) => {
   return res.status(statusCode).json({ success: true, data });
+};
+
+export const sendCreatedResult = (res: Response, data: any) => {
+  return res.status(HttpStatusCode.CREATED).json({ success: true, data });
 };
 
 export const sendErrorResult = (res: Response, message: string, statusCode: HttpStatusCode = HttpStatusCode.INTERNAL_SERVER_ERROR) => {

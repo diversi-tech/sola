@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { processAndSaveReport } from '../services/employee.service.js'; // ייבוא של הסרביס
-import { sendSuccessResult, sendErrorResult } from '../utils/responseHandler.js';
+import { sendCreatedResult, sendErrorResult } from '../utils/responseHandler.js';
 
 export const analyzeAndParseFeedback = async (req: Request, res: Response) => {
     try {
@@ -8,10 +8,10 @@ export const analyzeAndParseFeedback = async (req: Request, res: Response) => {
 
         const savedReport = await processAndSaveReport(manager_id, text);
 
-        return sendSuccessResult(res, {
+        return sendCreatedResult(res, {
             message: "Report successfully processed and saved!",
             savedReport: savedReport
-        }, 200);
+        });
 
     } catch (error: any) {
         console.error("Error saving to database:", error.message || error);
