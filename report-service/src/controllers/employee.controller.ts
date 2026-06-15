@@ -11,7 +11,7 @@ export const analyzeAndParseFeedback = async (req: Request, res: Response) => {
         return sendSuccessResult(res, {
             message: "Report successfully processed and saved!",
             savedReport: savedReport
-        }, 201);
+        }, 200);
 
     } catch (error: any) {
         console.error("Error saving to database:", error.message || error);
