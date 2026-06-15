@@ -1,8 +1,8 @@
 import 'dotenv/config'; 
 import OpenAI from 'openai';
 
-// חיבור לשרת הענן החינמי של GitHub
-const openai = new OpenAI({
+// עכשיו הוספנו export כדי ששאר הפרויקט יוכל להשתמש בזה!
+export const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, 
   baseURL: "https://models.inference.ai.azure.com" // השרת החינמי של גיטהאב (פתוח בנטפרי!)
 });
@@ -24,4 +24,5 @@ async function testGithubConnection() {
   }
 }
 
-testGithubConnection();
+// שמים בהערה את ההפעלה האוטומטית כדי שזה לא ירוץ סתם בכל פעם שמייבאים את הקובץ
+// testGithubConnection();
