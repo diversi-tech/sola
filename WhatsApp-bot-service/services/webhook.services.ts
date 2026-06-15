@@ -20,21 +20,20 @@ export const processWebhookEvent = (body: any) => {
 
             if (typeof extractedPhoneNumber === 'string' && extractedPhoneNumber.trim() !== '') {
                 let senderPhoneNumber = extractedPhoneNumber; 
-                console.log("✅ Success! Extracted phone number:", senderPhoneNumber);
+                console.log(" Success! Extracted phone number:", senderPhoneNumber);
                 
-                // --- Task #46: Pack the Phone Number ---
+             
                 const authPayload = { 
                     "phoneNumber": senderPhoneNumber 
                 };
-                console.log("📦 Packed auth payload:", authPayload);
-                // ---------------------------------------
-
-                // כרגע נחזיר את האובייקט הארוז במקום סתם את המחרוזת
+                console.log(" Packed auth payload:", authPayload);
+          
                 return authPayload; 
             } else {
-                console.error("❌ Validation failed: Phone number is missing or invalid");
+                console.error(" Validation failed: Phone number is missing or invalid");
             }
         }
-        // ...
+        
+     
     }
 };

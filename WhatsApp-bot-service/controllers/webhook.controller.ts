@@ -21,6 +21,7 @@ export const verifyMetaWebhook = (req: Request, res: Response) => {
     return res.sendStatus(400);
 };
 
+
 // POST (receive webhook events from Meta)
 export const receiveWebhookEvent = (req: Request, res: Response) => {
     const body = req.body;
@@ -30,3 +31,4 @@ export const receiveWebhookEvent = (req: Request, res: Response) => {
     
     res.status(200).send('EVENT_RECEIVED');
 };
+
