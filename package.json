@@ -14,10 +14,13 @@
     "install:all": "npm install && npm install --workspace=packages/backend && npm install --workspace=packages/frontend && npm install --workspace=packages/shared"
   },
   "devDependencies": {
+    "@types/multer": "^2.1.0",
+    "@types/streamifier": "^0.1.2",
     "concurrently": "^8.2.2"
   },
   "dependencies": {
     "express": "^5.2.1",
-    "multer": "^2.2.0"
+    "multer": "^2.2.0",
+    "streamifier": "^0.1.1"
   }
 }
