@@ -17,7 +17,6 @@ export const processAudioRequest = async (req: Request, res: Response): Promise<
         message: errorMessage,
         status: "400"
       });
-
       res.status(400).json({ error: errorMessage });
       return;
     }
