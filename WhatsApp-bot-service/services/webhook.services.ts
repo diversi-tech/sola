@@ -33,15 +33,7 @@ export const checkVerifyToken = (mode: string, token: string): boolean => {
     return mode === 'subscribe' && token === verification_token;
 };
 
-export const sendToReports = async (data: ReportIncomingData): Promise<boolean> => {
-    try {
-        console.log(` Sending data to Reports Service:`, JSON.stringify(data, null, 2));
-        return true;
-    } catch (error) {
-        console.error("Failed to send data to Reports Service:", error);
-        return false;
-    }
-};
+
 
 
 export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: boolean; phoneNumber?: string } | null> => {    console.log(': Received webhook event in service:', JSON.stringify(body, null, 2));
@@ -62,14 +54,15 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
                     return { isAuthorized: false, phoneNumber: senderPhoneNumber }; 
                 }
 
-                console.log(`User is authorized! Real UserID is: ${authResult.userId}`);
-                const messageType = message.type;
+                    const userId = authResult.userId; 
+                    console.log("User Authorized");
+                    console.log(`Real UserID is: ${userId}`);
 
-                // 2. ניתוב לפי סוג הודעה
+                    const messageType = message.type;
                 if (messageType === 'text') {
                     console.log("Message type is text.");
                     const reportData: ReportIncomingData = {
-                        userId: authResult.userId, 
+                        userId: userId, 
                         content: message.text?.body || '',
                         messageId: message.id,
                         timestamp: String(message.timestamp)
