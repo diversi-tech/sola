@@ -1,7 +1,9 @@
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
+import dns from 'dns'; 
 
+dns.setDefaultResultOrder('ipv4first');
 export const downloadAudioFile = async (mediaId: string): Promise<string | null> => {
     const accessToken = process.env.META_ACCESS_TOKEN;
     const META_API_BASE_URL = 'https://graph.facebook.com/v18.0';
