@@ -9,6 +9,7 @@ export const sendToReports = async (data: ReportIncomingData): Promise<boolean> 
             console.log("Reports Service received the data successfully!");
             return true;
         }
+        
         return false;
     } catch (error) {
         console.error("Failed to send data to Reports Service:", error);
