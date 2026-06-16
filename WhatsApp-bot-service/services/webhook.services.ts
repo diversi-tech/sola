@@ -33,8 +33,10 @@ export const checkVerifyToken = (mode: string, token: string): boolean => {
     return mode === 'subscribe' && token === verification_token;
 };
 
-export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: boolean; phoneNumber?: string } | null> => {
-    console.log(': Received webhook event in service:', JSON.stringify(body, null, 2));
+
+
+
+export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: boolean; phoneNumber?: string } | null> => {    console.log(': Received webhook event in service:', JSON.stringify(body, null, 2));
 
     if (body.object === WHATSAPP_BUSINESS) {
         const messages = body.entry?.[0]?.changes?.[0]?.value?.messages;
@@ -52,14 +54,15 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
                     return { isAuthorized: false, phoneNumber: senderPhoneNumber }; 
                 }
 
-                console.log(`User is authorized! Real UserID is: ${authResult.userId}`);
-                const messageType = message.type;
+                    const userId = authResult.userId; 
+                    console.log("User Authorized");
+                    console.log(`Real UserID is: ${userId}`);
 
-                // 2. ניתוב לפי סוג הודעה
+                    const messageType = message.type;
                 if (messageType === 'text') {
                     console.log("Message type is text.");
                     const reportData: ReportIncomingData = {
-                        userId: authResult.userId, 
+                        userId: userId, 
                         content: message.text?.body || '',
                         messageId: message.id,
                         timestamp: String(message.timestamp)
