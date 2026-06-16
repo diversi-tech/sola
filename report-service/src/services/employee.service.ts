@@ -1,7 +1,6 @@
 import { supabase } from '../config/supabase.js';
 import { openai } from '../ai/test-ai.js';
 
-// Sara did
 export const buildAiConfiguration = (text: string, categories: string[]) => {
     const categoriesString = categories.join(", ");
 
@@ -12,6 +11,7 @@ export const buildAiConfiguration = (text: string, categories: string[]) => {
   Finally, extract the full name of the employee mentioned in the feedback text.`;
 
     const dynamicMetricProperties: Record<string, any> = {};
+
     categories.forEach(category => {
         dynamicMetricProperties[category] = {
             type: ["number", "null"] as any,
@@ -43,13 +43,11 @@ export const buildAiConfiguration = (text: string, categories: string[]) => {
                             type: "string",
                             description: "A short summary of the feedback"
                         },
-                        // הנה התוספת שלנו! מבקשים מ-OpenAI את השם
                         employee_name: {
                             type: ["string", "null"] as any,
                             description: "The full name of the employee mentioned in the text, or null if no name is found."
                         }
                     },
-                    // הוספנו את השם לכאן כדי שהוא יהיה חייב להחזיר אותו
                     required: ["metric_scores", "text_summary", "employee_name"],
                     additionalProperties: false
                 }
@@ -58,7 +56,6 @@ export const buildAiConfiguration = (text: string, categories: string[]) => {
     };
 };
 
-// Gili did
 export const extractEmployeeMetrics = async (text: string) => {
     try {
         const { data: categoriesData, error } = await supabase
@@ -73,6 +70,8 @@ export const extractEmployeeMetrics = async (text: string) => {
         const categoryNames = categoriesData.map(c => c.name);
         const aiConfig = buildAiConfiguration(text, categoryNames);
         const response = await openai.chat.completions.create(aiConfig);
+        //   const response = await aiInterfaceService.process();
+
         const contentString = response.choices[0].message.content;
 
         if (!contentString) {
@@ -89,7 +88,6 @@ export const extractEmployeeMetrics = async (text: string) => {
 
 export const processAndSaveReport = async (manager_id: number, text: string) => {
     try {
-        // 1. קבלת כל הנתונים מה-AI (כולל השם שחילצנו!)
         const llmMetrics = await extractEmployeeMetrics(text);
         const extractedName = llmMetrics.employee_name;
 
@@ -97,27 +95,25 @@ export const processAndSaveReport = async (manager_id: number, text: string) => 
             throw new Error("The AI could not identify an employee name in the text.");
         }
 
-        // 2. חיפוש העובד בטבלת Employees לפי השם שה-AI חילץ
         const { data: employeeData, error: employeeError } = await supabase
             .from('Employees')
             .select('id')
-            .eq('name', extractedName) // מוצא מישהו שהשם שלו שווה לשם שחולץ
-            .single(); // מבקש מהמסד להחזיר רק תוצאה אחת מדויקת
+            .eq('name', extractedName)
+            .single();
 
-        // אם יש שגיאה בחיפוש או שהעובד פשוט לא קיים בטבלה
         if (employeeError || !employeeData) {
             throw new Error(`Employee named '${extractedName}' was not found in the database.`);
         }
 
-        // 3. בניית הנתונים לשמירה עם ה-ID האמיתי שמצאנו!
+
         const realData = {
-            employee_id: employeeData.id, // <--- הקסם קורה פה! דינמי לחלוטין
-            manager_id: manager_id || 2,
+            employee_id: employeeData.id,
+            manager_id: manager_id || null,
             metric_scores: llmMetrics.metric_scores,
             text_summary: llmMetrics.text_summary
         };
 
-        // 4. שמירת הדיווח הסופי בטבלת Reports
+
         const { data, error } = await supabase
             .from('Reports')
             .insert([realData])
