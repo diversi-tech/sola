@@ -30,6 +30,9 @@ export const processWebhookEvent = async (body: any) => {
     if (body.object === WHATSAPP_BUSINESS) {
         const messages = body.entry?.[0]?.changes?.[0]?.value?.messages;
 
+        
+        
+    
         if (messages?.length) {
             const message = messages[0];
             const extractedPhoneNumber = message.from; 
@@ -37,6 +40,15 @@ export const processWebhookEvent = async (body: any) => {
             if (typeof extractedPhoneNumber === 'string' && extractedPhoneNumber.trim() !== '') {
                 let senderPhoneNumber = extractedPhoneNumber; 
                 console.log(" Success! Extracted phone number:", senderPhoneNumber);
+                
+             
+                const authPayload = { 
+                    "phoneNumber": senderPhoneNumber 
+                    
+                };
+                console.log(" Packed auth payload:", authPayload);
+          
+                return authPayload; 
                 
                 const messageType = message.type;
                 console.log(` Classifying message content type: ${messageType}`);
@@ -70,6 +82,7 @@ export const processWebhookEvent = async (body: any) => {
                 console.error(" Validation failed: Phone number is missing or invalid");
             }
         }
-        // ...
+        
+     
     }
 };
