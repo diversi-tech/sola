@@ -3,6 +3,9 @@ import 'dotenv/config';
 import express from 'express';
 import authRoutes from './routes/authorization.routes.js'; 
 import { errorHandler } from './middlewares/errorHandler.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
@@ -11,7 +14,6 @@ app.use(express.json());
 
 app.use('/auth', authRoutes);
 
-// ... אחרי ה-import של dotenv
 console.log("Check Env:", {
     port: process.env.PORT,
     supabaseUrl: process.env.SUPABASE_URL,
