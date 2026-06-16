@@ -1,9 +1,32 @@
-import { verifyUserAuth } from './auth.sevices'; 
+import { verifyUserAuth } from './auth.services'; 
 import { ReportIncomingData } from '../types/reports.types';
+import axios from 'axios';
 
 declare const process: any;
 
 const WHATSAPP_BUSINESS = 'whatsapp_business_account';
+
+export const sendWhatsAppMessage = async (to: string, text: string) => {
+    try {
+        const token = process.env.WHATSAPP_TOKEN;
+        const phone_number_id = process.env.PHONE_NUMBER_ID; //our WhatsApp Business Account phone number ID
+
+        await axios.post(
+            `https://graph.facebook.com/v17.0/${phone_number_id}/messages`,
+            {
+                messaging_product: "whatsapp",
+                to: to,
+                text: { body: text },
+            },
+            {
+                headers: { Authorization: `Bearer ${token}` }
+            }
+        );
+        console.log(` Message sent successfully to ${to}`);
+    } catch (error) {
+        console.error(" Failed to send WhatsApp message:", error);
+    }
+};
 
 export const checkVerifyToken = (mode: string, token: string): boolean => {
     const verification_token = process.env.VERIFY_TOKEN;
@@ -20,8 +43,8 @@ export const sendToReports = async (data: ReportIncomingData): Promise<boolean> 
     }
 };
 
-export const processWebhookEvent = async (body: any) => {
-    console.log(': Received webhook event in service:', JSON.stringify(body, null, 2));
+
+export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: boolean; phoneNumber?: string } | null> => {    console.log(': Received webhook event in service:', JSON.stringify(body, null, 2));
 
     if (body.object === WHATSAPP_BUSINESS) {
         const messages = body.entry?.[0]?.changes?.[0]?.value?.messages;
@@ -40,7 +63,7 @@ export const processWebhookEvent = async (body: any) => {
                 
                 if (!authResult.isAuthorized) {
                     console.error(" Unauthorized User! Stopping process. Message:", authResult.message);
-                    return; 
+                    return { isAuthorized: false, phoneNumber: senderPhoneNumber }; 
                 }
 
                 console.log(` User is authorized! Real UserID is: ${authResult.userId}`);
@@ -76,9 +99,11 @@ export const processWebhookEvent = async (body: any) => {
                 } else {
                     console.log(` Unknown message type received: ${messageType}`);
                 }
+                return { isAuthorized: true, phoneNumber: senderPhoneNumber };
             } else {
                 console.error(" Validation failed: Phone number is missing or invalid");
             }
         }
     }
+    return null;
 };
