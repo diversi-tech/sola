@@ -33,9 +33,6 @@ export const checkVerifyToken = (mode: string, token: string): boolean => {
     return mode === 'subscribe' && token === verification_token;
 };
 
-
-
-
 export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: boolean; phoneNumber?: string } | null> => {    console.log(': Received webhook event in service:', JSON.stringify(body, null, 2));
 
     if (body.object === WHATSAPP_BUSINESS) {
@@ -46,8 +43,17 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
             const senderPhoneNumber = message.from;
 
             if (typeof senderPhoneNumber === 'string' && senderPhoneNumber.trim() !== '') {
-                // 1. אימות המשתמש
-                const authResult = await verifyUserAuth({ "phoneNumber": senderPhoneNumber });
+              
+                let authResult;
+                const authPayload = { "phoneNumber": senderPhoneNumber };
+
+                if (process.env.USE_MOCK_AUTH === 'true') {
+                    console.log(" DEV MODE: Bypassing Auth Service.");
+                    authResult = { isAuthorized: true, userId: "mock_user_123", message: "Dev bypass" };
+                } 
+                else {
+                    authResult = await verifyUserAuth(authPayload);
+                }
                 
                 if (!authResult.isAuthorized) {
                     console.error(" Unauthorized User! Stopping process. Message:", authResult.message);
