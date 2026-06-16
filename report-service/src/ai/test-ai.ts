@@ -1,28 +1,8 @@
 import 'dotenv/config'; 
 import OpenAI from 'openai';
 
-// עכשיו הוספנו export כדי ששאר הפרויקט יוכל להשתמש בזה!
+// יצירת החיבור וייצוא שלו לשאר חלקי המערכת
 export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, 
-  baseURL: "https://models.inference.ai.azure.com" // השרת החינמי של גיטהאב (פתוח בנטפרי!)
+    apiKey: process.env.OPENAI_API_KEY, 
+    baseURL: "https://models.inference.ai.azure.com" 
 });
-
-async function testGithubConnection() {
-  console.log("🔋 מנסה להתחבר ל-GPT-4o-mini החינמי של GitHub...");
-  
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // המודל המדויק מהמשימה שלך!
-      messages: [{ role: "user", content: "Say 'Hello World from GitHub Models'" }],
-      max_tokens: 10,
-    });
-
-    console.log("✅ החיבור הצליח באופן מאובטח דרך הענן!");
-    console.log("תשובת המודל:", response.choices[0].message.content);
-  } catch (error: any) {
-    console.error("❌ שגיאה בחיבור:", error.message);
-  }
-}
-
-// שמים בהערה את ההפעלה האוטומטית כדי שזה לא ירוץ סתם בכל פעם שמייבאים את הקובץ
-// testGithubConnection();
