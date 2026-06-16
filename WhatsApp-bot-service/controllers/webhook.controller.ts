@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
-import { checkVerifyToken, processWebhookEvent } from '../services/webhook.services';
+import { checkVerifyToken, processWebhookEvent, sendWhatsAppMessage } from '../services/webhook.services';
 
+const handleUnauthorizedAccess = async (res: Response, phoneNumber: string) => {
+    await sendWhatsAppMessage(phoneNumber, "Sorry, you are not authorized to use this bot.");
+    return res.status(200).send('EVENT_RECEIVED');
+};
 // GET (verify webhook with Meta)
 export const verifyMetaWebhook = (req: Request, res: Response) => {
     const mode = req.query['hub.mode'] as string;
@@ -23,12 +27,14 @@ export const verifyMetaWebhook = (req: Request, res: Response) => {
 
 
 // POST (receive webhook events from Meta)
-export const receiveWebhookEvent = (req: Request, res: Response) => {
-    const body = req.body;
+export const receiveWebhookEvent = async (req: Request, res: Response) => {
+    const body = req.body;
 
-    processWebhookEvent(body);
+    const authResult = await processWebhookEvent(body);
 
-    
-    res.status(200).send('EVENT_RECEIVED');
+if (authResult && authResult.isAuthorized === false && authResult.phoneNumber) {
+    return await handleUnauthorizedAccess(res, authResult.phoneNumber);
+}
+
+    res.status(200).send('EVENT_RECEIVED');
 };
-
