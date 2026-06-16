@@ -1,17 +1,16 @@
 import { Request, Response } from 'express';
 import * as audioService from '../services/audio.service';
-import * as errorHandlerService from '../services/error-handler.service'; 
+import * as errorHandlerService from '../services/error-handler.service';
 
 const MAX_SIZE_BYTES = 25 * 1024 * 1024;
 
 export const processAudioRequest = async (req: Request, res: Response): Promise<void> => {
-  
   let currentUserId: string | undefined = req.body?.userId;
 
   try {
     if (!req.file) {
       const errorMessage = 'Bad Request: No audio file provided.';
-      
+
       await errorHandlerService.handleProcessResult(
         currentUserId || 'unknown',
         errorMessage,
@@ -24,42 +23,45 @@ export const processAudioRequest = async (req: Request, res: Response): Promise<
 
     if (!currentUserId) {
       const errorMessage = 'Bad Request: Missing userId.';
-      
+
       await errorHandlerService.handleProcessResult(
-         'unknown',
-         errorMessage,
-         "400"
+        'unknown',
+        errorMessage,
+        "400"
       );
 
       res.status(400).json({ error: errorMessage });
       return;
     }
 
-   
     if (req.file.size > MAX_SIZE_BYTES) {
       const errorMessage = 'Payload Too Large: Audio file exceeds 25MB limit.';
-      
+
       await errorHandlerService.handleProcessResult(
-         currentUserId,
-         errorMessage,
-         "413"
+        currentUserId,
+        errorMessage,
+        "413"
       );
 
       res.status(413).json({ error: errorMessage });
       return;
     }
 
-    const transcriptionResult = await audioService.handleAudioProcessingPipeline(req.file, { userId: currentUserId });
+
+    const transcriptionResult = await audioService.handleAudioProcessingPipeline(
+      req.file,
+      currentUserId
+    );
 
     await errorHandlerService.handleProcessResult(
       currentUserId,
-       transcriptionResult,
-       "200"
+      transcriptionResult,
+      "200"
     );
 
-    res.status(200).json({ 
+    res.status(200).json({
       status: 'success',
-      text: transcriptionResult 
+      text: transcriptionResult
     });
 
   } catch (error: any) {
@@ -68,11 +70,11 @@ export const processAudioRequest = async (req: Request, res: Response): Promise<
     const errorMessage = error?.message || 'Audio processing failed during transcription.';
 
     await errorHandlerService.handleProcessResult(
-      
-      
-        currentUserId || 'unknown',
-       errorMessage,
-       "500"
+
+
+      currentUserId || 'unknown',
+      errorMessage,
+      "500"
     );
 
     res.status(500).json({ error: errorMessage });
