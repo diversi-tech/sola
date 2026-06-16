@@ -13,6 +13,7 @@ export const processWebhookEvent = (body: any) => {
         const messages = body.entry?.[0]?.changes?.[0]?.value?.messages;
 
         
+        
     
         if (messages?.length) {
             const message = messages[0];
