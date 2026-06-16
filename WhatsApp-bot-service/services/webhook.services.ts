@@ -25,6 +25,7 @@ export const processWebhookEvent = (body: any) => {
              
                 const authPayload = { 
                     "phoneNumber": senderPhoneNumber 
+                    
                 };
                 console.log(" Packed auth payload:", authPayload);
           
