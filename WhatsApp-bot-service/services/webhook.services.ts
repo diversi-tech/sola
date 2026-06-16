@@ -22,9 +22,9 @@ export const sendWhatsAppMessage = async (to: string, text: string) => {
                 headers: { Authorization: `Bearer ${token}` }
             }
         );
-        console.log(` Message sent successfully to ${to}`);
+        console.log(`Message sent successfully to ${to}`);
     } catch (error) {
-        console.error(" Failed to send WhatsApp message:", error);
+        console.error("Failed to send WhatsApp message:", error);
     }
 };
 
@@ -33,18 +33,8 @@ export const checkVerifyToken = (mode: string, token: string): boolean => {
     return mode === 'subscribe' && token === verification_token;
 };
 
-export const sendToReports = async (data: ReportIncomingData): Promise<boolean> => {
-    try {
-        console.log(` Sending data to Reports Service:`, JSON.stringify(data, null, 2));
-        return true;
-    } catch (error) {
-        console.error("Failed to send data to Reports Service:", error);
-        return false;
-    }
-};
-
-
-export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: boolean; phoneNumber?: string } | null> => {    console.log(': Received webhook event in service:', JSON.stringify(body, null, 2));
+export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: boolean; phoneNumber?: string } | null> => {
+    console.log(': Received webhook event in service:', JSON.stringify(body, null, 2));
 
     if (body.object === WHATSAPP_BUSINESS) {
         const messages = body.entry?.[0]?.changes?.[0]?.value?.messages;
@@ -58,7 +48,7 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
                 const authResult = await verifyUserAuth({ "phoneNumber": senderPhoneNumber });
                 
                 if (!authResult.isAuthorized) {
-                    console.error(" Unauthorized User! Stopping process. Message:", authResult.message);
+                    console.error("Unauthorized User! Stopping process. Message:", authResult.message);
                     return { isAuthorized: false, phoneNumber: senderPhoneNumber }; 
                 }
 
@@ -82,13 +72,22 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
                     
                     if (mediaId) {
                         const filePath = await downloadAudioFile(mediaId);
-                        if (filePath) {
-                            console.log("Audio file downloaded successfully for further processing.");
+                        
+                        // --- השינוי שלנו: הגנה במקרה של כישלון בהורדה ---
+                        if (!filePath) {
+                            console.error("Audio download failed, stopping processing.");
+                            // מחזירים שהמשתמש מורשה (כי האימות עבר), אבל עוצרים את המשך הריצה
+                            return { isAuthorized: true, phoneNumber: senderPhoneNumber }; 
                         }
+                        
+                        console.log("Audio file downloaded successfully for further processing.");
+                    } else {
+                        console.error("Audio message received but no media ID found.");
                     }
                 } else {
                     console.log(`Unknown message type received: ${messageType}`);
                 }
+                
                 return { isAuthorized: true, phoneNumber: senderPhoneNumber };
             } else {
                 console.error("Validation failed: Phone number is missing or invalid");
