@@ -17,17 +17,16 @@ export const reportService = {
   },
 
   // שליפת דוח בודד לפי ID
-  async getReportById(id: number): Promise<IReport> {
+  async getReportById(id: number): Promise<IReport[]> {
     const { data, error } = await supabase
       .from('Reports')
       .select('*')
-      .eq('id', id)
-      .single();
+      .eq('employee_id', id);
 
     if (error) {
       throw new Error(`שגיאה בשליפת דוח: ${error.message}`);
     }
 
-    return data as IReport;
+    return data as IReport[];
   }
 };
