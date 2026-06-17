@@ -1,3 +1,7 @@
+// מעקף חובה עבור סינון האינטרנט (נטפרי) בסביבת פיתוח
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+import dns from 'dns';
+if (dns && dns.setDefaultResultOrder) { dns.setDefaultResultOrder('ipv4first'); }
 import express from 'express';
 // import meetingRoutes from './routes/meeting.routes';
 // import { errorHandler } from './middleware/error.middleware';
