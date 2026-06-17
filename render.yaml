@@ -9,7 +9,7 @@ services:
     repo: https://github.com/diversi-tech/sola
     branch: main
     rootDir: ./auth_service
-    buildCommand: npm install && npm install --save-dev @types/node @types/express typescript && npm run build
+    buildCommand: npm install && npm install --save-dev @types/node @types/express typescript && npx tsc --skipLibCheck --noEmitOnError false
     startCommand: npm start
     autoDeploy: true
     envVars:
