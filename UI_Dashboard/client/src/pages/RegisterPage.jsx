@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom'; // הוספת הייבוא החשוב הזה
-import Input from '../components/Input';
-import Button from '../components/Button';
+import Input from '../features/login/components/Input';
+import Button from '../features/login/components/Button';
 function RegisterPage() {
 
   const handleGoogleClick = async () => {
