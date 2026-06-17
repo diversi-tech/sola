@@ -5,13 +5,13 @@ services:
 # 1. שירות אימות (Auth Service)
 # ==========================================
   - type: web
-    name: auth_service
+    name: auth-service
     env: node
     plan: free
     repo: https://github.com/diversi-tech/sola
     branch: main
-    rootDir: ./auth_service                     
-    buildCommand: npm install && npm run build
+    rootDir: ./auth_service
+    buildCommand: npm install express @supabase/supabase-js && npm install --save-dev @types/express @types/node typescript && npm run build
     startCommand: npm start
     autoDeploy: true
     envVars:
