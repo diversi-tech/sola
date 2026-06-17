@@ -1,24 +1,63 @@
-services:
+# services:
 
+#   - type: web
+#     name: speach-to-text-service
+#     env: node
+#     plan: free
+#     repo: https://github.com/diversi-tech/sola
+#     branch: main
+#     rootDir: ./speach-to-text-service    
+#     buildCommand: npm ci && npm run build
+#     startCommand: npm start
+#     autoDeploy: true
+    
+#     envVars:
+#       - key: NODE_ENV
+#         value: production
+
+#       - key: AUTH_SERVICE_URL
+#         fromService:
+#           type: web 
+#           name: auth-service  
+#           property: host
+
+
+services:
+# ==========================================
+# 1. שירות אימות (Auth Service)
+# ==========================================
+  - type: web
+    name: auth-service
+    env: node
+    plan: free
+    repo: https://github.com/diversi-tech/sola
+    branch: main
+    rootDir: ./auth-service                     
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+# ==========================================
+# 2. שירות אודיו (Speech to Text Service)
+# ==========================================
   - type: web
     name: speach-to-text-service
     env: node
     plan: free
     repo: https://github.com/diversi-tech/sola
     branch: main
-    rootDir: ./speach-to-text-service    
-    buildCommand: npm ci && npm run build
+    rootDir: ./speach-to-text-service          
+    buildCommand: npm ci && npm run build       
     startCommand: npm start
-    autoDeploy: true
-    
+    autoDeploy: true                          
     envVars:
       - key: NODE_ENV
         value: production
-
       - key: AUTH_SERVICE_URL
         fromService:
           type: web
-          name: auth-service  
-          property: host
-
-     
+          name: auth-service
+          property: host    
