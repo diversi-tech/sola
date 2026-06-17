@@ -1,3 +1,4 @@
+//meeting.model.ts
 export type MeetingType = 'Frontal team meeting' | 'Online team meeting' | 'Online personal meeting' | 'Frontal personal meeting';
 export interface Meeting {
   meeting_id?: number;
