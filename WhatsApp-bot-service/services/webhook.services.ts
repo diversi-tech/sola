@@ -1,6 +1,7 @@
 import { verifyUserAuth } from './auth.services';
 import { downloadAudioFile } from './media.services';
 import { sendToReports } from './reports.service'; 
+import { transcribeAudioFile } from './stt.service'; 
 import { ReportIncomingData } from '../types/reports.types';
 import axios from 'axios';
 
@@ -33,10 +34,8 @@ export const checkVerifyToken = (mode: string, token: string): boolean => {
     return mode === 'subscribe' && token === verification_token;
 };
 
-
-
-
-export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: boolean; phoneNumber?: string } | null> => {    console.log(': Received webhook event in service:', JSON.stringify(body, null, 2));
+export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: boolean; phoneNumber?: string } | null> => {
+    console.log(': Received webhook event in service:', JSON.stringify(body, null, 2));
 
     if (body.object === WHATSAPP_BUSINESS) {
         const messages = body.entry?.[0]?.changes?.[0]?.value?.messages;
@@ -46,7 +45,7 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
             const senderPhoneNumber = message.from;
 
             if (typeof senderPhoneNumber === 'string' && senderPhoneNumber.trim() !== '') {
-                // 1. אימות המשתמש
+              
                 const authResult = await verifyUserAuth({ "phoneNumber": senderPhoneNumber });
                 
                 if (!authResult.isAuthorized) {
@@ -54,11 +53,12 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
                     return { isAuthorized: false, phoneNumber: senderPhoneNumber }; 
                 }
 
-                    const userId = authResult.userId; 
-                    console.log("User Authorized");
-                    console.log(`Real UserID is: ${userId}`);
+                const userId = authResult.userId; 
+                console.log("User Authorized");
+                console.log(`Real UserID is: ${userId}`);
 
-                    const messageType = message.type;
+                const messageType = message.type;
+                
                 if (messageType === 'text') {
                     console.log("Message type is text.");
                     const reportData: ReportIncomingData = {
@@ -76,14 +76,26 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
                     if (mediaId) {
                         const filePath = await downloadAudioFile(mediaId);
                         
-                        // --- השינוי שלנו: הגנה במקרה של כישלון בהורדה ---
+                    
                         if (!filePath) {
                             console.error("Audio download failed, stopping processing.");
-                            // מחזירים שהמשתמש מורשה (כי האימות עבר), אבל עוצרים את המשך הריצה
                             return { isAuthorized: true, phoneNumber: senderPhoneNumber }; 
                         }
                         
                         console.log("Audio file downloaded successfully for further processing.");
+
+                        
+                        const transcribedText = await transcribeAudioFile(filePath);
+
+                        if (!transcribedText) {
+                            console.error("STT transcription failed, stopping processing.");
+                            return { isAuthorized: true, phoneNumber: senderPhoneNumber };
+                        }
+
+                        console.log("STT transcription completed successfully!");
+
+                       
+                        
                     } else {
                         console.error("Audio message received but no media ID found.");
                     }
