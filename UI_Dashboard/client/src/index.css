@@ -1,9 +1,10 @@
-.login-page-wrapper {
+@import "tailwindcss";
+/* .login-page-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #0f172a; /* הרקע הכהה שאת אוהבת */
+  background-color: #0f172a; 
   font-family: sans-serif;
 }
 .login-form-container {
@@ -20,4 +21,4 @@
 .or-text { padding: 0 10px; color: #888; }
 
 
-
+ */
