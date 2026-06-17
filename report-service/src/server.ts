@@ -2,13 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config();
-import employeeRoutes from './routes/employee.routes.js';
+
+import reportRoutes from './routes/report.routes.js';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/employees', employeeRoutes);
+app.use('/api/reports', reportRoutes);
 
 const port = process.env.PORT || 5003;
 

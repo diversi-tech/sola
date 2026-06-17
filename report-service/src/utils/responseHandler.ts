@@ -1,6 +1,5 @@
 import { Response } from 'express';
 
-
 export enum HttpStatusCode {
   OK = 200,
   CREATED = 201,
@@ -11,7 +10,6 @@ export enum HttpStatusCode {
   INTERNAL_SERVER_ERROR = 500
 }
 
-
 export const sendSuccessResult = (res: Response, data: any, statusCode: HttpStatusCode = HttpStatusCode.OK) => {
   return res.status(statusCode).json({ success: true, data });
 };
@@ -20,8 +18,12 @@ export const sendCreatedResult = (res: Response, data: any) => {
   return res.status(HttpStatusCode.CREATED).json({ success: true, data });
 };
 
-export const sendErrorResult = (res: Response, message: string, statusCode: HttpStatusCode = HttpStatusCode.INTERNAL_SERVER_ERROR) => {
-  return res.status(statusCode).json({ success: false, error: message });
+export const sendErrorResult = (res: Response, message: string, statusCode: HttpStatusCode = HttpStatusCode.INTERNAL_SERVER_ERROR, additionalData?: any) => {
+    
+    if (additionalData) {
+        return res.status(statusCode).json({ success: false, error: message, data: additionalData });
+    }
+        return res.status(statusCode).json({ success: false, error: message });
 };
 
 export const sendBadRequestResult = (res: Response, message: string = 'Invalid or missing data') => {
