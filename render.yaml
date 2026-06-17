@@ -1,0 +1,24 @@
+services:
+
+  - type: web
+    name: speach-to-text-service
+    env: node
+    plan: free
+    repo: https://github.com/diversi-tech/sola
+    branch: main
+    rootDir: ./speach-to-text-service    
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    autoDeploy: true
+    
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: AUTH_SERVICE_URL
+        fromService:
+          type: web
+          name: auth-service  
+          property: host
+
+     
