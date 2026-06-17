@@ -6,6 +6,10 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "strict": true,
-    "esModuleInterop": true
-  }
+    "esModuleInterop": true,
+    "skipLibCheck": true,            
+    "lib": ["ES2022", "DOM"],     
+    "types": ["node"]               
+  },
+  "include": ["src/**/*"]
 }
