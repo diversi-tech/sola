@@ -68,6 +68,7 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
 
                 const messageType = message.type;
                 
+                
                 if (messageType === 'text') {
                     console.log("Message type is text.");
                     const reportData: ReportIncomingData = {
@@ -78,14 +79,15 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
                     };
                     await sendToReports(reportData);
                 } 
+                
                 else if (messageType === 'audio') {
                     console.log("Message type is audio. Switching to Task 57 (Media Download).");
                     const mediaId = message.audio?.id;
                     
                     if (mediaId) {
+                      
                         const filePath = await downloadAudioFile(mediaId);
                         
-                    
                         if (!filePath) {
                             console.error("Audio download failed, stopping processing.");
                             return { isAuthorized: true, phoneNumber: senderPhoneNumber }; 
@@ -103,7 +105,17 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
 
                         console.log("STT transcription completed successfully!");
 
-                       
+                      
+                        const reportData: ReportIncomingData = {
+                            userId: userId, 
+                            content: transcribedText, 
+                            messageId: message.id,
+                            timestamp: String(message.timestamp)
+                        };
+                        
+                        
+                        await sendToReports(reportData);
+                        console.log("[Webhook] Audio transcription chain finalized and report sent successfully! (Task 56 Complete)");
                         
                     } else {
                         console.error("Audio message received but no media ID found.");
