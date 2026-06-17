@@ -1,29 +1,23 @@
+import router from './routes/meeting.route.js';
+import { supabase } from './config/supabase.js';
+import dns from 'dns';
+import express from 'express';
+
+
+
 // מעקף חובה עבור סינון האינטרנט (נטפרי) בסביבת פיתוח
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-import dns from 'dns';
 if (dns && dns.setDefaultResultOrder) { dns.setDefaultResultOrder('ipv4first'); }
-import express from 'express';
-// import meetingRoutes from './routes/meeting.routes';
-// import { errorHandler } from './middleware/error.middleware';
 
 const app = express();
 
-// מאפשר לשרת לקרוא ולקבל גוף בקשה (body) בפורמט JSON
 app.use(express.json());
 
-// נתיב בסיסי לבדיקה שהשרת מגיב בדפדפן
 app.get('/', (req, res) => {
   res.send('Server is up and running!');
 });
 
-
-
-// חיבור נתיבי הפגישות לאפליקציה (זמנית יכול להיות כבוי אם הקובץ meeting.routes ריק)
-// app.use('/api/meetings', meetingRoutes);
-
-// חיבור תופס השגיאות הגלובלי של האפליקציה
-// app.use(errorHandler);
-import { supabase } from './config/supabase.js';
+app.use('/api/meetings', router)
 
 async function testConnection() {
   try {
@@ -42,12 +36,10 @@ async function testConnection() {
   }
 }
 
-// הרצת פונקציית הבדיקה
 testConnection();
 const PORT = process.env.PORT || 3000
 
 app.listen(PORT,()=>{
   console.log(`Server is running on port ${PORT}`);
 })
-// השורה הכי חשובה שפתרה את השגיאה שלכן!
 export default app;
