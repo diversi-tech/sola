@@ -9,21 +9,28 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_SECRET,
   process.env.GOOGLE_REDIRECT_URI
 );
-//חישוב משך הפגישה
-function calcDuration(start: string, end: string): string {
-  const diffMs = new Date(end).getTime() - new Date(start).getTime();
-  const totalMinutes = Math.floor(diffMs / 60000);
-  const hours = Math.floor(totalMinutes / 60).toString().padStart(2, '0');
-  const minutes = (totalMinutes % 60).toString().padStart(2, '0');
-  return `${hours}:${minutes}:00`;
+
+// זיהוי ספק וידאו קול
+function detectVideoCallProvider(event: any): string | null {
+  // שלב 1 - שדות מובנים, אמינים ביותר (תמיד נכון ל-Google Meet)
+  if (event.hangoutLink) return 'Google Meet';
+  if (event.conferenceData?.conferenceSolution?.name) {
+    return event.conferenceData.conferenceSolution.name;
+  }
+
+  // שלב 2 - גיבוי: חיפוש טקסט חופשי בתיאור/מיקום
+  const text = `${event.location || ''} ${event.description || ''}`.toLowerCase();
+  if (text.includes('zoom.us')) return 'Zoom';
+  if (text.includes('meet.google.com')) return 'Google Meet';
+  if (text.includes('teams.microsoft.com')) return 'Microsoft Teams';
+
+  return null; // כנראה פרונטלי, או שאין קישור מזוהה
 }
 
-function inferMeetingType(title: string): MeetingType {
-  const lower = title.toLowerCase();
-  const isOnline = lower.includes('zoom') || lower.includes('meet') || 
-                   lower.includes('teams') || lower.includes('online');
-  const isPersonal = lower.includes('1:1') || lower.includes('personal') || 
-                     lower.includes('one on one');
+// סוג הפגישה לפי ספק וידאו ומספר משתתפים
+function inferMeetingType(event: any, participantsCount: number): MeetingType {
+  const isOnline = !!detectVideoCallProvider(event);
+  const isPersonal = participantsCount <= 2;
 
   if (isOnline && isPersonal) return 'Online personal meeting';
   if (isOnline) return 'Online team meeting';
@@ -39,20 +46,23 @@ function mapEventToMeeting(event: any, badgeNumber: number): Meeting | null {
 
   const diffMs = new Date(endTime).getTime() - new Date(startTime).getTime();
   const estimatedMinutes = Math.floor(diffMs / 60000);
+  const participantsCount = (event.attendees ?? []).length;
 
   return {
+    google_event_id:            event.id,
     title:                      event.summary ?? 'Untitled Meeting',
-    type:                       inferMeetingType(event.summary ?? ''),
-    CreatedAt:                  event.created ?? new Date().toISOString(),
-    CreatedTo:                  startTime,
-    Estimated_duration_minutes: estimatedMinutes,
-    ParticipantsCount:          (event.attendees ?? []).length,
-    ManagerID:                  undefined,
-    CalendarID:                 badgeNumber,
-    StartTime:                  startTime,
-    EndTime:                    endTime,
-    Actual_time:                "-",
-    EfficiencyScore:            undefined,
+    type:                       inferMeetingType(event, participantsCount),
+    created_at:                 event.created ?? new Date().toISOString(),
+    created_to:                 startTime,
+    estimated_duration_minutes: estimatedMinutes,
+    participants_count:         participantsCount,
+    manager_id:                 undefined,
+    calendar_id:                badgeNumber,
+    start_time:                 startTime,
+    end_time:                   endTime,
+    actual_time:                null,
+    efficiency_score:           undefined,
+    attendees:                  (event.attendees ?? []).map((att: any) => att.email),
   };
 }
 
@@ -90,23 +100,26 @@ export async function syncUserCalendar(
 
   const { error } = await supabase
     .from('Meeting')
-    .insert(meetings);
+    .upsert(meetings, { onConflict: 'google_event_id' });
 
   if (error) {
     console.error('[Sync] שגיאת Supabase:', error.message);
     throw new Error(error.message);
   }
 
-  console.log(`[Sync] ✅ נשמרו ${meetings.length} פגישות`);
+  console.log(`[Sync] ✅ נשמרו/עודכנו ${meetings.length} פגישות`);
 }
 
 export async function syncAllActiveUsers(): Promise<void> {
   const { data: users, error } = await supabase
     .from('Users')
-    .select('id, name, badgenumber, refresh_token')
+    .select('id, employee_email, refresh_token')
     .not('refresh_token', 'is', null);
 
-  if (error) throw error;
+  if (error) {
+    console.error('[Sync] שגיאה בשליפת משתמשים:', error);
+    throw error;
+  }
 
   if (!users?.length) {
     console.log('[Sync] לא נמצאו משתמשים');
@@ -115,9 +128,9 @@ export async function syncAllActiveUsers(): Promise<void> {
 
   for (const user of users) {
     try {
-      await syncUserCalendar(user.badgenumber, user.refresh_token);
+      await syncUserCalendar(user.id, user.refresh_token);
     } catch (err) {
-      console.error(`[Sync] נכשל עבור ${user.name}:`, err);
+      console.error(`[Sync] נכשל עבור ${user.employee_email}:`, err);
     }
   }
 }
