@@ -1,7 +1,10 @@
-import { AiAnalysisResult } from '../interfaces/ai.interface.js';
+import { LlmAnalysisResult } from '../interfaces/LlmAnalysisResult.js'; 
 import { SchemaType, Schema } from '@google/generative-ai';
-import { logAiRun } from '../utils/logger.js'; 
-export abstract class BaseAiProvider {
+import { logLLMRun } from '../utils/logLlmRun.js'; 
+import fs from 'fs';
+import path from 'path';
+
+export abstract class baseLLMProvider {
     
     private delay(ms: number) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -9,16 +12,15 @@ export abstract class BaseAiProvider {
 
     protected buildPrompt(text: string, categories: string[]): string {
         const categoriesString = categories.join(", ");
-        return `You are a strict and analytical HR analyst. Your task is to analyze raw employee feedback text.
- Rate ONLY the metrics explicitly mentioned or strongly implied in the text from the following list: ${categoriesString}.
- IMPORTANT: All metric scores MUST be integers on a scale from 1 to 10 (where 1 is lowest and 10 is highest).
- If a metric is not relevant to the text, you MUST return null for its score.
- Additionally, write a brief, one-sentence text summary of the employee's feedback IN ENGLISH.
- Finally, extract the full name of the employee mentioned in the feedback text. 
- IMPORTANT: Extract the name exactly as it is written in the text. If the name is in Hebrew, translate or transliterate it to English.
-
- Feedback text to analyze:
- "${text}"`;
+        
+        const promptPath = path.join(process.cwd(), 'src', 'config', 'llm', 'system-prompt.txt');
+        
+        let promptTemplate = fs.readFileSync(promptPath, 'utf-8');
+        
+        promptTemplate = promptTemplate.replace('{{CATEGORIES}}', categoriesString);
+        promptTemplate = promptTemplate.replace('{{USER_TEXT}}', text);
+        
+        return promptTemplate;
     }
 
     protected buildSchema(categories: string[]): Schema {
@@ -39,9 +41,9 @@ export abstract class BaseAiProvider {
 
     protected abstract getProviderName(): string;
 
-    protected abstract callAiApi(prompt: string, schema: any): Promise<string>;
+    protected abstract callLlmApi(prompt: string, schema: any): Promise<string>;
 
-    public async analyzeFeedback(text: string, categories: string[]): Promise<AiAnalysisResult> {
+    public async analyzeFeedback(text: string, categories: string[]): Promise<LlmAnalysisResult> {
         const prompt = this.buildPrompt(text, categories);
         const schema = this.buildSchema(categories);
         const modelName = this.getProviderName(); 
@@ -51,9 +53,9 @@ export abstract class BaseAiProvider {
 
         while (attempt < maxRetries) {
             try {
-                const rawResponse = await this.callAiApi(prompt, schema);
+                const rawResponse = await this.callLlmApi(prompt, schema);
                 
-                logAiRun('SUCCESS', `Model: ${modelName} | Analyzed feedback successfully on attempt ${attempt + 1}.`);
+                logLLMRun('SUCCESS', `Model: ${modelName} | Analyzed feedback successfully on attempt ${attempt + 1}.`);
                 
                 return JSON.parse(rawResponse);
                 
@@ -61,10 +63,10 @@ export abstract class BaseAiProvider {
                 attempt++;
                 
                 if (error.status === 503 && attempt < maxRetries) {
-                    logAiRun('WARNING', `Model: ${modelName} | Attempt ${attempt} failed (503 Busy). Retrying...`);
+                    logLLMRun('WARNING', `Model: ${modelName} | Attempt ${attempt} failed (503 Busy). Retrying...`);
                     await this.delay(2000); 
                 } else {
-                    logAiRun('ERROR', `Model: ${modelName} | Failed completely after ${attempt} attempts. Error: ${error.message || 'Unknown Error'}`);
+                    logLLMRun('ERROR', `Model: ${modelName} | Failed completely after ${attempt} attempts. Error: ${error.message || 'Unknown Error'}`);
                     throw error;
                 }
             }

@@ -4,9 +4,9 @@ import { sendCreatedResult, sendErrorResult } from '../utils/responseHandler.js'
 
 export const handleIncomingFeedback = async (req: Request, res: Response) => {
     try {
-        const { manager_id, text } = req.body;
+        const { manager_id, text, audio_url } = req.body;
 
-        const savedReport = await processAndSaveFeedback(manager_id, text);
+        const savedReport = await processAndSaveFeedback(manager_id, text, audio_url);
         return sendCreatedResult(res, {
             message: "Report successfully processed and saved!",
             manager_id: manager_id,

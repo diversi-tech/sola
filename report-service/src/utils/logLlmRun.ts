@@ -1,8 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export const logAiRun = (status: 'SUCCESS' | 'WARNING' | 'ERROR', details: string) => {
-    // הקובץ יווצר אוטומטית בתיקייה הראשית של הפרויקט
+export const logLLMRun = (status: 'SUCCESS' | 'WARNING' | 'ERROR', details: string) => {
     const logFilePath = path.join(process.cwd(), 'ai-performance.log');
     
     const now = new Date();
