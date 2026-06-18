@@ -3,7 +3,6 @@ import FormData from 'form-data';
 import axios from 'axios';
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/audio/transcriptions';
-
 export const handleAudioProcessingPipeline = async (file: any, userData: any): Promise<string> => {
     if (!process.env.GROQ_API_KEY) {
         throw new Error("Configuration Error: GROQ_API_KEY is not defined.");

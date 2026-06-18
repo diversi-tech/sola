@@ -17,5 +17,10 @@
     "@types/express": "^4.17.25",
     "@types/multer": "^2.1.0",
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "multer": "^2.2.0",
+    "streamifier": "^0.1.1"
   }
 }
