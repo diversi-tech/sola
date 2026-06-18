@@ -7,7 +7,7 @@ export class LlmFactory {
     
     public static getProvider(): ILlmProvider {
         try {
-            const configPath = path.join(process.cwd(), 'src', 'config', 'llm', 'llm.current.json'); // שחקי עם השם אם קראת לקובץ אחרת
+            const configPath = path.join(process.cwd(), 'src', 'config', 'llm', 'llm.current.json');      
             const configRaw = fs.readFileSync(configPath, 'utf-8');
             const config = JSON.parse(configRaw);
 

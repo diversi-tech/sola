@@ -1,10 +1,10 @@
-import { LlmAnalysisResult } from '../interfaces/LlmAnalysisResult.js'; // יישרתי את השם של קובץ האינטרפייס לפי הסטנדרט
+import { LlmAnalysisResult } from '../interfaces/LlmAnalysisResult.js'; 
 import { SchemaType, Schema } from '@google/generative-ai';
-import { logLlmRun } from '../utils/logLlmRun.js'; // שינינו את שם הפונקציה בלוגר!
+import { logLLMRun } from '../utils/logLlmRun.js'; 
 import fs from 'fs';
 import path from 'path';
 
-export abstract class BaseLlmProvider {
+export abstract class baseLLMProvider {
     
     private delay(ms: number) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -55,7 +55,7 @@ export abstract class BaseLlmProvider {
             try {
                 const rawResponse = await this.callLlmApi(prompt, schema);
                 
-                logLlmRun('SUCCESS', `Model: ${modelName} | Analyzed feedback successfully on attempt ${attempt + 1}.`);
+                logLLMRun('SUCCESS', `Model: ${modelName} | Analyzed feedback successfully on attempt ${attempt + 1}.`);
                 
                 return JSON.parse(rawResponse);
                 
@@ -63,10 +63,10 @@ export abstract class BaseLlmProvider {
                 attempt++;
                 
                 if (error.status === 503 && attempt < maxRetries) {
-                    logLlmRun('WARNING', `Model: ${modelName} | Attempt ${attempt} failed (503 Busy). Retrying...`);
+                    logLLMRun('WARNING', `Model: ${modelName} | Attempt ${attempt} failed (503 Busy). Retrying...`);
                     await this.delay(2000); 
                 } else {
-                    logLlmRun('ERROR', `Model: ${modelName} | Failed completely after ${attempt} attempts. Error: ${error.message || 'Unknown Error'}`);
+                    logLLMRun('ERROR', `Model: ${modelName} | Failed completely after ${attempt} attempts. Error: ${error.message || 'Unknown Error'}`);
                     throw error;
                 }
             }

@@ -1,9 +1,9 @@
-import { BaseLlmProvider } from './base-llm.provider.js';
+import { baseLLMProvider } from './base-llm.provider.js';
 import { genAI } from './gemini.client.js';
 import fs from 'fs';
 import path from 'path';
 
-export class GeminiProvider extends BaseLlmProvider {
+export class GeminiProvider extends baseLLMProvider {
     
     private modelName!: string;
     private temperature!: number;

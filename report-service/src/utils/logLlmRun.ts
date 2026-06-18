@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export const logLlmRun = (status: 'SUCCESS' | 'WARNING' | 'ERROR', details: string) => {
+export const logLLMRun = (status: 'SUCCESS' | 'WARNING' | 'ERROR', details: string) => {
     const logFilePath = path.join(process.cwd(), 'ai-performance.log');
     
     const now = new Date();
