@@ -36,5 +36,6 @@ if (authResult && authResult.isAuthorized === false && authResult.phoneNumber) {
     return await handleUnauthorizedAccess(res, authResult.phoneNumber);
 }
 
+
     res.status(200).send('EVENT_RECEIVED');
 };
