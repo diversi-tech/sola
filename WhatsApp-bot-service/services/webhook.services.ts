@@ -10,8 +10,7 @@ const WHATSAPP_BUSINESS = 'whatsapp_business_account';
 export const sendWhatsAppMessage = async (to: string, text: string) => {
     try {
         const token = process.env.WHATSAPP_TOKEN;
-        const phone_number_id = process.env.PHONE_NUMBER_ID; //our WhatsApp Business Account phone number ID
-
+        const phone_number_id = process.env.PHONE_NUMBER_ID;
         await axios.post(
             `https://graph.facebook.com/v17.0/${phone_number_id}/messages`,
             {
@@ -115,7 +114,7 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
                         
                         
                         await sendToReports(reportData);
-                        console.log("[Webhook] Audio transcription chain finalized and report sent successfully! (Task 56 Complete)");
+                        console.log("[Webhook] Audio transcription chain finalized and report sent successfully!");
                         
                     } else {
                         console.error("Audio message received but no media ID found.");

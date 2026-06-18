@@ -10,7 +10,7 @@ import FormData from 'form-data';
 export const transcribeAudioFile = async (filePath: string): Promise<string | null> => {
     try {
        
-        const baseUrl = process.env.STT_SERVICE_URL || 'http://localhost:3000';
+        const baseUrl = process.env.STT_SERVICE_URL || 'http://localhost:5002';
         const sttEndpoint = `${baseUrl}/v1/audio/process`;
 
        
