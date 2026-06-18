@@ -4,13 +4,14 @@ import { sendToReports } from './reports.service';
 import { transcribeAudioFile } from './stt.service'; 
 import { ReportIncomingData } from '../types/reports.types';
 import axios from 'axios';
+import fs from 'fs';
 
 const WHATSAPP_BUSINESS = 'whatsapp_business_account';
 
 export const sendWhatsAppMessage = async (to: string, text: string) => {
     try {
-        const token = process.env.WHATSAPP_TOKEN;
-        const phone_number_id = process.env.PHONE_NUMBER_ID;
+        const token = process.env.META_ACCESS_TOKEN;
+        const phone_number_id = process.env.META_PHONE_NUMBER_ID;
         await axios.post(
             `https://graph.facebook.com/v17.0/${phone_number_id}/messages`,
             {
@@ -34,7 +35,7 @@ export const checkVerifyToken = (mode: string, token: string): boolean => {
 };
 
 export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: boolean; phoneNumber?: string } | null> => {
-    console.log(': Received webhook event in service:', JSON.stringify(body, null, 2));
+    console.log("Webhook event received from Meta");
 
     if (body.object === WHATSAPP_BUSINESS) {
         const messages = body.entry?.[0]?.changes?.[0]?.value?.messages;
@@ -96,6 +97,13 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
 
                         
                         const transcribedText = await transcribeAudioFile(filePath);
+
+                        try {
+                              fs.unlinkSync(filePath);
+                              console.log(`[Cleanup] Temporary file deleted successfully: ${filePath}`);
+                     } catch (cleanupError) {
+                              console.error(`[Cleanup] Failed to delete temporary file: ${filePath}`, cleanupError);
+                         }
 
                         if (!transcribedText) {
                             console.error("STT transcription failed, stopping processing.");

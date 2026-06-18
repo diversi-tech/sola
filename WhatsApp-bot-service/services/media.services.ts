@@ -22,7 +22,7 @@ export const downloadAudioFile = async (mediaId: string): Promise<string | null>
         });
 
        
-        const uploadDir = path.join(__dirname, '../../temp');
+        const uploadDir = path.join(__dirname, '../temp');
         if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
         
         const filePath = path.join(uploadDir, `${mediaId}.ogg`);
