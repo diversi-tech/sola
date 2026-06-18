@@ -1,6 +1,10 @@
+import 'dotenv/config';
 import express from 'express';
 // import meetingRoutes from './routes/meeting.routes';
 // import { errorHandler } from './middleware/error.middleware';
+
+import calendarAuthRoutes from './routes/calendarAuth.route.js';
+import { supabase } from './config/supabase.js';
 
 const app = express();
 
@@ -12,13 +16,16 @@ app.get('/', (req, res) => {
   res.send('Server is up and running!');
 });
 
-// חיבור נתיבי הפגישות לאפליקציה (זמנית יכול להיות כבוי אם הקובץ meeting.routes ריק)
+// חיבור נתיבי הפגישות לאפליקציה
 // app.use('/api/meetings', meetingRoutes);
 
-// חיבור תופס השגיאות הגלובלי של האפליקציה
-// app.use(errorHandler);
-import { supabase } from './config/supabase.js';
+// חיבור הראוטים של ה-Calendar Auth שהגדרנו
+app.use('/api/calendar', calendarAuthRoutes);
 
+// חיבור תופס השגיאות הגלובלי של האפליקציה (מומלץ שיהיה אחרי הראוטים)
+// app.use(errorHandler);
+
+// פונקציית בדיקת החיבור ל-Supabase
 async function testConnection() {
   try {
     const { data, error } = await supabase.from('Meeting').select('*');
@@ -36,8 +43,12 @@ async function testConnection() {
   }
 }
 
-// הרצת פונקציית הבדיקה
+// הרצת פונקציית הבדיקה באתחול
 testConnection();
 
-// השורה הכי חשובה שפתרה את השגיאה שלכן!
+const PORT = process.env.PORT;
+app.listen(PORT, () => {
+  console.log(`🚀 השרת רץ ומקשיב על פורט ${PORT}`);
+});
+
 export default app;
