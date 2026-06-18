@@ -1,11 +1,12 @@
 import { supabase } from '../config/supabase.js';
 import { findEmployeeByName } from './employee.service.js';
 import { getActiveCategories } from './category.service.js';
-import { GeminiProvider } from '../ai/gemini.provider.js';
+import { LlmFactory } from '../ai/llm.factory.js';
 
-const aiProvider = new GeminiProvider();
 
-export const processAndSaveFeedback = async (manager_id: number, text: string) => {
+const aiProvider = LlmFactory.getProvider();
+
+export const processAndSaveFeedback = async (manager_id: number, text: string, audio_url?: string) => {
     try {
         const categories = await getActiveCategories();
         
@@ -22,7 +23,8 @@ export const processAndSaveFeedback = async (manager_id: number, text: string) =
             employee_id: employeeId,
             manager_id: manager_id || null,
             metric_scores: llmMetrics.metric_scores,
-            text_summary: llmMetrics.text_summary
+            text_summary: llmMetrics.text_summary,
+            audio_link: audio_url || null,
         };
 
         const { data, error } = await supabase
