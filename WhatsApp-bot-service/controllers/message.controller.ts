@@ -19,12 +19,12 @@ export const handleSendInternalMessage = async (req: Request, res: Response) => 
 
 
     if (success === true) {
-       const summary = data?.savedReport?.[0]?.text_summary || "No text summary received";
-       textContent = `The report was saved successfully! Here is the summary:\n${summary}`;
-    }  else {
-           const errorMessage = error || "An unknown error occurred in the system";
-           textContent = `Oops, an error occurred:\n${errorMessage}`;
-}
+    const summary = data?.savedReport?.[0]?.text_summary || "No text summary received";
+    textContent = `Hi! Your report was successfully received and saved. Here is the analysis summary:\n${summary}`;
+   } else {
+    const errorMessage = error || "An unknown error occurred in the system";
+    textContent = `Oops, something went wrong while processing your report:\n${errorMessage}`;
+   }
 
     try {
         await sendWhatsAppMessage(toPhoneNumber, textContent);
