@@ -4,17 +4,17 @@ export interface Meeting {
   meeting_id?: number;
   title: string;
   type: MeetingType;
-  created_at: string;        // datetime - מתי הפגישה נוצרה
+  created_at: string;        
   created_to: string;  
-  estimated_duration_minutes: number;      // משך זמן משוער בדקות
+  estimated_duration_minutes: number;     
   participants_count: number;
   manager_id?: number;
-  calendar_id: number;       // המספר האישי של העובד
+  calendar_id: number;     
   start_time?: string;        
   end_time?: string;          
-  actual_time?: string|null;       // משך זמן בפועל (יכול להיות שונה מהמשוער)
+  actual_time?: string|null;      
   efficiency_score?:number;
-  attendees: string[];      // רשימת המשתתפים בפגישה
-    google_event_id?: string; // ← חדש
+  attendees: string[];
+    google_event_id?: string; 
 
 }

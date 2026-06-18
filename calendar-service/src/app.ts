@@ -5,7 +5,6 @@ import express from 'express';
 
 
 
-// מעקף חובה עבור סינון האינטרנט (נטפרי) בסביבת פיתוח
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 if (dns && dns.setDefaultResultOrder) { dns.setDefaultResultOrder('ipv4first'); }
 

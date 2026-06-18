@@ -18,7 +18,7 @@ export async function syncActiveUsers(req:Request, res:Response) {
         await syncAllActiveUsers()
         res.json({message: "secseed"})
     } catch (error) {
-          console.log(error); // ← הוסיפי את זה זמנית
+          console.log(error); 
 
         res.status(500).json({message: "get all active users faild"})
     }

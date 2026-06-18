@@ -3,31 +3,26 @@ import { google } from 'googleapis';
 import { supabase } from '../config/supabase.js';
 import { Meeting, MeetingType } from '../models/meeting.model.js';
 
-//חיבור לגוגל
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
   process.env.GOOGLE_REDIRECT_URI
 );
 
-// זיהוי ספק וידאו קול
 function detectVideoCallProvider(event: any): string | null {
-  // שלב 1 - שדות מובנים, אמינים ביותר (תמיד נכון ל-Google Meet)
   if (event.hangoutLink) return 'Google Meet';
   if (event.conferenceData?.conferenceSolution?.name) {
     return event.conferenceData.conferenceSolution.name;
   }
 
-  // שלב 2 - גיבוי: חיפוש טקסט חופשי בתיאור/מיקום
   const text = `${event.location || ''} ${event.description || ''}`.toLowerCase();
   if (text.includes('zoom.us')) return 'Zoom';
   if (text.includes('meet.google.com')) return 'Google Meet';
   if (text.includes('teams.microsoft.com')) return 'Microsoft Teams';
 
-  return null; // כנראה פרונטלי, או שאין קישור מזוהה
+  return null; 
 }
 
-// סוג הפגישה לפי ספק וידאו ומספר משתתפים
 function inferMeetingType(event: any, participantsCount: number): MeetingType {
   const isOnline = !!detectVideoCallProvider(event);
   const isPersonal = participantsCount <= 2;
