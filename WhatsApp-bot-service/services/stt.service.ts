@@ -2,11 +2,6 @@ import axios from 'axios';
 import fs from 'fs';
 import FormData from 'form-data';
 
-/**
- * שירות המשלב את משימה 55 - שליחת קובץ האודיו המקומי לשרת ה-STT
- * @param filePath הנתיב המקומי של קובץ האודיו בשרת
- * @returns הטקסט המתומלל או null במקרה של שגיאה
- */
 export const transcribeAudioFile = async (filePath: string): Promise<string | null> => {
     try {
        
