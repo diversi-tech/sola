@@ -10,7 +10,7 @@ const WHATSAPP_BUSINESS = 'whatsapp_business_account';
 export const sendWhatsAppMessage = async (to: string, text: string) => {
     try {
         const token = process.env.WHATSAPP_TOKEN;
-        const phone_number_id = process.env.PHONE_NUMBER_ID; //our WhatsApp Business Account phone number ID
+        const phone_number_id = process.env.PHONE_NUMBER_ID;
 
         await axios.post(
             `https://graph.facebook.com/v17.0/${phone_number_id}/messages`,
@@ -35,7 +35,7 @@ export const checkVerifyToken = (mode: string, token: string): boolean => {
 };
 
 export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: boolean; phoneNumber?: string } | null> => {
-    console.log(': Received webhook event in service:', JSON.stringify(body, null, 2));
+    console.log('Received webhook event in service:', JSON.stringify(body, null, 2));
 
     if (body.object === WHATSAPP_BUSINESS) {
         const messages = body.entry?.[0]?.changes?.[0]?.value?.messages;
@@ -45,15 +45,13 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
             const senderPhoneNumber = message.from;
 
             if (typeof senderPhoneNumber === 'string' && senderPhoneNumber.trim() !== '') {
-              
                 let authResult;
                 const authPayload = { "phoneNumber": senderPhoneNumber };
 
                 if (process.env.USE_MOCK_AUTH === 'true') {
-                    console.log(" DEV MODE: Bypassing Auth Service.");
+                    console.log("DEV MODE: Bypassing Auth Service.");
                     authResult = { isAuthorized: true, userId: "mock_user_123", message: "Dev bypass" };
-                } 
-                else {
+                } else {
                     authResult = await verifyUserAuth(authPayload);
                 }
                 
@@ -68,7 +66,6 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
 
                 const messageType = message.type;
                 
-                
                 if (messageType === 'text') {
                     console.log("Message type is text.");
                     const reportData: ReportIncomingData = {
@@ -78,14 +75,11 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
                         timestamp: String(message.timestamp)
                     };
                     await sendToReports(reportData);
-                } 
-                
-                else if (messageType === 'audio') {
-                    console.log("Message type is audio. Switching to Task 57 (Media Download).");
+                } else if (messageType === 'audio') {
+                    console.log("Message type is audio. Proceeding to media download.");
                     const mediaId = message.audio?.id;
                     
                     if (mediaId) {
-                      
                         const filePath = await downloadAudioFile(mediaId);
                         
                         if (!filePath) {
@@ -95,7 +89,6 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
                         
                         console.log("Audio file downloaded successfully for further processing.");
 
-                        
                         const transcribedText = await transcribeAudioFile(filePath);
 
                         if (!transcribedText) {
@@ -105,7 +98,6 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
 
                         console.log("STT transcription completed successfully!");
 
-                      
                         const reportData: ReportIncomingData = {
                             userId: userId, 
                             content: transcribedText, 
@@ -113,10 +105,8 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
                             timestamp: String(message.timestamp)
                         };
                         
-                        
                         await sendToReports(reportData);
-                        console.log("[Webhook] Audio transcription chain finalized and report sent successfully! (Task 56 Complete)");
-                        
+                        console.log("[Webhook] Audio transcription chain finalized and report sent successfully!");
                     } else {
                         console.error("Audio message received but no media ID found.");
                     }
