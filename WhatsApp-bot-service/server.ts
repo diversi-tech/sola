@@ -2,6 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import webhookRoutes from './routes/webhook.routes';
 import messageRoutes from './routes/message.routes';
+import dns from 'dns';
+dns.setDefaultResultOrder('ipv4first');
 
 dotenv.config();
 
