@@ -10,7 +10,7 @@ export const handleSendInternalMessage = async (req: Request, res: Response) => 
         return res.status(401).json({ error: "Unauthorized: Invalid API Key" });
     }
 
-    const { toPhoneNumber: to, success, data, error } = req.body;
+    const { toPhoneNumber: to, success, data } = req.body;
 
     if (!to) {
         return res.status(400).json({ error: "Missing required field: toPhoneNumber" });
@@ -18,7 +18,7 @@ export const handleSendInternalMessage = async (req: Request, res: Response) => 
     
     let textContent = "";
 
-if (success === true) {
+    if (success) {
         const summary = data?.savedReport?.[0]?.text_summary;
         if (summary) {
             textContent = `Hi! Your report was successfully received and saved. Here is the analysis summary:\n${summary}`;
