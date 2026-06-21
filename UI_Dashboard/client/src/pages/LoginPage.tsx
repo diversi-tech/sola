@@ -3,8 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import Input from '../features/login/components/Input';
 import Button from '../features/login/components/Button';
 
-// אם העמוד יקבל props בעתיד, ניתן להגדיר כאן ממשק:
-// interface LoginPageProps {}
 
 export  const LoginPage: React.FC = () => {
   const navigate = useNavigate(); 

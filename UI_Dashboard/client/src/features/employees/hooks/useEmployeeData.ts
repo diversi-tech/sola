@@ -46,7 +46,6 @@ export default function useEmployeeData(): UseEmployeeDataReturn {
       setModalLoading(true);
       const result = (await employeeApi.fetchEmployeeReports(employee.id)) as any;
       
-      // חילוץ חכם גם לדוחות
       const reportsArray = result.data ? result.data : result;
       setCurrentReports(Array.isArray(reportsArray) ? reportsArray : []);
     } catch (err) {

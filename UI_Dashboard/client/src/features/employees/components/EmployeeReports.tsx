@@ -1,6 +1,5 @@
 import React, { useState, useMemo, ChangeEvent } from 'react';
 
-// --- הגדרת טיפוסים ---
 
 interface MetricScores {
   [key: string]: number | string | null | undefined;
@@ -22,7 +21,6 @@ export const EmployeeReports: React.FC<EmployeeReportsProps> = ({ reports }) => 
   const [filterMonth, setFilterMonth] = useState<string>('');
   const [filterCategory, setFilterCategory] = useState<string>('all');
 
-  // שליפת קטגוריות ייחודיות מתוך כל הדו"חות
   const availableCategories = useMemo(() => {
     if (!reports) return [];
     const categoriesSet = new Set<string>();
@@ -34,23 +32,19 @@ export const EmployeeReports: React.FC<EmployeeReportsProps> = ({ reports }) => 
     return Array.from(categoriesSet);
   }, [reports]);
 
-  // סינון ומיון הדו"חות
   const filteredAndSortedReports = useMemo(() => {
     if (!reports) return [];
     
-    // מיון לפי תאריך (חדש לישן)
     let result = [...reports].sort((a, b) => 
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
 
-    // סינון לפי חודש
     if (filterMonth) {
       result = result.filter(report => 
         new Date(report.created_at).toISOString().slice(0, 7) === filterMonth
       );
     }
 
-    // סינון לפי קטגוריה
     if (filterCategory !== 'all') {
       result = result.filter(report => {
         if (!report.metric_scores) return false;
@@ -63,7 +57,6 @@ export const EmployeeReports: React.FC<EmployeeReportsProps> = ({ reports }) => 
 
   return (
     <div className="animate-fade-in py-4 max-w-4xl mx-auto flex flex-col gap-6">
-      {/* סרגל סינון */}
       <div className="bg-white p-4 rounded-2xl border border-indigo-100 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="flex items-center gap-2 text-indigo-800 font-bold text-sm">סינון דוחות:</div>
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
@@ -92,7 +85,6 @@ export const EmployeeReports: React.FC<EmployeeReportsProps> = ({ reports }) => 
         </div>
       </div>
 
-      {/* רשימת דוחות */}
       {filteredAndSortedReports.length > 0 ? (
         <div className="relative border-r-2 border-indigo-100 pr-6 mr-3 space-y-8">
           {filteredAndSortedReports.map((report) => (

@@ -4,10 +4,9 @@ import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
 
-// --- הגדרת טיפוסים (Interfaces) ---
 
 interface MetricScores {
-  [key: string]: number; // מאפשר גמישות אם יתווספו מדדים חדשים
+  [key: string]: number; 
 }
 
 interface Report {
@@ -35,7 +34,6 @@ export const EmployeeMetrics: React.FC<EmployeeMetricsProps> = ({ reports }) => 
       return { timelineData: [], latestRadarData: [] };
     }
 
-    // תיקון בחישוב הזמן (שימוש ב-getTime) למניעת שגיאת טיפוסים ב-TS
     const sortedReports = [...reports].sort((a, b) => 
       new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
     );

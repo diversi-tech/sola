@@ -1,4 +1,3 @@
-// src/components/employee/services/employeeApi.ts
 
 export interface Employee {
   id: number;
@@ -42,7 +41,7 @@ export const employeeApi = {
   },
 
   fetchEmployeeReports: async (employeeId: number): Promise<Report[]> => {
-    const URL =  `${import.meta.env.VITE_API_BASE_URL}/api/reports/${employeeId}`; 
+    const URL = `${import.meta.env.VITE_API_BASE_URL}/api/reports/${employeeId}`;
     const response = await fetch(URL);
     if (!response.ok) throw new Error('Failed to fetch reports');
     return response.json();

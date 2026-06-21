@@ -4,13 +4,10 @@ import Input from '../features/login/components/Input';
 import Button from '../features/login/components/Button';
 
 function RegisterPage() {
-  // חובה לקרוא ל-Hooks ברמה העליונה של הקומפוננטה!
   const navigate = useNavigate(); 
 
   const handleSignIn = async () => {
-    // כאן תוכל להוסיף בעתיד לוגיקה של שמירת משתמש במסד הנתונים
     
-    // מעבר לעמוד העובדים
     navigate('/EmployeePage');
   };
 

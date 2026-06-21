@@ -1,6 +1,5 @@
 import React from 'react';
 
-// --- הגדרת טיפוסים ---
 
 interface Employee {
   id: string | number;

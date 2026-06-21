@@ -10,7 +10,6 @@ interface Employee {
   is_active: boolean;
 }
 
-// ניתן לייבא את ממשק ה-Report מהקובץ הרלוונטי אם הוא כבר מוגדר שם
 interface Report {
   id: string | number;
   created_at: string;
@@ -30,7 +29,6 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   loading, 
   onClose 
 }) => {
-  // הגדרת המצבים האפשריים ללשוניות כדי למנוע טעויות הקלדה
   const [activeTab, setActiveTab] = useState<'overview' | 'reports'>('overview');
 
   return (
@@ -59,7 +57,6 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
           </button>
         </div>
 
-        {/* Tabs Section */}
         <div className="flex border-b border-gray-200 bg-white px-8 gap-4 shrink-0 shadow-sm z-10 overflow-x-auto">
           <button 
             onClick={() => setActiveTab('overview')} 
@@ -75,7 +72,6 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
           </button>
         </div>
 
-        {/* Content Section */}
         <div className="p-6 md:p-8 overflow-y-auto flex-1 bg-slate-50/50">
           {loading ? (
             <div className="flex flex-col justify-center items-center h-full gap-4">
