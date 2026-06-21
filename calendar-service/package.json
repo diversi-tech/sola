@@ -2,9 +2,9 @@
   "name": "calendar-service",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "dist/app.js",
   "scripts": {
-    "dev": "nodemon --exec \"node --loader ts-node/esm\" src/app.ts"
+    "dev": "nodemon --exec node --loader ts-node/esm src/app.ts"
   },
   "author": "Yaeli Rosner Efrat Madmon and Malka Gedelovitch",
   "license": "ISC",

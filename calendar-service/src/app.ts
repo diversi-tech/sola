@@ -1,11 +1,10 @@
 import 'dotenv/config';
 import express from 'express';
 import dns from 'dns';
-
+import router from './routes/meeting.route.js';
+import { supabase } from './config/supabase.js';
 import calendarRoutes from './routes/calendar.route.js';
 import calendarAuthRoutes from './routes/calendarAuth.route.js';
-
-import { supabase } from './config/supabase.js';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
@@ -20,9 +19,9 @@ app.use((req, res, next) => {
 
 app.get('/', (req, res) => res.send('Server is up and running!'));
 
+app.use('/api/meetings', router);
 app.use('/api/calendar', calendarRoutes);
 app.use('/api/calendar/auth', calendarAuthRoutes);
-
 
 async function testConnection() {
     const { error } = await supabase.from('Meeting').select('*');
@@ -33,7 +32,7 @@ testConnection();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 השרת רץ ומקשיב על פורט ${PORT}`);
+    console.log(`🚀 השרת רץ ומקשיב על פורט ${PORT}`);
 });
 
 export default app;
