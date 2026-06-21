@@ -11,9 +11,10 @@ export const sendWhatsAppMessage = async (to: string, text: string) => {
     try {
         const token = process.env.WHATSAPP_TOKEN;
         const phone_number_id = process.env.PHONE_NUMBER_ID;
+        const whatsapp_url = `${process.env.WHATSAPP_API_URL || 'https://graph.facebook.com/v17.0'}/${phone_number_id}/messages`;
 
         await axios.post(
-            `https://graph.facebook.com/v17.0/${phone_number_id}/messages`,
+            whatsapp_url,
             {
                 messaging_product: "whatsapp",
                 to: to,
