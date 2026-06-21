@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabase.js';
 import { google } from 'googleapis';
-import { encryptToken } from '../utils/crypto.util.js';
+import { encryptToken } from '../utils/crypto.util.js'
 
 const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
