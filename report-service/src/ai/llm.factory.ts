@@ -1,11 +1,12 @@
-import { ILlmProvider } from '../interfaces/LlmAnalysisResult.js';
+import { ILLMProvider } from '../interfaces/LlmAnalysisResult.js';
 import { GeminiProvider } from './gemini.provider.js';
 import fs from 'fs';
 import path from 'path';
 
-export class LlmFactory {
+export class LLMFactory {
     
-    public static getProvider(): ILlmProvider {
+
+    public static getProvider(): ILLMProvider {
         try {
             const configPath = path.join(process.cwd(), 'src', 'config', 'llm', 'llm.current.json');      
             const configRaw = fs.readFileSync(configPath, 'utf-8');

@@ -1,4 +1,4 @@
-import { LlmAnalysisResult } from '../interfaces/LlmAnalysisResult.js'; 
+import { LlmAnalysisResult } from '../interfaces/LLMAnalysisResult.js'; 
 import { SchemaType, Schema } from '@google/generative-ai';
 import { logLLMRun } from '../utils/logLlmRun.js'; 
 import fs from 'fs';

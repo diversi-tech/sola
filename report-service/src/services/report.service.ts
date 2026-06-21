@@ -1,10 +1,10 @@
 import { supabase } from '../config/supabase.js';
 import { findEmployeeByName } from './employee.service.js';
 import { getActiveCategories } from './category.service.js';
-import { LlmFactory } from '../ai/llm.factory.js';
+import { LLMFactory } from '../ai/llm.factory.js';
 
 
-const aiProvider = LlmFactory.getProvider();
+const aiProvider = LLMFactory.getProvider();
 
 export const processAndSaveFeedback = async (manager_id: number, text: string, audio_url?: string) => {
     try {
