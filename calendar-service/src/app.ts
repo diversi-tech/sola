@@ -1,43 +1,33 @@
 import express from 'express';
-// import meetingRoutes from './routes/meeting.routes';
-// import { errorHandler } from './middleware/error.middleware';
+import calendarRoutes from './routes/meeting.route.js';
+import { supabase } from './config/supabase.js';
+import dns from 'dns';
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
-
-// מאפשר לשרת לקרוא ולקבל גוף בקשה (body) בפורמט JSON
 app.use(express.json());
 
-// נתיב בסיסי לבדיקה שהשרת מגיב בדפדפן
-app.get('/', (req, res) => {
-  res.send('Server is up and running!');
+// Debug middleware
+app.use((req, res, next) => {
+    console.log(`📍 ${req.method} ${req.path}`);
+    next();
 });
 
-// חיבור נתיבי הפגישות לאפליקציה (זמנית יכול להיות כבוי אם הקובץ meeting.routes ריק)
-// app.use('/api/meetings', meetingRoutes);
+app.get('/', (req, res) => res.send('Server is up and running!'));
 
-// חיבור תופס השגיאות הגלובלי של האפליקציה
-// app.use(errorHandler);
-import { supabase } from './config/supabase.js';
+// רק route אחד לcalendar — מחקי את /api/meetings אם הוא אותו קובץ
+app.use('/api/calendar', calendarRoutes);
 
 async function testConnection() {
-  try {
-    const { data, error } = await supabase.from('Meeting').select('*');
-    if (error) {
-      console.log('❌ החיבור נכשל (object):', error);
-      try {
-        console.log('❌ פרטי שגיאה:', JSON.stringify(error));
-      } catch (_) {}
-      return;
-    }
-    console.log('✅ החיבור הצליח');
-  } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    console.log('❌ החיבור נכשל:', msg);
-  }
+    const { error } = await supabase.from('Meeting').select('*');
+    console.log(error ? '❌ חיבור נכשל:' + error.message : '✅ החיבור הצליח');
 }
 
-// הרצת פונקציית הבדיקה
 testConnection();
 
-// השורה הכי חשובה שפתרה את השגיאה שלכן!
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+
 export default app;
