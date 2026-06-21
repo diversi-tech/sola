@@ -6,12 +6,13 @@ import { ReportIncomingData } from '../types/reports.types';
 import axios from 'axios';
 
 const WHATSAPP_BUSINESS = 'whatsapp_business_account';
+const WHATSAPP_API_BASE_URL = process.env.WHATSAPP_API_URL || 'https://graph.facebook.com/v17.0';
 
 export const sendWhatsAppMessage = async (to: string, text: string) => {
     try {
         const token = process.env.WHATSAPP_TOKEN;
         const phone_number_id = process.env.PHONE_NUMBER_ID;
-        const whatsapp_url = `${process.env.WHATSAPP_API_URL || 'https://graph.facebook.com/v17.0'}/${phone_number_id}/messages`;
+        const whatsapp_url = `${WHATSAPP_API_BASE_URL}/${phone_number_id}/messages`;
 
         await axios.post(
             whatsapp_url,
