@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { processGoogleCallback } from '../services/meeting.service.js';
+import { processGoogleCallback } from '../services/calendar.service.js';
 
 export const googleCallbackHandler = async (req: Request, res: Response) => {
     try {

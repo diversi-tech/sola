@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import dns from 'dns';
 
-import calendarRoutes from './routes/meeting.route.js';
+import calendarRoutes from './routes/calendar.route.js';
 import calendarAuthRoutes from './routes/calendarAuth.route.js';
 
 import { supabase } from './config/supabase.js';
@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 
 app.get('/', (req, res) => res.send('Server is up and running!'));
 
-app.use('/api/meetings', calendarRoutes);
+app.use('/api/calendar', calendarRoutes);
 app.use('/api/calendar/auth', calendarAuthRoutes);
 
 
