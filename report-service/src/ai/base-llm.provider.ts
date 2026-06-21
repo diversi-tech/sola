@@ -1,4 +1,4 @@
-import { LlmAnalysisResult } from '../interfaces/LLMAnalysisResult.js'; 
+import { LLMAnalysisResult } from '../interfaces/LlmAnalysisResult.js'; 
 import { SchemaType, Schema } from '@google/generative-ai';
 import { logLLMRun } from '../utils/logLlmRun.js'; 
 import fs from 'fs';
@@ -43,7 +43,7 @@ export abstract class baseLLMProvider {
 
     protected abstract callLlmApi(prompt: string, schema: any): Promise<string>;
 
-    public async analyzeFeedback(text: string, categories: string[]): Promise<LlmAnalysisResult> {
+    public async analyzeFeedback(text: string, categories: string[]): Promise<LLMAnalysisResult> {
         const prompt = this.buildPrompt(text, categories);
         const schema = this.buildSchema(categories);
         const modelName = this.getProviderName(); 
