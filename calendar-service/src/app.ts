@@ -1,3 +1,4 @@
+//app.ts
 import router from './routes/meeting.route.js';
 import { supabase } from './config/supabase.js';
 import dns from 'dns';
