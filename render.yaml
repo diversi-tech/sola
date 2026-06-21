@@ -24,7 +24,7 @@ services:
     env: node
     plan: free
     repo: https://github.com/diversi-tech/sola
-    branch: main
+    branch: STT_service
     rootDir: ./speach-to-text-service          
     buildCommand: npm install && npm run build       
     startCommand: npm start
