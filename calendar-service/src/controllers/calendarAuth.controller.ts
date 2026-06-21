@@ -26,7 +26,7 @@ export const generateAuthUrlHandler = async (req: Request, res: Response): Promi
       res.status(500).json({ error: 'Failed to initialize auth session' });
       return;
     }
-    const authUrl = generateGoogleAuthUrl(state);
+    const authUrl = generateGoogleAuthUrl(state, employee_email);
     res.status(200).json({ 
       auth_url: authUrl 
     });

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { googleCallbackHandler } from '../controllers/meeting.controller.js';
+import { googleCallbackHandler } from '../controllers/calendar.controller.js';
 
 const router = Router();
 

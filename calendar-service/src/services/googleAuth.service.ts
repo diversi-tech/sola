@@ -11,12 +11,13 @@ const getOAuth2Client = () => {
   return new google.auth.OAuth2(clientId, clientSecret, redirectUri);
 };
 
-export const generateGoogleAuthUrl = (state: string): string => {
+export const generateGoogleAuthUrl = (state: string, employee_email: string): string => {
   const oauth2Client = getOAuth2Client();
   return oauth2Client.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
     scope: ['https://www.googleapis.com/auth/calendar.readonly'],
     state: state,
+    login_hint: employee_email
   });
 };
