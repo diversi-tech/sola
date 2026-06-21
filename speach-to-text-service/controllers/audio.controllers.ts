@@ -10,53 +10,34 @@ export const processAudioRequest = async (req: Request, res: Response): Promise<
   try {
     if (!req.file) {
       const errorMessage = 'Bad Request: No audio file provided.';
+      
+      const userFriendlyMessage = errorHandlerService.handleProcessResult(400, errorMessage, currentUserId || 'unknown');
 
-      await errorHandlerService.handleProcessResult(
-        currentUserId || 'unknown',
-        errorMessage,
-        "400"
-      );
-
-      res.status(400).json({ error: errorMessage });
+      res.status(400).json({ error: userFriendlyMessage });
       return;
     }
 
     if (!currentUserId) {
       const errorMessage = 'Bad Request: Missing userId.';
+      
+      const userFriendlyMessage = errorHandlerService.handleProcessResult(400, errorMessage, 'unknown');
 
-      await errorHandlerService.handleProcessResult(
-        'unknown',
-        errorMessage,
-        "400"
-      );
-
-      res.status(400).json({ error: errorMessage });
+      res.status(400).json({ error: userFriendlyMessage });
       return;
     }
 
     if (req.file.size > MAX_SIZE_BYTES) {
       const errorMessage = 'Payload Too Large: Audio file exceeds 25MB limit.';
+      
+      const userFriendlyMessage = errorHandlerService.handleProcessResult(413, errorMessage, currentUserId);
 
-      await errorHandlerService.handleProcessResult(
-        currentUserId,
-        errorMessage,
-        "413"
-      );
-
-      res.status(413).json({ error: errorMessage });
+      res.status(413).json({ error: userFriendlyMessage });
       return;
     }
-
 
     const transcriptionResult = await audioService.handleAudioProcessingPipeline(
       req.file,
       currentUserId
-    );
-
-    await errorHandlerService.handleProcessResult(
-      currentUserId,
-      transcriptionResult,
-      "200"
     );
 
     res.status(200).json({
@@ -66,17 +47,10 @@ export const processAudioRequest = async (req: Request, res: Response): Promise<
 
   } catch (error: any) {
     console.error('Controller caught an error:', error);
-
     const errorMessage = error?.message || 'Audio processing failed during transcription.';
 
-    await errorHandlerService.handleProcessResult(
+    const userFriendlyMessage = errorHandlerService.handleProcessResult(500, errorMessage, currentUserId || 'unknown');
 
-
-      currentUserId || 'unknown',
-      errorMessage,
-      "500"
-    );
-
-    res.status(500).json({ error: errorMessage });
+    res.status(500).json({ error: userFriendlyMessage });
   }
 };

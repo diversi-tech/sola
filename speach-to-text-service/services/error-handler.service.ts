@@ -1,5 +1,5 @@
-export function handleProcessResult(status: string, info: string, userId: string): string {
-    if (status === 'success') {
+export function handleProcessResult(status: number, info: string, userId: string): string {
+    if (status === 200) {
         return info; 
     }
 
