@@ -7,22 +7,52 @@ import axios from 'axios';
 import fs from 'fs';
 
 const WHATSAPP_BUSINESS = 'whatsapp_business_account';
+const WHATSAPP_API_BASE_URL = process.env.WHATSAPP_API_URL || 'https://graph.facebook.com/v17.0';
+
+const handleTextMessage = async (userId: string, message: any) => {
+    const reportData: ReportIncomingData = {
+        userId,
+        content: message.text?.body || '',
+        messageId: message.id,
+        timestamp: String(message.timestamp)
+    };
+    await sendToReports(reportData);
+};
+
+const handleAudioMessage = async (userId: string, message: any) => {
+    const mediaId = message.audio?.id;
+    if (!mediaId) return console.error("No media ID found in audio message.");
+
+    const filePath = await downloadAudioFile(mediaId);
+    if (!filePath) return console.error("Audio download failed.");
+
+    const transcribedText = await transcribeAudioFile(filePath);
+    
+    try { if (fs.existsSync(filePath)) fs.unlinkSync(filePath); } catch (e) { console.error("Cleanup failed", e); }
+
+    if (!transcribedText) return console.error("Transcription failed.");
+
+    await sendToReports({
+        userId,
+        content: transcribedText,
+        messageId: message.id,
+        timestamp: String(message.timestamp)
+    });
+};
 
 export const sendWhatsAppMessage = async (to: string, text: string) => {
     try {
         const token = process.env.META_ACCESS_TOKEN;
         const phone_number_id = process.env.META_PHONE_NUMBER_ID;
-        await axios.post(
-            `https://graph.facebook.com/v17.0/${phone_number_id}/messages`,
-            {
-                messaging_product: "whatsapp",
-                to: to,
-                text: { body: text },
-            },
-            {
-                headers: { Authorization: `Bearer ${token}` }
-            }
-        );
+        const whatsapp_url = `${WHATSAPP_API_BASE_URL}/${phone_number_id}/messages`;
+
+        await axios.post(whatsapp_url, {
+            messaging_product: "whatsapp",
+            to,
+            text: { body: text },
+        }, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
         console.log(`Message sent successfully to ${to}`);
     } catch (error) {
         console.error("Failed to send WhatsApp message:", error);
@@ -30,112 +60,26 @@ export const sendWhatsAppMessage = async (to: string, text: string) => {
 };
 
 export const checkVerifyToken = (mode: string, token: string): boolean => {
-    const verification_token = process.env.VERIFY_TOKEN;
-    return mode === 'subscribe' && token === verification_token;
+    return mode === 'subscribe' && token === process.env.VERIFY_TOKEN;
 };
 
 export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: boolean; phoneNumber?: string } | null> => {
-    console.log("Webhook event received from Meta");
+    if (body.object !== WHATSAPP_BUSINESS) return null;
+    
+    const message = body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+    if (!message) return null;
 
-    if (body.object === WHATSAPP_BUSINESS) {
-        const messages = body.entry?.[0]?.changes?.[0]?.value?.messages;
+    const senderPhoneNumber = message.from;
+    
+    const authResult = process.env.USE_MOCK_AUTH === 'true' 
+        ? { isAuthorized: true, userId: "mock_user_123" } 
+        : await verifyUserAuth({ phoneNumber: senderPhoneNumber });
 
-        if (messages?.length) {
-            const message = messages[0];
-            const senderPhoneNumber = message.from;
+    if (!authResult.isAuthorized) return { isAuthorized: false, phoneNumber: senderPhoneNumber };
 
-            if (typeof senderPhoneNumber === 'string' && senderPhoneNumber.trim() !== '') {
-              
-                let authResult;
-                const authPayload = { "phoneNumber": senderPhoneNumber };
+    if (message.type === 'text') await handleTextMessage(authResult.userId, message);
+    else if (message.type === 'audio') await handleAudioMessage(authResult.userId, message);
+    else console.log(`Unknown message type: ${message.type}`);
 
-                if (process.env.USE_MOCK_AUTH === 'true') {
-                    console.log(" DEV MODE: Bypassing Auth Service.");
-                    authResult = { isAuthorized: true, userId: "mock_user_123", message: "Dev bypass" };
-                } 
-                else {
-                    authResult = await verifyUserAuth(authPayload);
-                }
-                
-                if (!authResult.isAuthorized) {
-                    console.error("Unauthorized User! Stopping process. Message:", authResult.message);
-                    return { isAuthorized: false, phoneNumber: senderPhoneNumber }; 
-                }
-
-                const userId = authResult.userId; 
-                console.log("User Authorized");
-                console.log(`Real UserID is: ${userId}`);
-
-                const messageType = message.type;
-                
-                
-                if (messageType === 'text') {
-                    console.log("Message type is text.");
-                    const reportData: ReportIncomingData = {
-                        userId: userId, 
-                        content: message.text?.body || '',
-                        messageId: message.id,
-                        timestamp: String(message.timestamp)
-                    };
-                    await sendToReports(reportData);
-                } 
-                
-                else if (messageType === 'audio') {
-                    console.log("Message type is audio. Switching to Task 57 (Media Download).");
-                    const mediaId = message.audio?.id;
-                    
-                    if (mediaId) {
-                      
-                        const filePath = await downloadAudioFile(mediaId);
-                        
-                        if (!filePath) {
-                            console.error("Audio download failed, stopping processing.");
-                            return { isAuthorized: true, phoneNumber: senderPhoneNumber }; 
-                        }
-                        
-                        console.log("Audio file downloaded successfully for further processing.");
-
-                        
-                        const transcribedText = await transcribeAudioFile(filePath);
-
-                        try {
-                              fs.unlinkSync(filePath);
-                              console.log(`[Cleanup] Temporary file deleted successfully: ${filePath}`);
-                     } catch (cleanupError) {
-                              console.error(`[Cleanup] Failed to delete temporary file: ${filePath}`, cleanupError);
-                         }
-
-                        if (!transcribedText) {
-                            console.error("STT transcription failed, stopping processing.");
-                            return { isAuthorized: true, phoneNumber: senderPhoneNumber };
-                        }
-
-                        console.log("STT transcription completed successfully!");
-
-                      
-                        const reportData: ReportIncomingData = {
-                            userId: userId, 
-                            content: transcribedText, 
-                            messageId: message.id,
-                            timestamp: String(message.timestamp)
-                        };
-                        
-                        
-                        await sendToReports(reportData);
-                        console.log("[Webhook] Audio transcription chain finalized and report sent successfully!");
-                        
-                    } else {
-                        console.error("Audio message received but no media ID found.");
-                    }
-                } else {
-                    console.log(`Unknown message type received: ${messageType}`);
-                }
-                
-                return { isAuthorized: true, phoneNumber: senderPhoneNumber };
-            } else {
-                console.error("Validation failed: Phone number is missing or invalid");
-            }
-        }
-    }
-    return null;
+    return { isAuthorized: true, phoneNumber: senderPhoneNumber };
 };

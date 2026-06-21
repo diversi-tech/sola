@@ -5,7 +5,6 @@ export const verifyUserAuth = async (authPayload: { phoneNumber: string }) => {
 
     try {
         const response = await axios.post(authApiUrl, authPayload);
-
         const { IsSucceeded, message, userId } = response.data;
 
         return {
@@ -24,7 +23,6 @@ export const verifyUserAuth = async (authPayload: { phoneNumber: string }) => {
                 userId: null
             };
         }
-
         return {
             isAuthorized: false,
             message: "Auth Service is offline or unreachable",

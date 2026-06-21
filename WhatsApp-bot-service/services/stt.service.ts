@@ -7,18 +7,9 @@ export const transcribeAudioFile = async (filePath: string): Promise<string | nu
        
         const baseUrl = process.env.STT_SERVICE_URL || 'http://localhost:5002';
         const sttEndpoint = `${baseUrl}/v1/audio/process`;
-
-       
         const formData = new FormData();
-        
-      
         formData.append('file', fs.createReadStream(filePath));
-
-      
-
         console.log(`[STT] Forwarding audio file to STT service: ${sttEndpoint}`);
-
-       
         const response = await axios.post(sttEndpoint, formData, {
             headers: {
                 ...formData.getHeaders(), 
@@ -26,7 +17,7 @@ export const transcribeAudioFile = async (filePath: string): Promise<string | nu
         });
 
         const transcribedText = response.data?.transcribedText || response.data?.text;
-
+        
         if (!transcribedText) {
             console.error("[STT] API responded successfully but missing text fields:", response.data);
             return null;
