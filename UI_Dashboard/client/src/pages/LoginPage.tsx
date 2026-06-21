@@ -3,10 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import Input from '../features/login/components/Input';
 import Button from '../features/login/components/Button';
 
-export default function LoginPage() {
+// אם העמוד יקבל props בעתיד, ניתן להגדיר כאן ממשק:
+// interface LoginPageProps {}
+
+export  const LoginPage: React.FC = () => {
   const navigate = useNavigate(); 
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (): Promise<void> => {
     navigate('/EmployeePage');
   };
 
@@ -67,4 +70,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
+};

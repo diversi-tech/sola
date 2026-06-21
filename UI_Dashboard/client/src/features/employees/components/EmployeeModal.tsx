@@ -1,16 +1,43 @@
 import React, { useState } from 'react';
-// מייבאים מאותה תיקייה (./) ובשמות החדשים
 import { EmployeeMetrics } from './EmployeeMetrics';
 import { EmployeeReports } from './EmployeeReports';
 
+// --- הגדרת טיפוסים (Interfaces) ---
 
-export const EmployeeModal = ({ employee, reports, loading, onClose }) => {
-  const [activeTab, setActiveTab] = useState('overview');
+interface Employee {
+  id: string | number;
+  name: string;
+  is_active: boolean;
+}
+
+// ניתן לייבא את ממשק ה-Report מהקובץ הרלוונטי אם הוא כבר מוגדר שם
+interface Report {
+  id: string | number;
+  created_at: string;
+  metric_scores: { [key: string]: number };
+}
+
+interface EmployeeModalProps {
+  employee: Employee;
+  reports: Report[];
+  loading: boolean;
+  onClose: () => void;
+}
+
+export const EmployeeModal: React.FC<EmployeeModalProps> = ({ 
+  employee, 
+  reports, 
+  loading, 
+  onClose 
+}) => {
+  // הגדרת המצבים האפשריים ללשוניות כדי למנוע טעויות הקלדה
+  const [activeTab, setActiveTab] = useState<'overview' | 'reports'>('overview');
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/50 backdrop-blur-sm animate-fade-in w-full h-full p-4 md:p-8" style={{ direction: 'rtl' }}>
       <div className="bg-white rounded-2xl w-full h-full flex flex-col overflow-hidden shadow-2xl border border-gray-100 max-w-7xl mx-auto">
         
+        {/* Header Section */}
         <div className="p-6 md:p-8 border-b border-gray-100 flex justify-between items-center bg-gray-50/80">
           <div>
             <div className="flex items-center gap-4">
@@ -22,16 +49,33 @@ export const EmployeeModal = ({ employee, reports, loading, onClose }) => {
             <p className="text-sm text-gray-500 mt-1.5 font-medium">מזהה מערכת ארגוני: #{employee.id}</p>
           </div>
           
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-red-600 bg-white hover:bg-red-50 rounded-xl transition-all border border-gray-200 shadow-sm">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+          <button 
+            onClick={onClose} 
+            className="p-2 text-gray-400 hover:text-red-600 bg-white hover:bg-red-50 rounded-xl transition-all border border-gray-200 shadow-sm"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
           </button>
         </div>
 
+        {/* Tabs Section */}
         <div className="flex border-b border-gray-200 bg-white px-8 gap-4 shrink-0 shadow-sm z-10 overflow-x-auto">
-          <button onClick={() => setActiveTab('overview')} className={`py-4 px-2 font-bold text-sm border-b-2 transition-all whitespace-nowrap ${activeTab === 'overview' ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>📊 סקירה והתפתחות מדדים</button>
-          <button onClick={() => setActiveTab('reports')} className={`py-4 px-2 font-bold text-sm border-b-2 transition-all whitespace-nowrap ${activeTab === 'reports' ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>📝 היסטוריית דוחות</button>
+          <button 
+            onClick={() => setActiveTab('overview')} 
+            className={`py-4 px-2 font-bold text-sm border-b-2 transition-all whitespace-nowrap ${activeTab === 'overview' ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
+          >
+            📊 סקירה והתפתחות מדדים
+          </button>
+          <button 
+            onClick={() => setActiveTab('reports')} 
+            className={`py-4 px-2 font-bold text-sm border-b-2 transition-all whitespace-nowrap ${activeTab === 'reports' ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
+          >
+            📝 היסטוריית דוחות
+          </button>
         </div>
 
+        {/* Content Section */}
         <div className="p-6 md:p-8 overflow-y-auto flex-1 bg-slate-50/50">
           {loading ? (
             <div className="flex flex-col justify-center items-center h-full gap-4">

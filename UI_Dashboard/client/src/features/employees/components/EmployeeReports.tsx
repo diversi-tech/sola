@@ -1,13 +1,31 @@
-// src/components/employee/components/tabs/ReportsTab.jsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, ChangeEvent } from 'react';
 
-export const EmployeeReports= ({ reports }) => {
-  const [filterMonth, setFilterMonth] = useState('');
-  const [filterCategory, setFilterCategory] = useState('all');
+// --- הגדרת טיפוסים ---
 
+interface MetricScores {
+  [key: string]: number | string | null | undefined;
+}
+
+interface Report {
+  id: string | number;
+  created_at: string;
+  manager_id?: string | number;
+  text_summary?: string;
+  metric_scores?: MetricScores;
+}
+
+interface EmployeeReportsProps {
+  reports: Report[] | undefined;
+}
+
+export const EmployeeReports: React.FC<EmployeeReportsProps> = ({ reports }) => {
+  const [filterMonth, setFilterMonth] = useState<string>('');
+  const [filterCategory, setFilterCategory] = useState<string>('all');
+
+  // שליפת קטגוריות ייחודיות מתוך כל הדו"חות
   const availableCategories = useMemo(() => {
     if (!reports) return [];
-    const categoriesSet = new Set();
+    const categoriesSet = new Set<string>();
     reports.forEach(report => {
       if (report.metric_scores) {
         Object.keys(report.metric_scores).forEach(key => categoriesSet.add(key));
@@ -16,14 +34,23 @@ export const EmployeeReports= ({ reports }) => {
     return Array.from(categoriesSet);
   }, [reports]);
 
+  // סינון ומיון הדו"חות
   const filteredAndSortedReports = useMemo(() => {
     if (!reports) return [];
-    let result = [...reports].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    
+    // מיון לפי תאריך (חדש לישן)
+    let result = [...reports].sort((a, b) => 
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
 
+    // סינון לפי חודש
     if (filterMonth) {
-      result = result.filter(report => new Date(report.created_at).toISOString().slice(0, 7) === filterMonth);
+      result = result.filter(report => 
+        new Date(report.created_at).toISOString().slice(0, 7) === filterMonth
+      );
     }
 
+    // סינון לפי קטגוריה
     if (filterCategory !== 'all') {
       result = result.filter(report => {
         if (!report.metric_scores) return false;
@@ -36,20 +63,36 @@ export const EmployeeReports= ({ reports }) => {
 
   return (
     <div className="animate-fade-in py-4 max-w-4xl mx-auto flex flex-col gap-6">
+      {/* סרגל סינון */}
       <div className="bg-white p-4 rounded-2xl border border-indigo-100 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="flex items-center gap-2 text-indigo-800 font-bold text-sm">סינון דוחות:</div>
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-          <input type="month" value={filterMonth} onChange={(e) => setFilterMonth(e.target.value)} className="bg-slate-50 border border-slate-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500" />
-          <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="bg-slate-50 border border-slate-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500">
+          <input 
+            type="month" 
+            value={filterMonth} 
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterMonth(e.target.value)} 
+            className="bg-slate-50 border border-slate-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500" 
+          />
+          <select 
+            value={filterCategory} 
+            onChange={(e: ChangeEvent<HTMLSelectElement>) => setFilterCategory(e.target.value)} 
+            className="bg-slate-50 border border-slate-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500"
+          >
             <option value="all">כל הקטגוריות</option>
             {availableCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
           </select>
           {(filterMonth || filterCategory !== 'all') && (
-            <button onClick={() => { setFilterMonth(''); setFilterCategory('all'); }} className="text-xs font-bold text-red-500 bg-red-50 px-3 py-2.5 rounded-xl">איפוס</button>
+            <button 
+              onClick={() => { setFilterMonth(''); setFilterCategory('all'); }} 
+              className="text-xs font-bold text-red-500 bg-red-50 px-3 py-2.5 rounded-xl"
+            >
+              איפוס
+            </button>
           )}
         </div>
       </div>
 
+      {/* רשימת דוחות */}
       {filteredAndSortedReports.length > 0 ? (
         <div className="relative border-r-2 border-indigo-100 pr-6 mr-3 space-y-8">
           {filteredAndSortedReports.map((report) => (

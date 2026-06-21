@@ -35,14 +35,14 @@ export const calculateEmployeeRating = (reports: Report[]): number => {
 
 export const employeeApi = {
   fetchAllEmployees: async (): Promise<Employee[]> => {
-    const URL = 'http://localhost:5006/api/employees'; 
+    const URL = `${import.meta.env.VITE_API_BASE_URL}/api/employees`;
     const response = await fetch(URL);
     if (!response.ok) throw new Error('Failed to fetch employees');
     return response.json();
   },
 
   fetchEmployeeReports: async (employeeId: number): Promise<Report[]> => {
-    const URL = `http://localhost:5006/api/reports/${employeeId}`; 
+    const URL =  `${import.meta.env.VITE_API_BASE_URL}/api/reports/${employeeId}`; 
     const response = await fetch(URL);
     if (!response.ok) throw new Error('Failed to fetch reports');
     return response.json();

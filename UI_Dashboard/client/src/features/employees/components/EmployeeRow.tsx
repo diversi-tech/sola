@@ -1,4 +1,20 @@
-export const EmployeeRow = ({ employee, rating, onClick }) => {
+import React from 'react';
+
+// --- הגדרת טיפוסים ---
+
+interface Employee {
+  id: string | number;
+  name: string;
+  is_active: boolean;
+}
+
+interface EmployeeRowProps {
+  employee: Employee;
+  rating: number;
+  onClick: () => void;
+}
+
+export const EmployeeRow: React.FC<EmployeeRowProps> = ({ employee, rating, onClick }) => {
   return (
     <div
       onClick={onClick}
