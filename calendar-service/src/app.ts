@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 
 app.use((req, res, next) => {
-    console.log(`📍 ${req.method} ${req.path}`);
+    console.log(` ${req.method} ${req.path}`);
     next();
 });
 
@@ -25,14 +25,14 @@ app.use('/api/calendar/auth', calendarAuthRoutes);
 
 async function testConnection() {
     const { error } = await supabase.from('Meeting').select('*');
-    console.log(error ? '❌ חיבור נכשל:' + error.message : '✅ החיבור הצליח');
+    console.log(error ? 'Connection failed: ' + error.message : 'Connection successful');
 }
 
 testConnection();
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`🚀 השרת רץ ומקשיב על פורט ${PORT}`);
+    console.log(` Server running on port ${PORT}`);
 });
 
 export default app;

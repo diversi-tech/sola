@@ -1,4 +1,3 @@
-//meeting.service.ts
 import { google } from 'googleapis';
 import { supabase } from '../config/supabase.js';
 import { Meeting, MeetingType } from '../models/meeting.model.js';
@@ -89,7 +88,7 @@ export async function syncUserCalendar(
     .filter((m): m is Meeting => m !== null);
 
   if (meetings.length === 0) {
-    console.log('[Sync] אין פגישות להכנסה');
+    console.log('[Sync] no meetings to sync');
     return;
   }
 
@@ -98,11 +97,10 @@ export async function syncUserCalendar(
     .upsert(meetings, { onConflict: 'google_event_id' });
 
   if (error) {
-    console.error('[Sync] שגיאת Supabase:', error.message);
+    console.error('[Sync] Supabase error:', error.message);
     throw new Error(error.message);
   }
-
-  console.log(`[Sync] ✅ נשמרו/עודכנו ${meetings.length} פגישות`);
+  console.log(`[Sync] ✅ Saved/updated ${meetings.length} meetings`);
 }
 
 export async function syncAllActiveUsers(): Promise<void> {
@@ -112,12 +110,12 @@ export async function syncAllActiveUsers(): Promise<void> {
     .not('refresh_token', 'is', null);
 
   if (error) {
-    console.error('[Sync] שגיאה בשליפת משתמשים:', error);
+    console.error('[Sync] error fetching users:', error);
     throw error;
   }
 
   if (!users?.length) {
-    console.log('[Sync] לא נמצאו משתמשים');
+    console.log('[Sync] no users found');
     return;
   }
 
@@ -125,7 +123,7 @@ export async function syncAllActiveUsers(): Promise<void> {
     try {
       await syncUserCalendar(user.id, user.refresh_token);
     } catch (err) {
-      console.error(`[Sync] נכשל עבור ${user.employee_email}:`, err);
+      console.error(`[Sync] failed for ${user.employee_email}:`, err);
     }
   }
 }

@@ -3,7 +3,7 @@ import { syncCalendar, syncActiveUsers } from "../controllers/meeting.controller
 
 const router = Router()
 
-router.post('/:badgeNumber',syncCalendar)
+router.post('/:userID',syncCalendar)
 
 router.post('/',syncActiveUsers)
 
