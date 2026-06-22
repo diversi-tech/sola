@@ -1,10 +1,10 @@
 import { supabase } from '../config/supabase.js';
 
-const getUserByPhone = async (phoneNumber: string) => {
+const getUserByPhone = async (phone_number: string) => {
   const { data, error } = await supabase
-    .from('Users')
-    .select('ID')
-    .eq('PhoneNumber', phoneNumber)
+    .from('Authorized_Users')
+    .select('user_id')
+    .eq('phone_number', phone_number)
     .single();
 
   if (error && error.code !== 'PGRST116') {
@@ -13,8 +13,8 @@ const getUserByPhone = async (phoneNumber: string) => {
   return data;
 };
 
-export const authenticateUser = async (phoneNumber: string) => {
-  const user = await getUserByPhone(phoneNumber);
+export const authenticateUser = async (phone_number: string) => {
+  const user = await getUserByPhone(phone_number);
 
   return user; 
 };

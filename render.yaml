@@ -37,3 +37,4 @@ services:
           type: web
           name: auth-service
           property: host
+      - fromGroup: speach-to-text-env-group          
