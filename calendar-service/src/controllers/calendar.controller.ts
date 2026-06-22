@@ -8,7 +8,7 @@ export const googleCallbackHandler = async (req: Request, res: Response) => {
         const error = req.query.error as string;
 
         if (!code && !error) {
-            return res.status(400).json({ message: "בקשה לא תקינה - חסרים נתונים מגוגל." });
+            return res.status(400).json({ message: "Invalid request - missing data from Google." });
         }
 
         await processGoogleCallback(code, state, error);
@@ -25,16 +25,16 @@ export const googleCallbackHandler = async (req: Request, res: Response) => {
         
         switch (err.message) {
             case "USER_DENIED":
-                return res.status(400).json({ message: "החיבור נדחה. לא ניתן לגשת ליומן." });
+                return res.status(400).json({ message: "Connection refused. Cannot access the calendar." });
             case "SECURITY_ERROR":
-                return res.status(401).json({ message: "שגיאת אבטחה: הבקשה לא חוקית או שפג תוקפה." });
+                return res.status(401).json({ message: "Security error: The request is invalid or has expired." });
             case "GOOGLE_API_ERROR":
             case "NO_REFRESH_TOKEN":
-                return res.status(500).json({ message: "שגיאה מול גוגל בהמרת הקוד." });
+                return res.status(500).json({ message: "Error with Google converting the code." });
             case "DB_SAVE_ERROR":
-                return res.status(500).json({ message: "שגיאה בשמירת הנתונים במערכת." });
+                return res.status(500).json({ message: "Error saving data to the system." });
             default:
-                return res.status(500).json({ message: "שגיאת שרת פנימית." });
+                return res.status(500).json({ message: "Internal server error." });
         }
     }
 };
