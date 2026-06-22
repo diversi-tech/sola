@@ -11,10 +11,10 @@ concurrency:
 
 # ── Per-project config (the only lines that differ between repos) ──
 env:
-  PROJECT_NAME: sola-security
-  PUBLISH_DIR: packages/frontend/build
-  BUILD_CMD: npm ci && npm run build --workspace=packages/shared && CI=false npm run build --workspace=packages/frontend
-
+  PROJECT_NAME: dashboard-client
+  PUBLISH_DIR: dashboard/client/dist
+  BUILD_CMD: cd dashboard/client && npm install && npm run build
+  
 jobs:
   deploy:
     runs-on: ubuntu-latest
