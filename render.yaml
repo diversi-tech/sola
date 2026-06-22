@@ -8,7 +8,7 @@ services:
     plan: free
     repo: https://github.com/diversi-tech/sola
     branch: main
-    rootDir: ./auth_service
+    rootDir: ./auth-service
     buildCommand: npm install && npm run build
     startCommand: npm start
     autoDeploy: true
