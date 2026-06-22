@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npm install && ts-node -T app.ts"
+    "dev": "npm install && ts-node -T app.ts",
+    "start": "node dist/app.js",
+    "build": "tsc"
+    
   },
   
   "keywords": [],
