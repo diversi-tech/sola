@@ -52,4 +52,5 @@ services:
       - key: NODE_ENV
         value: production
       - key: AUTH_SERVICE_URL
+        sync: false
       - fromGroup: report-env-group          
