@@ -46,9 +46,9 @@ const handleTextMessage = async (userId: string, message: any, senderPhoneNumber
 
     const isSuccess = await sendToReports(reportData);
     if (isSuccess) {
-        await sendWhatsAppMessage(senderPhoneNumber, "הדיווח התקבל בהצלחה! תודה שעדכנת.");
+        await sendWhatsAppMessage(senderPhoneNumber, "The report was received successfully! Thank you for the update");
     } else {
-        await sendWhatsAppMessage(senderPhoneNumber, "מצטערים, חלה שגיאה בעיבוד הדיווח. אנא נסה שוב.");
+        await sendWhatsAppMessage(senderPhoneNumber,"Sorry, an error occurred while processing the report. Please try again.");
     }
 };
 
@@ -64,7 +64,7 @@ const handleAudioMessage = async (userId: string, message: any, senderPhoneNumbe
     const filePath = await downloadAudioFile(mediaId);
 
     if (!filePath) {
-        await sendWhatsAppMessage(senderPhoneNumber, "מצטערים, לא הצלחנו להוריד את קובץ האודיו.");
+        await sendWhatsAppMessage(senderPhoneNumber, "Sorry, we couldn't download your audio file.");
         return;
     }
 
@@ -78,7 +78,7 @@ const handleAudioMessage = async (userId: string, message: any, senderPhoneNumbe
     }
 
     if (!transcribedText) {
-        await sendWhatsAppMessage(senderPhoneNumber, "מצטערים, לא הצלחנו לתמלל את האודיו שלך.");
+        await sendWhatsAppMessage(senderPhoneNumber, "Sorry, we couldn't transcribe your audio file.");
         return;
     }
 
@@ -91,9 +91,9 @@ const handleAudioMessage = async (userId: string, message: any, senderPhoneNumbe
 
     const isSuccess = await sendToReports(reportData);
     if (isSuccess) {
-        await sendWhatsAppMessage(senderPhoneNumber, "הדיווח הקולי התקבל וטופל בהצלחה!");
+        await sendWhatsAppMessage(senderPhoneNumber,"The voice report was received and processed successfully!");
     } else {
-        await sendWhatsAppMessage(senderPhoneNumber, "הדיווח הקולי הגיע, אך חלה שגיאה בשמירתו במערכת.");
+        await sendWhatsAppMessage(senderPhoneNumber, "The voice report was received, but an error occurred while saving it to the system.");
     }
 };
 
