@@ -1,5 +1,6 @@
 import { ILLMProvider } from '../interfaces/LlmAnalysisResult.js';
 import { GeminiProvider } from './gemini.provider.js';
+import { OpenAiProvider } from './openai.provider.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -16,8 +17,8 @@ export class LLMFactory {
                 case 'gemini':
                     return new GeminiProvider();
                 
-                // case 'openai':
-                 //    return new OpenAiProvider(); 
+                 case 'openai':
+                     return new OpenAiProvider(); 
                 
                 default:
                     console.warn(`[LlmFactory] Unknown provider '${config.provider}', falling back to Gemini.`);
