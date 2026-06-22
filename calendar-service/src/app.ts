@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => res.send('Server is up and running!'));
 
 app.use('/api/meetings', router);
-app.use('/api/calendar', calendarRoutes);
+app.use('/auth/google', calendarRoutes);
 app.use('/api/calendar/auth', calendarAuthRoutes);
 
 async function testConnection() {
