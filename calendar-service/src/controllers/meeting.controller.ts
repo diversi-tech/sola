@@ -3,7 +3,7 @@ import { syncAllActiveUsers, syncUserCalendar } from "../services/meeting.servic
 
 export async function syncCalendar(req:Request,res:Response) {
     try {
-        const bedgNumber = Number(req.params.bedgNumber)
+        const bedgNumber = Number(req.params.userID)
         const refresh_token = req.body.refresh_token
         await syncUserCalendar(bedgNumber,refresh_token)
         res.json({message: "secseed"})
