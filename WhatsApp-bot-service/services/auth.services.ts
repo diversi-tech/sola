@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const verifyUserAuth = async (authPayload: { phoneNumber: string }) => {
-    const authApiUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:5005/auth/verify-phone';
+    const authApiUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:5005/auth/login';
 
     try {
         const response = await axios.post(authApiUrl, authPayload);

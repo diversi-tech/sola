@@ -28,14 +28,18 @@ export const verifyMetaWebhook = (req: Request, res: Response) => {
 
 // POST (receive webhook events from Meta)
 export const receiveWebhookEvent = async (req: Request, res: Response) => {
-    const body = req.body;
+    try {
+        const body = req.body;
 
-    const authResult = await processWebhookEvent(body);
+        const authResult = await processWebhookEvent(body);
 
-if (authResult && authResult.isAuthorized === false && authResult.phoneNumber) {
-    return await handleUnauthorizedAccess(res, authResult.phoneNumber);
-}
+        if (authResult && authResult.isAuthorized === false && authResult.phoneNumber) {
+            return await handleUnauthorizedAccess(res, authResult.phoneNumber);
+        }
 
-
-    res.status(200).send('EVENT_RECEIVED');
+        return res.status(200).send('EVENT_RECEIVED');
+    } catch (error) {
+        console.error("Error processing webhook event:", error);
+        return res.status(200).send('EVENT_RECEIVED'); 
+    }
 };
