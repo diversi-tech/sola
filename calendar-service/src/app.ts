@@ -1,15 +1,38 @@
+import 'dotenv/config';
 import express from 'express';
+import dns from 'dns';
+import router from './routes/meeting.route.js';
+import { supabase } from './config/supabase.js';
+import calendarRoutes from './routes/calendar.route.js';
+import calendarAuthRoutes from './routes/calendarAuth.route.js';
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
-
 app.use(express.json());
 
-app.get('/',(req,res) => {
-  res.send('Server is up and running')
-})
+app.use((req, res, next) => {
+    console.log(` ${req.method} ${req.path}`);
+    next();
+});
 
-const PORT = process.env.PORT || 3000
+app.get('/', (req, res) => res.send('Server is up and running!'));
 
-app.listen(PORT,()=>{
-  console.log(`Server is running on port ${PORT}`);
-})
+app.use('/api/meetings', router);
+app.use('/auth/google', calendarRoutes);
+app.use('/api/calendar/auth', calendarAuthRoutes);
+
+async function testConnection() {
+    const { error } = await supabase.from('Meeting').select('*');
+
+    console.log(error ? 'Connection failed: ' + error.message : 'Connection successful');}
+
+testConnection();
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(` Server running on port ${PORT}`);
+});
+
+export default app;
