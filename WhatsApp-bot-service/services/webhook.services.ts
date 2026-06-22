@@ -67,6 +67,7 @@ const handleAudioMessage = async (userId: string, message: any, senderPhoneNumbe
         await sendWhatsAppMessage(senderPhoneNumber, "Sorry, we couldn't download your audio file.");
         return;
     }
+    
 
     const transcribedText = await transcribeAudioFile(filePath);
 
