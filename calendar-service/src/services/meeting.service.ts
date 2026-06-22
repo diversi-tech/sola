@@ -1,4 +1,3 @@
-//meeting.service.ts
 import { google } from 'googleapis';
 import { supabase } from '../config/supabase.js';
 import { Meeting, MeetingType } from '../models/meeting.model.js';
