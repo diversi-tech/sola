@@ -25,8 +25,8 @@ app.use('/api/calendar/auth', calendarAuthRoutes);
 
 async function testConnection() {
     const { error } = await supabase.from('Meeting').select('*');
-    console.log(error ? 'Connection failed: ' + error.message : 'Connection successful');
-}
+
+    console.log(error ? 'Connection failed: ' + error.message : 'Connection successful');}
 
 testConnection();
 
