@@ -7,8 +7,8 @@ export const loginHandler = async (req: Request, res: Response, next: NextFuncti
   try {
     const phone_number = req.body.phone_number;
 
-    if (!phone_number || !phone_number.startsWith('+')) {
-      sendErrorResponse(res, HttpStatusCode.BAD_REQUEST, "Phone number is required and must start with '+'");
+    if (!phone_number || !phone_number.startsWith('country-code')) {
+      sendErrorResponse(res, HttpStatusCode.BAD_REQUEST, "Phone number is required and must start with country code.");
       return;
     }
 
