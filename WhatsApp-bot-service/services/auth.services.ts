@@ -1,7 +1,11 @@
 import axios from 'axios';
 
 export const verifyUserAuth = async (authPayload: { phoneNumber: string }) => {
-    const authApiUrl = process.env.AUTH_SERVICE_URL || 'http://localhost:5005/auth/verify-phone';
+    const authApiUrl = process.env.AUTH_SERVICE_URL;
+
+    if (!authApiUrl) {
+        throw new Error("AUTH_SERVICE_URL is not defined in environment variables");
+    }
 
     try {
         const response = await axios.post(authApiUrl, authPayload);
@@ -15,8 +19,7 @@ export const verifyUserAuth = async (authPayload: { phoneNumber: string }) => {
 
     } catch (error: any) {
         if (error.response) {
-            const { IsSucceeded, statusCode, message } = error.response.data;
-
+            const { IsSucceeded, message } = error.response.data;
             return {
                 isAuthorized: IsSucceeded,
                 message: message,

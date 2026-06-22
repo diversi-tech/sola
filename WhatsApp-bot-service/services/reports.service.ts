@@ -11,10 +11,10 @@ export const sendToReports = async (data: ReportIncomingData): Promise<boolean> 
             return false;
         }
 
-        const fullUrl = `${reportsApiUrl}${reportsApiPath}`;
+        const reportsServiceUrl = `${reportsApiUrl}${reportsApiPath}`;
 
-        console.log(`Sending real data to Reports Service at ${fullUrl}...`);
-        await axios.post(fullUrl, data);
+        console.log(`Sending real data to Reports Service at ${reportsServiceUrl}...`);
+        await axios.post(reportsServiceUrl, data);
         
         console.log("Data successfully delivered to Reports Team!");
         return true;
