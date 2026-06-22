@@ -31,9 +31,24 @@ services:
     autoDeploy: true                                  
     envVars:
       - key: NODE_ENV
+        value: production      
+      - fromGroup: speach-to-text-env-group          
+      
+# ==========================================
+# 3. Report-Service
+# ==========================================
+  - type: web
+    name: report-service
+    env: node
+    plan: free
+    repo: https://github.com/diversi-tech/sola
+    branch: main
+    rootDir: ./report-service          
+    buildCommand: npm install && npm run build       
+    startCommand: npm start
+    autoDeploy: true                                  
+    envVars:
+      - key: NODE_ENV
         value: production
       - key: AUTH_SERVICE_URL
-        fromService:
-          type: web
-          name: auth-service
-          property: host
+      - fromGroup: report-env-group          
