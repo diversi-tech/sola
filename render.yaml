@@ -1,21 +1,5 @@
 services:
-# ==========================================
-# 1. שירות אימות (Auth Service)
-# ==========================================
-  - type: web
-    name: auth-service
-    env: node
-    plan: free
-    repo: https://github.com/diversi-tech/sola
-    branch: main
-    rootDir: ./auth-service
-    buildCommand: npm install && npm run build
-    startCommand: npm start
-    autoDeploy: true
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - fromGroup: auth-env-group
+
 
 # ==========================================
 # 2. שירות אודיו (Speech to Text Service)
@@ -34,22 +18,3 @@ services:
       - key: NODE_ENV
         value: production      
       - fromGroup: speach-to-text-env-group          
-      
-# ==========================================
-# 3. Report-Service
-# ==========================================
-  - type: web
-    name: report-service
-    env: node
-    plan: free
-    repo: https://github.com/diversi-tech/sola
-    branch: main
-    rootDir: ./report-service          
-    buildCommand: npm install && npm run build       
-    startCommand: npm start
-    autoDeploy: true                                  
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: AUTH_SERVICE_URL
-      - fromGroup: report-env-group          
