@@ -18,6 +18,24 @@ services:
       - fromGroup: auth-env-group
 
 # ==========================================
+# 1.  שירות הדשבורד  (UI Service)
+# ==========================================
+  - type: web
+    name: dashboard-service
+    env: node
+    plan: free
+    repo: https://github.com/diversi-tech/sola
+    branch: main
+    rootDir: ./dashboard/server
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - fromGroup: dashboard-env-group
+
+# ==========================================
 # 2. שירות אודיו (Speech to Text Service)
 # ==========================================
   - type: web
