@@ -5,7 +5,7 @@ const handleUnauthorizedAccess = async (res: Response, phoneNumber: string) => {
     await sendWhatsAppMessage(phoneNumber, "Sorry, you are not authorized to use this bot.");
     return res.status(200).send('EVENT_RECEIVED');
 };
-// GET (verify webhook with Meta)
+
 export const verifyMetaWebhook = (req: Request, res: Response) => {
     const mode = req.query['hub.mode'] as string;
     const token = req.query['hub.verify_token'] as string;
@@ -26,7 +26,6 @@ export const verifyMetaWebhook = (req: Request, res: Response) => {
 };
 
 
-// POST (receive webhook events from Meta)
 export const receiveWebhookEvent = async (req: Request, res: Response) => {
     try {
         const body = req.body;

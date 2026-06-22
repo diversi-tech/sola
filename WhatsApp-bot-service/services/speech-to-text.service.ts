@@ -4,7 +4,7 @@ import FormData from 'form-data';
 
 export const transcribeAudioFile = async (filePath: string): Promise<string | null> => {
     try {
-        
+
         const baseUrl = process.env.STT_SERVICE_URL;
         const apiPath = process.env.STT_SERVICE_API_PATH || '/audio/process';
 
@@ -12,7 +12,7 @@ export const transcribeAudioFile = async (filePath: string): Promise<string | nu
             throw new Error("STT_SERVICE_URL is not defined");
         }
 
-        const sttEndpoint = `${baseUrl}${apiPath}`; // חיבור של שניהם
+        const sttEndpoint = `${baseUrl}${apiPath}`; 
         
         const formData = new FormData();
         formData.append('file', fs.createReadStream(filePath));

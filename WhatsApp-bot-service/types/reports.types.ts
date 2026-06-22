@@ -1,5 +1,5 @@
 
-// ⚠️ TODO: DRAFT ONLY! 
+// TODO: DRAFT ONLY! 
 // These types are a working draft based on assumptions. 
 // Must be updated once the Reports team sends the official API specification!
 
