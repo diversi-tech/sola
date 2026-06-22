@@ -1,6 +1,8 @@
+//meeting.service.ts
 import { google } from 'googleapis';
 import { supabase } from '../config/supabase.js';
 import { Meeting, MeetingType } from '../models/meeting.model.js';
+import { decryptToken } from '../utils/crypto.util.js';
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
@@ -19,7 +21,7 @@ function detectVideoCallProvider(event: any): string | null {
   if (text.includes('meet.google.com')) return 'Google Meet';
   if (text.includes('teams.microsoft.com')) return 'Microsoft Teams';
 
-  return null; 
+  return null;
 }
 
 function inferMeetingType(event: any, participantsCount: number): MeetingType {
@@ -64,7 +66,8 @@ export async function syncUserCalendar(
   badgeNumber: number,
   refreshToken: string
 ): Promise<void> {
-  oauth2Client.setCredentials({ refresh_token: refreshToken });
+  const decryptedToken = decryptToken(refreshToken); // פענוח הטוקן
+  oauth2Client.setCredentials({ refresh_token: decryptedToken });
   const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
   const timeMin = new Date();
