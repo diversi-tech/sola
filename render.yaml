@@ -48,9 +48,4 @@ services:
     buildCommand: npm install && npm run build       
     startCommand: npm start
     autoDeploy: true                                  
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: AUTH_SERVICE_URL
-        sync: false
-      - fromGroup: report-env-group          
+    
