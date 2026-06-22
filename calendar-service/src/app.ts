@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
 import dns from 'dns';
-
 import router from './routes/meeting.route.js';
 import { supabase } from './config/supabase.js';
 import calendarRoutes from './routes/calendar.route.js';
