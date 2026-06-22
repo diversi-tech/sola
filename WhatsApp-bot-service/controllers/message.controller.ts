@@ -10,9 +10,9 @@ export const handleSendInternalMessage = async (req: Request, res: Response) => 
         return res.status(401).json({ error: "Unauthorized: Invalid API Key" });
     }
 
-    const { toPhoneNumber: to, success, data } = req.body;
+    const { toPhoneNumber: receiverPhoneNumber, success, data } = req.body;
 
-    if (!to) {
+    if (!receiverPhoneNumber) {
         return res.status(400).json({ error: "Missing required field: toPhoneNumber" });
     }
     
@@ -23,14 +23,14 @@ export const handleSendInternalMessage = async (req: Request, res: Response) => 
         if (summary) {
             textContent = `Hi! Your report was successfully received and saved. Here is the analysis summary:\n${summary}`;
         } else {
-            textContent = "Hi! Your report was successfully received and saved, but no analysis summary was generated.";
+            textContent = "Hi! Your report was successfully received and saved.";
         }
     } else {
-        textContent = "Oops, an error occurred. Your message wasn't received.";
+        textContent = "I'm sorry, I couldn't process your message. Please try again later.";
     }
 
     try {
-        await sendWhatsAppMessage(to, textContent);
+        await sendWhatsAppMessage(receiverPhoneNumber, textContent);
         
         return res.status(200).json({ 
             success: true, 
