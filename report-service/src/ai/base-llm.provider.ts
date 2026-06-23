@@ -9,8 +9,10 @@ export abstract class baseLLMProvider {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    protected buildPrompt(text: string, categories: string[]): string {
+    protected buildPrompt(text: string, categories: string[], employeeNames: string[]): string {
         const categoriesString = categories.join(", ");
+
+        const employeeNamesString = employeeNames.join(", ");
 
         const promptPath = path.join(process.cwd(), 'src', 'config', 'llm', 'system-prompt.txt');
 
@@ -18,11 +20,12 @@ export abstract class baseLLMProvider {
 
         promptTemplate = promptTemplate.replace('{{CATEGORIES}}', categoriesString);
         promptTemplate = promptTemplate.replace('{{USER_TEXT}}', text);
+        promptTemplate = promptTemplate.replace('{{EMPLOYEE_NAMES}}', employeeNamesString);
 
         return promptTemplate;
     }
 
-    protected buildSchema(categories: string[]): any {
+    protected buildSchema(categories: string[],employeeNames: string[]): any {
         const dynamicMetricProperties: Record<string, any> = {};
         categories.forEach(category => {
             dynamicMetricProperties[category] = { type: "integer", nullable: true };
@@ -33,7 +36,7 @@ export abstract class baseLLMProvider {
             properties: {
                 metric_scores: { type: "object", properties: dynamicMetricProperties, required: categories },
                 text_summary: { type: "string" },
-                employee_name: { type: "string", nullable: true }
+                employee_name: { type: "string", enum: employeeNames, nullable: true }
             },
             required: ["metric_scores", "text_summary", "employee_name"],
         };
@@ -43,9 +46,9 @@ export abstract class baseLLMProvider {
 
     protected abstract callLlmApi(prompt: string, schema: any): Promise<string>;
 
-    public async analyzeFeedback(text: string, categories: string[]): Promise<LLMAnalysisResult> {
-        const prompt = this.buildPrompt(text, categories);
-        const schema = this.buildSchema(categories);
+    public async analyzeFeedback(text: string, categories: string[], employeeNames: string[] ): Promise<LLMAnalysisResult> {
+        const prompt = this.buildPrompt(text, categories,employeeNames);
+        const schema = this.buildSchema(categories,employeeNames);
         const modelName = this.getProviderName();
 
         const maxRetries = 3;
