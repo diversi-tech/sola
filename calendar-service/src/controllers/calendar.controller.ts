@@ -1,40 +1,27 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express'; 
 import { processGoogleCallback } from '../services/calendar.service.js';
+import { AppError } from '../middleware/error.middleware.js';
+import { AuthErrorType ,HttpStatusCode} from '../types/authErrors.enum.js';
 
-export const googleCallbackHandler = async (req: Request, res: Response) => {
+export const googleCallbackHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const code = req.query.code as string;
         const state = req.query.state as string;
         const error = req.query.error as string;
 
         if (!code && !error) {
-            return res.status(400).json({ message: "בקשה לא תקינה - חסרים נתונים מגוגל." });
+            throw new AppError("Invalid request - missing data from Google.", AuthErrorType.SECURITY_ERROR);
         }
 
         await processGoogleCallback(code, state, error);
 
-        return res.status(200).send(`
-            <div style="text-align: center; font-family: sans-serif; margin-top: 50px;">
-                <h1 style="color: #2ecc71;">החיבור ל-Google Calendar הצליח! 🎉</h1>
-                <p>היומן שלך סונכרן בהצלחה למערכת Sola. המידע הוצפן ונשמר בבטחה. אפשר לסגור את הלשונית הזו עכשיו.</p>
-            </div>
-        `);
+        res.status(HttpStatusCode.OK).json({
+            IsSucceeded: true,
+            statusCode: HttpStatusCode.OK,
+            message: "Connection to Google Calendar was successful! You can close the window."
+        });
 
     } catch (err: any) {
-        console.error("Callback endpoint error:", err.message);
-        
-        switch (err.message) {
-            case "USER_DENIED":
-                return res.status(400).json({ message: "החיבור נדחה. לא ניתן לגשת ליומן." });
-            case "SECURITY_ERROR":
-                return res.status(401).json({ message: "שגיאת אבטחה: הבקשה לא חוקית או שפג תוקפה." });
-            case "GOOGLE_API_ERROR":
-            case "NO_REFRESH_TOKEN":
-                return res.status(500).json({ message: "שגיאה מול גוגל בהמרת הקוד." });
-            case "DB_SAVE_ERROR":
-                return res.status(500).json({ message: "שגיאה בשמירת הנתונים במערכת." });
-            default:
-                return res.status(500).json({ message: "שגיאת שרת פנימית." });
-        }
+        next(err);
     }
 };

@@ -1,0 +1,14 @@
+export enum HttpStatusCode {
+    OK = 200,
+    BAD_REQUEST = 400,
+    UNAUTHORIZED = 401,
+    INTERNAL_SERVER_ERROR = 500
+}
+
+export enum AuthErrorType {
+    USER_DENIED = "USER_DENIED",
+    SECURITY_ERROR = "SECURITY_ERROR",
+    GOOGLE_API_ERROR = "GOOGLE_API_ERROR",
+    NO_REFRESH_TOKEN = "NO_REFRESH_TOKEN",
+    DB_SAVE_ERROR = "DB_SAVE_ERROR"
+}
