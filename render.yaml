@@ -54,3 +54,21 @@ services:
       - key: AUTH_SERVICE_URL
         sync: false
       - fromGroup: sola-project         
+
+# ==========================================
+# 4. Calendar-Service
+# ==========================================
+  - type: web
+    name: calendar-service
+    env: node
+    plan: free
+    repo: https://github.com/diversi-tech/sola
+    branch: main
+    rootDir: ./calendar-service          
+    buildCommand: npm install && npm run build       
+    startCommand: npm run dev
+    autoDeploy: true                                  
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - fromGroup: sola-project         
