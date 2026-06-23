@@ -1,6 +1,8 @@
 import { supabase } from '../config/supabase.js';
 import { google } from 'googleapis';
-import { encryptToken } from '../utils/crypto.util.js'
+import { encryptToken } from '../utils/crypto.util.js';
+import { AppError } from '../middleware/error.middleware.js';
+import { AuthErrorType } from '../types/authErrors.enum.js'
 
 const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -9,25 +11,25 @@ const oauth2Client = new google.auth.OAuth2(
 );
 
 export const processGoogleCallback = async (code: string, state: string, error?: string) => {
-    if (error) {
-        if (state) {
-            await supabase
-                .from('Users')
-                .update({ status: 'UNACTIVE', state: null }) 
-                .eq('state', state);
-        }
-        throw new Error("USER_DENIED");
+if (error) {
+    if (state) {
+        await supabase
+            .from('Users')
+            .update({ status: 'INACTIVE', state: null })
+            .eq('state', state);
     }
+    throw new AppError("The connection was denied. You cannot access the calendar.", AuthErrorType.USER_DENIED); 
+}
 
     const { data: authRecord, error: dbError } = await supabase
         .from('Users')
         .select('*')
         .eq('state', state)
-        .eq('status', 'UNACTIVE')
+        .eq('status', 'INACTIVE')
         .single();
 
     if (dbError || !authRecord) {
-        throw new Error("SECURITY_ERROR");
+        throw new AppError("Security error: The request is invalid or has expired.", AuthErrorType.SECURITY_ERROR);
     }
 
     let tokens;
@@ -35,12 +37,12 @@ export const processGoogleCallback = async (code: string, state: string, error?:
         const response = await oauth2Client.getToken(code);
         tokens = response.tokens;
     } catch (googleErr) {
-        throw new Error("GOOGLE_API_ERROR");
+        throw new AppError("Error with Google API during code exchange.", AuthErrorType.GOOGLE_API_ERROR);
     }
 
     const tokenToSave = tokens.refresh_token || authRecord.refresh_token;
     if (!tokenToSave) {
-        throw new Error("NO_REFRESH_TOKEN");
+        throw new AppError("No refresh token received from Google.", AuthErrorType.NO_REFRESH_TOKEN);
     }
 
     const encryptedToken = encryptToken(tokenToSave);
@@ -56,7 +58,7 @@ export const processGoogleCallback = async (code: string, state: string, error?:
         .eq('id', authRecord.id);
 
     if (updateError) {
-        throw new Error("DB_SAVE_ERROR");
+        throw new AppError("Error saving data to the database.", AuthErrorType.DB_SAVE_ERROR);
     }
 
     return authRecord; 
