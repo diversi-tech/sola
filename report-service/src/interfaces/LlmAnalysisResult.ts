@@ -5,5 +5,5 @@ export interface LLMAnalysisResult {
 }
 
 export interface ILLMProvider {
-    analyzeFeedback(text: string, categories: string[]): Promise<LLMAnalysisResult>;
+    analyzeFeedback(text: string, categories: string[], employeeNames: string[]): Promise<LLMAnalysisResult>;
 }
