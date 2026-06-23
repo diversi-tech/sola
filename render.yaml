@@ -52,4 +52,22 @@ services:
       - key: NODE_ENV
         value: production
       - key: AUTH_SERVICE_URL
-      - fromGroup: report-env-group          
+      - fromGroup: report-env-group 
+               
+# ==========================================
+# 4. WhatsApp Bot Service
+# ==========================================
+  - type: web
+    name: whatsapp-bot-service
+    env: node
+    plan: free
+    repo: https://github.com/diversi-tech/sola
+    branch: main
+    rootDir: ./WhatsApp-bot-service
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - fromGroup: whatsapp-bot-env-group
