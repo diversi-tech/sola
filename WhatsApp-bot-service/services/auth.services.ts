@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const verifyUserAuth = async (authPayload: { phoneNumber: string }) => {
+export const verifyUserAuth = async (authPayload: { phone_number: string }) => {
     const authApiUrl = process.env.AUTH_SERVICE_URL;
 
     if (!authApiUrl) {

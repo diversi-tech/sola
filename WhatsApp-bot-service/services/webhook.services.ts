@@ -12,8 +12,9 @@ export const sendWhatsAppMessage = async (to: string, text: string) => {
     try {
         const token = process.env.META_ACCESS_TOKEN;
         const phone_number_id = process.env.META_PHONE_NUMBER_ID;
-        const whatsappUrl = `${process.env.META_API_BASE_URL}/${phone_number_id}/messages`;
         
+        const baseUrl = process.env.META_API_BASE_URL || 'https://graph.facebook.com/v18.0';
+        const whatsappUrl = `${baseUrl}/${phone_number_id}/messages`;
         await axios.post(
             whatsappUrl,
             {
@@ -38,8 +39,8 @@ export const checkVerifyToken = (mode: string, token: string): boolean => {
 const handleTextMessage = async (userId: string, message: any, senderPhoneNumber: string) => {
     console.log("Message type is text.");
     const reportData: ReportIncomingData = {
-        userId: userId,
-        content: message.text?.body || '',
+        manager_id: userId,
+        text: message.text?.body || '',
         messageId: message.id,
         timestamp: String(message.timestamp)
     };
@@ -67,9 +68,9 @@ const handleAudioMessage = async (userId: string, message: any, senderPhoneNumbe
         await sendWhatsAppMessage(senderPhoneNumber, "Sorry, we couldn't download your audio file.");
         return;
     }
-    
 
-    const transcribedText = await transcribeAudioFile(filePath);
+
+    const transcribedText = await transcribeAudioFile(filePath,userId);
 
     try {
         fs.unlinkSync(filePath);
@@ -84,10 +85,10 @@ const handleAudioMessage = async (userId: string, message: any, senderPhoneNumbe
     }
 
     const reportData: ReportIncomingData = {
-        userId: userId,
-        content: transcribedText,
-        messageId: message.id,
-        timestamp: String(message.timestamp)
+       manager_id: userId,
+       text: transcribedText || '',
+       messageId: message.id,
+       timestamp: String(message.timestamp)
     };
 
     const isSuccess = await sendToReports(reportData);
@@ -110,10 +111,14 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
 
             if (typeof senderPhoneNumber === 'string' && senderPhoneNumber.trim() !== '') {
                 let authResult;
-                const authPayload = { "phoneNumber": senderPhoneNumber };
+                let formattedPhone = senderPhoneNumber;
+                if (!formattedPhone.startsWith('+')) {
+                formattedPhone = `+${formattedPhone}`;
+                }
 
+                const authPayload = { "phone_number": formattedPhone };
                 if (process.env.USE_MOCK_AUTH === 'true') {
-                    authResult = { isAuthorized: true, userId: "mock_user_123", message: "Dev bypass" };
+                    authResult = { isAuthorized: true, userId: "1", message: "Dev bypass" };
                 } else {
                     authResult = await verifyUserAuth(authPayload);
                 }
