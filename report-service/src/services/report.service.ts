@@ -1,5 +1,5 @@
 import { supabase } from '../config/supabase.js';
-import { findEmployeeByName, getAllEmployeeNames } from './employee.service.js';
+import { findEmployeeByName,getAllEmployeeNames } from './employee.service.js';
 import { getActiveCategories } from './category.service.js';
 import { LLMFactory } from '../ai/llm.factory.js';
 
@@ -20,6 +20,7 @@ export const processAndSaveFeedback = async (manager_id: number, text: string, a
         }
 
         const employeeId = await findEmployeeByName(extractedName);
+
         const realData = {
             employee_id: employeeId,
             manager_id: manager_id || null,
