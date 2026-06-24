@@ -1,4 +1,17 @@
+import {AuthErrorType}from '../types/authErrors.enum.js';
 import { Request, Response, NextFunction } from 'express';
+
+
+export class AppCalendarError extends Error {
+  public statusCode: AuthErrorType;
+
+  constructor(message: string, statusCode: AuthErrorType) {
+    super(message);
+    this.statusCode = statusCode;
+    this.name = this.constructor.name; 
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
 
 
 export class BadRequestError extends Error {
