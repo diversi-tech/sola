@@ -11,12 +11,14 @@ const oauth2Client = new google.auth.OAuth2(
 );
 
 export const processGoogleCallback = async (code: string, state: string, error?: string) => {
-if (error) {
-    if (state) {
-        await supabase
-            .from('Users')
-            .update({ status: 'INACTIVE', state: null })
-            .eq('state', state);
+    if (error) {
+        if (state) {
+            await supabase
+                .from('Users')
+                .update({ status: 'INACTIVE', state: null }) 
+                .eq('state', state);
+        }
+        throw new Error("USER_DENIED");
     }
     throw new AppError("The connection was denied. You cannot access the calendar.", AuthErrorType.USER_DENIED); 
 }

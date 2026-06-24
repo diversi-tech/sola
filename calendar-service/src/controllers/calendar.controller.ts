@@ -10,7 +10,7 @@ export const googleCallbackHandler = async (req: Request, res: Response, next: N
         const error = req.query.error as string;
 
         if (!code && !error) {
-            throw new AppError("Invalid request - missing data from Google.", AuthErrorType.SECURITY_ERROR);
+            return res.status(400).json({ message: "Invalid request - missing data from Google." });
         }
 
         await processGoogleCallback(code, state, error);

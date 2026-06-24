@@ -5,6 +5,7 @@ import router from './routes/meeting.route.js';
 import { supabase } from './config/supabase.js';
 import calendarRoutes from './routes/calendar.route.js';
 import calendarAuthRoutes from './routes/calendarAuth.route.js';
+import errorHandler from './middleware/error.middleware.js';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
@@ -30,7 +31,7 @@ async function testConnection() {
 
 testConnection();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
     console.log(` Server is running on port ${PORT}`);
 });

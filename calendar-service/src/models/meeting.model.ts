@@ -1,5 +1,3 @@
-//meeting.model.ts
-export type MeetingType = 'Frontal team meeting' | 'Online team meeting' | 'Online personal meeting' | 'Frontal personal meeting';
 export interface Meeting {
   meeting_id?: number;
   title: string;
@@ -17,4 +15,11 @@ export interface Meeting {
   attendees: string[];
     google_event_id?: string; 
 
+}
+
+export enum MeetingType{
+    FRONTAL_TEAM_MEETING = 'Frontal team meeting',
+    ONLINE_TEAM_MEETING= 'Online team meeting',
+    ONLINE_PERSONAL_MEETING = 'Online personal meeting',
+    FRONTAL_PERSONAL_MEETING = 'Frontal personal meeting'
 }
