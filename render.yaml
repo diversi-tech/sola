@@ -72,7 +72,7 @@ services:
       - key: NODE_ENV
         value: production
       - fromGroup: sola-project         
-      - fromGroup: report-env-group 
+       
                
 # ==========================================
 # 4. WhatsApp Bot Service
@@ -90,4 +90,4 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - fromGroup: whatsapp-bot-env-group
+      - fromGroup: sola-project
