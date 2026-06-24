@@ -5,6 +5,7 @@ import router from './routes/meeting.route.js';
 import { supabase } from './config/supabase.js';
 import calendarRoutes from './routes/calendar.route.js';
 import calendarAuthRoutes from './routes/calendarAuth.route.js';
+import errorHandler from './middleware/error.middleware.js';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
@@ -22,6 +23,7 @@ app.get('/', (req, res) => res.send('Server is up and running!'));
 app.use('/api/meetings', router);
 app.use('/auth/google', calendarRoutes);
 app.use('/api/calendar/auth', calendarAuthRoutes);
+app.use(errorHandler);
 
 async function testConnection() {
     const { error } = await supabase.from('Meeting').select('*');

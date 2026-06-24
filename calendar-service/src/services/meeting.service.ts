@@ -16,10 +16,8 @@ function detectVideoCallProvider(event: any): string | null {
   }
 
   const text = `${event.location || ''} ${event.description || ''}`.toLowerCase();
-  if (text.includes('zoom.us')) return 'Zoom';
   if (text.includes('meet.google.com')) return 'Google Meet';
-  if (text.includes('teams.microsoft.com')) return 'Microsoft Teams';
-
+  
   return null;
 }
 
@@ -27,10 +25,10 @@ function inferMeetingType(event: any, participantsCount: number): MeetingType {
   const isOnline = !!detectVideoCallProvider(event);
   const isPersonal = participantsCount <= 2;
 
-  if (isOnline && isPersonal) return 'Online personal meeting';
-  if (isOnline) return 'Online team meeting';
-  if (isPersonal) return 'Frontal personal meeting';
-  return 'Frontal team meeting';
+  if (isOnline && isPersonal) return MeetingType.ONLINE_PERSONAL_MEETING;
+  if (isOnline) return MeetingType.ONLINE_TEAM_MEETING;
+  if (isPersonal) return MeetingType.FRONTAL_PERSONAL_MEETING;
+  return MeetingType.FRONTAL_TEAM_MEETING;
 }
 
 function mapEventToMeeting(event: any, badgeNumber: number): Meeting | null {
@@ -65,23 +63,58 @@ export async function syncUserCalendar(
   badgeNumber: number,
   refreshToken: string
 ): Promise<void> {
-  const decryptedToken = decryptToken(refreshToken); // פענוח הטוקן
+  
+  const { data: user, error: userError } = await supabase
+    .from('Users')
+    .select('id, refresh_token')
+    .eq('id', badgeNumber)
+    .single();
+
+  if (userError || !user) {
+   
+    const error: any = new Error(`User with ID ${badgeNumber} does not exist in the system.`);
+    error.statusCode = 404;
+    throw error;
+  }
+  if (user.refresh_token !== refreshToken) {
+     const error: any = new Error(`Provided refresh token does not match the system record for this user.`);
+     error.statusCode = 401; // Unauthorized
+     throw error;
+  }
+  let decryptedToken: string;
+  try {
+    decryptedToken = decryptToken(refreshToken);
+  } catch (cryptoError) {
+    const error: any = new Error('Corrupted or invalid token format.');
+    error.statusCode = 400;
+    throw error;
+  }
+
   oauth2Client.setCredentials({ refresh_token: decryptedToken });
   const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
-  const timeMin = new Date();
-  timeMin.setDate(timeMin.getDate() - 7);
-  const timeMax = new Date();
-  timeMax.setDate(timeMax.getDate() + 30);
+  let response;
+  try {
+    const lastWeek = new Date();
+    lastWeek.setDate(lastWeek.getDate() - 7); 
+    const nextMonth = new Date();
+    nextMonth.setDate(nextMonth.getDate() + 30);
 
-  const response = await calendar.events.list({
-    calendarId:   'primary',
-    timeMin:      timeMin.toISOString(),
-    timeMax:      timeMax.toISOString(),
-    singleEvents: true,
-    orderBy:      'startTime',
-    maxResults:   250,
-  });
+    response = await calendar.events.list({
+      calendarId:   'primary',
+      timeMin:      lastWeek.toISOString(),
+      timeMax:      nextMonth.toISOString(),
+      singleEvents: true,
+      orderBy:      'startTime',
+      maxResults:   250,
+    });
+  } catch (googleError: any) {
+    
+    console.error(`[Sync] Google API connection failed for user ${badgeNumber}:`, googleError.message);
+    const error: any = new Error(`Google Authentication failed: ${googleError.message}`);
+    error.statusCode = googleError.status || 401; 
+    throw error; 
+  }
 
   const events = response.data.items ?? [];
 
@@ -90,18 +123,19 @@ export async function syncUserCalendar(
     .filter((m): m is Meeting => m !== null);
 
   if (meetings.length === 0) {
-    console.log('[Sync] no meetings to sync');
+    console.log(`[Sync] user ${badgeNumber} has no meetings to sync`);
     return;
   }
 
-  const { error } = await supabase
+  const { error: dbError } = await supabase
     .from('Meeting')
     .upsert(meetings, { onConflict: 'google_event_id' });
 
-  if (error) {
-    console.error('[Sync] Supabase error:', error.message);
-    throw new Error(error.message);
+  if (dbError) {
+    console.error('[Sync] Supabase error:', dbError.message);
+    throw new Error(dbError.message);
   }
+  
   console.log(`[Sync] ✅ Saved/updated ${meetings.length} meetings`);
 }
 
