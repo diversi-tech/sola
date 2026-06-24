@@ -1,7 +1,9 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express'; 
 import { processGoogleCallback } from '../services/calendar.service.js';
+import { AppError } from '../middleware/error.middleware.js';
+import { AuthErrorType ,HttpStatusCode} from '../types/authErrors.enum.js';
 
-export const googleCallbackHandler = async (req: Request, res: Response) => {
+export const googleCallbackHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const code = req.query.code as string;
         const state = req.query.state as string;
@@ -13,28 +15,13 @@ export const googleCallbackHandler = async (req: Request, res: Response) => {
 
         await processGoogleCallback(code, state, error);
 
-        return res.status(200).send(`
-            <div style="text-align: center; font-family: sans-serif; margin-top: 50px;">
-                <h1 style="color: #2ecc71;">Google Calendar connection successful!</h1>
-                <p>Your calendar has been successfully synchronized with the Sola system. The information has been encrypted and securely saved. You can close this tab now.</p>
-            </div>
-        `);
+        res.status(HttpStatusCode.OK).json({
+            IsSucceeded: true,
+            statusCode: HttpStatusCode.OK,
+            message: "Connection to Google Calendar was successful! You can close the window."
+        });
 
     } catch (err: any) {
-        console.error("Callback endpoint error:", err.message);
-        
-        switch (err.message) {
-            case "USER_DENIED":
-                return res.status(400).json({ message: "Connection refused. Cannot access the calendar." });
-            case "SECURITY_ERROR":
-                return res.status(401).json({ message: "Security error: The request is invalid or has expired." });
-            case "GOOGLE_API_ERROR":
-            case "NO_REFRESH_TOKEN":
-                return res.status(500).json({ message: "Error with Google converting the code." });
-            case "DB_SAVE_ERROR":
-                return res.status(500).json({ message: "Error saving data to the system." });
-            default:
-                return res.status(500).json({ message: "Internal server error." });
-        }
+        next(err);
     }
 };
