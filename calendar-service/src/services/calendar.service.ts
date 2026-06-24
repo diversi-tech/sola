@@ -13,7 +13,7 @@ export const processGoogleCallback = async (code: string, state: string, error?:
         if (state) {
             await supabase
                 .from('Users')
-                .update({ status: 'UNACTIVE', state: null }) 
+                .update({ status: 'INACTIVE', state: null }) 
                 .eq('state', state);
         }
         throw new Error("USER_DENIED");
@@ -23,7 +23,7 @@ export const processGoogleCallback = async (code: string, state: string, error?:
         .from('Users')
         .select('*')
         .eq('state', state)
-        .eq('status', 'UNACTIVE')
+        .eq('status', 'INACTIVE')
         .single();
 
     if (dbError || !authRecord) {
