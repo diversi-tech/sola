@@ -1,11 +1,15 @@
 import axios from 'axios';
 
 export const verifyUserAuth = async (authPayload: { phone_number: string }) => {
-    const authApiUrl = process.env.AUTH_SERVICE_URL;
+     
+    const authBaseUrl = process.env.AUTH_BASE_URL;
+    const authLoginPath = process.env.AUTH_LOGIN_PATH;
 
-    if (!authApiUrl) {
-        throw new Error("AUTH_SERVICE_URL is not defined in environment variables");
+    if (!authBaseUrl || !authLoginPath) {
+        throw new Error("AUTH_BASE_URL or AUTH_LOGIN_PATH is not defined in environment variables");
     }
+
+    const authApiUrl = `${authBaseUrl}${authLoginPath}`;
 
     try {
         const response = await axios.post(authApiUrl, authPayload);
