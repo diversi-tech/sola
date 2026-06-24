@@ -78,7 +78,7 @@ export async function syncUserCalendar(
   }
   if (user.refresh_token !== refreshToken) {
      const error: any = new Error(`Provided refresh token does not match the system record for this user.`);
-     error.statusCode = 401; // Unauthorized
+     error.statusCode = 401; 
      throw error;
   }
   let decryptedToken: string;
@@ -136,7 +136,7 @@ export async function syncUserCalendar(
     throw new Error(dbError.message);
   }
   
-  console.log(`[Sync] ✅ Saved/updated ${meetings.length} meetings`);
+  console.log(`[Sync]  Saved/updated ${meetings.length} meetings`);
 }
 
 export async function syncAllActiveUsers(): Promise<void> {
