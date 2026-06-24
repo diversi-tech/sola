@@ -64,29 +64,23 @@ export async function syncUserCalendar(
   refreshToken: string
 ): Promise<void> {
   
-  // 1. בדיקה מול הדאטהבייס: האם המשתמש קיים והאם יש לו טוקן במערכת?
   const { data: user, error: userError } = await supabase
     .from('Users')
     .select('id, refresh_token')
     .eq('id', badgeNumber)
-    .single(); // מחזיר שורה אחת או שגיאה אם לא נמצא
+    .single();
 
   if (userError || !user) {
-    // אם המשתמש לא קיים, נזרוק שגיאת 404 (תוכלי להשתמש ב-BadRequestError או לייצר NotFoundError)
+   
     const error: any = new Error(`User with ID ${badgeNumber} does not exist in the system.`);
     error.statusCode = 404;
     throw error;
   }
-
-  // 2. אופציונלי: ודאי שהטוקן שנשלח בבקשה תואם לטוקן ששמור בדאטהבייס (אם רלוונטי לאבטחה שלך)
-  // אם את רוצה לאפשר לסנכרן רק עם הטוקן המקורי שלו:
   if (user.refresh_token !== refreshToken) {
      const error: any = new Error(`Provided refresh token does not match the system record for this user.`);
      error.statusCode = 401; // Unauthorized
      throw error;
   }
-
-  // 3. פענוח ופנייה לגוגל
   let decryptedToken: string;
   try {
     decryptedToken = decryptToken(refreshToken);
@@ -99,7 +93,6 @@ export async function syncUserCalendar(
   oauth2Client.setCredentials({ refresh_token: decryptedToken });
   const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
-  // 4. תפיסת שגיאות ישירה מול גוגל (כגון טוקן פג תוקף / לא קיים באמת בגוגל)
   let response;
   try {
     const lastWeek = new Date();
@@ -116,10 +109,10 @@ export async function syncUserCalendar(
       maxResults:   250,
     });
   } catch (googleError: any) {
-    // אם גוגל זורק שגיאה (למשל כי הטוקן הומצא או בוטל)
+    
     console.error(`[Sync] Google API connection failed for user ${badgeNumber}:`, googleError.message);
     const error: any = new Error(`Google Authentication failed: ${googleError.message}`);
-    error.statusCode = googleError.status || 401; // לרוב 401 לשגיאות אימות
+    error.statusCode = googleError.status || 401; 
     throw error; 
   }
 
@@ -131,7 +124,7 @@ export async function syncUserCalendar(
 
   if (meetings.length === 0) {
     console.log(`[Sync] user ${badgeNumber} has no meetings to sync`);
-    return; // כאן זה תקין לעצור - המשתמש קיים, הטוקן נכון, פשוט אין לו פגישות בלוח השנה
+    return;
   }
 
   const { error: dbError } = await supabase
