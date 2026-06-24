@@ -15,11 +15,10 @@ export const googleCallbackHandler = async (req: Request, res: Response) => {
 
         return res.status(200).send(`
             <div style="text-align: center; font-family: sans-serif; margin-top: 50px;">
-                <h1 style="color: #2ecc71;">החיבור ל-Google Calendar הצליח! 🎉</h1>
-                <p>היומן שלך סונכרן בהצלחה למערכת Sola. המידע הוצפן ונשמר בבטחה. אפשר לסגור את הלשונית הזו עכשיו.</p>
+                <h1 style="color: #2ecc71;">Google Calendar connection successful!</h1>
+                <p>Your calendar has been successfully synchronized with the Sola system. The information has been encrypted and securely saved. You can close this tab now.</p>
             </div>
         `);
-
     } catch (err: any) {
         console.error("Callback endpoint error:", err.message);
         

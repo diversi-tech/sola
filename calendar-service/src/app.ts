@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => res.send('Server is up and running!'));
 
 app.use('/api/meetings', router);
-app.use('/api/calendar', calendarRoutes);
+app.use('/auth/google', calendarRoutes);
 app.use('/api/calendar/auth', calendarAuthRoutes);
 
 async function testConnection() {
@@ -30,7 +30,7 @@ async function testConnection() {
 
 testConnection();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
     console.log(` Server running on port ${PORT}`);
 });
