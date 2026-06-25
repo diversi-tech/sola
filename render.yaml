@@ -84,7 +84,7 @@ services:
     repo: https://github.com/diversi-tech/sola
     branch: main
     rootDir: ./WhatsApp-bot-service
-    buildCommand: npm install && npm run build
+    buildCommand: npm install 
     startCommand: npm start
     autoDeploy: true
     envVars:
