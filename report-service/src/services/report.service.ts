@@ -24,7 +24,6 @@ export const processAndSaveFeedback = async (manager_id: number, text: string, a
             manager_id: manager_id || null,
             metric_scores: llmMetrics.metric_scores,
             text_summary: llmMetrics.text_summary,
-            audio_link: audio_url || null,
         };
 
         const { data, error } = await supabase
