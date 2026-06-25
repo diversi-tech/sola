@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express'; 
 import { processGoogleCallback } from '../services/calendar.service.js';
-import { AppCalendarError } from '../middleware/error.middleware.js';
-import { AuthErrorType ,HttpStatusCode} from '../types/authErrors.enum.js';
+import { HttpStatusCode} from '../types/authErrors.enum.js';
 
 export const googleCallbackHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -19,7 +18,7 @@ export const googleCallbackHandler = async (req: Request, res: Response, next: N
         res.status(HttpStatusCode.OK).json({
             IsSucceeded: true,
             statusCode: HttpStatusCode.OK,
-            message: "Connection to Google Calendar was successful! You can close the window."
+            message: "Google Calendar authentication successful! You can close this window."
         });
 
     } catch (err: any) {

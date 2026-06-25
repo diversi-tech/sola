@@ -2,7 +2,7 @@ import {AuthErrorType}from '../types/authErrors.enum.js';
 import { Request, Response, NextFunction } from 'express';
 
 
-export class AppCalendarError extends Error {
+export class CalendarServiceError extends Error {
   public statusCode: AuthErrorType;
 
   constructor(message: string, statusCode: AuthErrorType) {

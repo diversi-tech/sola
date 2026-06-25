@@ -12,20 +12,28 @@ const getOAuth2Client = () => {
   return new google.auth.OAuth2(clientId, clientSecret, redirectUri);
 };
 
-export const initializeAuthSession = async (employeeEmail: string, state: string): Promise<string> => {
+async function insertAuthSession(employeeEmail: string, state: string): Promise<void> {
   const { error } = await supabase
     .from('Users')
     .insert([
       {
         employee_email: employeeEmail,
-        state: state
-      }
+        state: state,
+      },
     ]);
 
   if (error) {
     console.error('Supabase insertion error inside service:', error);
     throw new Error('Database insertion failed');
   }
+}
+
+export const generateGoogleAuthUrl = async (
+  employeeEmail: string,
+  state: string
+): Promise<string> => {
+  await insertAuthSession(employeeEmail, state);
+
   const oauth2Client = getOAuth2Client();
   return oauth2Client.generateAuthUrl({
     access_type: 'offline',

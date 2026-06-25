@@ -13,11 +13,6 @@ if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
 const app = express();
 app.use(express.json());
 
-app.use((req, res, next) => {
-    console.log(`[DEBUG] Incoming Request: ${req.method} ${req.path}`);
-    next();
-});
-
 app.get('/', (req, res) => res.send('Server is up and running!'));
 
 app.use('/api/calendar/auth', calendarAuthRoutes);
