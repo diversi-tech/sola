@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import crypto from 'crypto';
-import { initializeAuthSession } from '../services/googleAuth.service.js';
+import { generateGoogleAuthUrl } from '../services/googleAuth.service.js';
 
 export const generateAuthUrlHandler = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -11,7 +11,7 @@ export const generateAuthUrlHandler = async (req: Request, res: Response): Promi
       return;
     }
     const state = crypto.randomBytes(16).toString('hex');
-    const authUrl = await initializeAuthSession(employee_email, state);
+    const authUrl = await generateGoogleAuthUrl(employee_email, state);
 
     res.status(200).json({ 
       auth_url: authUrl 

@@ -1,7 +1,7 @@
 import { supabase } from '../config/supabase.js';
 import { google } from 'googleapis';
 import { encryptToken } from '../utils/crypto.util.js';
-import { AppCalendarError } from '../middleware/error.middleware.js';
+import { CalendarServiceError } from '../middleware/error.middleware.js';
 import { AuthErrorType } from '../types/authErrors.enum.js'
 
 const oauth2Client = new google.auth.OAuth2(
@@ -19,7 +19,7 @@ export const processGoogleCallback = async (code: string, state: string, error?:
                 .eq('state', state);
         }
 
-        throw new AppCalendarError(
+        throw new CalendarServiceError(
             'The connection was denied. You cannot access the calendar.',
             AuthErrorType.USER_DENIED
         );
@@ -33,7 +33,7 @@ export const processGoogleCallback = async (code: string, state: string, error?:
         .single();
 
     if (dbError || !authRecord) {
-        throw new AppCalendarError(
+        throw new CalendarServiceError(
             'Security error: The request is invalid or has expired.',
             AuthErrorType.SECURITY_ERROR
         );
@@ -44,7 +44,7 @@ export const processGoogleCallback = async (code: string, state: string, error?:
         const response = await oauth2Client.getToken(code);
         tokens = response.tokens;
     } catch (googleErr) {
-        throw new AppCalendarError(
+        throw new CalendarServiceError(
             'Error with Google API during code exchange.',
             AuthErrorType.GOOGLE_API_ERROR
         );
@@ -52,7 +52,7 @@ export const processGoogleCallback = async (code: string, state: string, error?:
 
     const tokenToSave = tokens.refresh_token || authRecord.refresh_token;
     if (!tokenToSave) {
-        throw new AppCalendarError(
+        throw new CalendarServiceError(
             'No refresh token received from Google.',
             AuthErrorType.NO_REFRESH_TOKEN
         );
@@ -71,7 +71,7 @@ export const processGoogleCallback = async (code: string, state: string, error?:
         .eq('id', authRecord.id);
 
     if (updateError) {
-        throw new AppCalendarError(
+        throw new CalendarServiceError(
             'Error saving data to the database.',
             AuthErrorType.DB_SAVE_ERROR
         );
