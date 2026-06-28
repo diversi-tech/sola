@@ -34,10 +34,6 @@ services:
     envVars:
       - key: NODE_ENV
         value: production      
-<<<<<<< HEAD
-      - fromGroup: speach-to-text-env-group          
-=======
->>>>>>> bdeb2cb3f1aee828fa1d231ed6a6a6a27bf30087
       - fromGroup: sola-project             
       
 # ==========================================
@@ -77,8 +73,6 @@ services:
       - key: NODE_ENV
         value: production
       - fromGroup: sola-project         
-<<<<<<< HEAD
-=======
        
                
 # ==========================================
@@ -98,4 +92,3 @@ services:
       - key: NODE_ENV
         value: production
       - fromGroup: sola-project
->>>>>>> bdeb2cb3f1aee828fa1d231ed6a6a6a27bf30087
