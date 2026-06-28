@@ -34,7 +34,10 @@ services:
     envVars:
       - key: NODE_ENV
         value: production      
+<<<<<<< HEAD
       - fromGroup: speach-to-text-env-group          
+=======
+>>>>>>> bdeb2cb3f1aee828fa1d231ed6a6a6a27bf30087
       - fromGroup: sola-project             
       
 # ==========================================
@@ -68,9 +71,31 @@ services:
     branch: main
     rootDir: ./calendar-service          
     buildCommand: npm install && npm run build       
-    startCommand: npm run dev
+    startCommand: npm start
     autoDeploy: true                                  
     envVars:
       - key: NODE_ENV
         value: production
       - fromGroup: sola-project         
+<<<<<<< HEAD
+=======
+       
+               
+# ==========================================
+# 4. WhatsApp Bot Service
+# ==========================================
+  - type: web
+    name: whatsapp-bot-service
+    env: node
+    plan: free
+    repo: https://github.com/diversi-tech/sola
+    branch: main
+    rootDir: ./WhatsApp-bot-service
+    buildCommand: npm install 
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - fromGroup: sola-project
+>>>>>>> bdeb2cb3f1aee828fa1d231ed6a6a6a27bf30087
