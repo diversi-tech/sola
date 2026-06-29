@@ -51,6 +51,25 @@ export const processGoogleCallback = async (code: string, state: string, error?:
     }
 
     const tokenToSave = tokens.refresh_token || authRecord.refresh_token;
+    try {
+
+        const decoded = JSON.parse(
+            Buffer.from(tokens.id_token!.split('.')[1], 'base64').toString()
+        );
+
+        if (decoded.email !== authRecord.employee_email) {
+            throw new CalendarServiceError(
+                'Wrong account selected. Please sign in with the correct email.',
+                AuthErrorType.SECURITY_ERROR
+            );
+        }
+    } catch (err) {
+        if (err instanceof CalendarServiceError) throw err;
+        throw new CalendarServiceError(
+            'Could not verify account identity.',
+            AuthErrorType.GOOGLE_API_ERROR
+        );
+    }
     if (!tokenToSave) {
         throw new CalendarServiceError(
             'No refresh token received from Google.',

@@ -20,6 +20,7 @@ async function insertAuthSession(employeeEmail: string, state: string): Promise<
         employee_email: employeeEmail,
         state: state,
       },
+       
     ]);
 
   if (error) {
@@ -38,7 +39,10 @@ export const generateGoogleAuthUrl = async (
   return oauth2Client.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
-    scope: ['https://www.googleapis.com/auth/calendar.readonly'],
+    scope: [
+      'openid',
+      'email',
+      'https://www.googleapis.com/auth/calendar.readonly'],
     state: state,
   });
 };
