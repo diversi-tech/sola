@@ -3,7 +3,8 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { findOrCreateGoogleUser } from '../../services/oidc.service.js';
 import { getUserById } from '../../services/oidc.service.js';
 
-import { User } from '../../types/user.js'; // ייבוא הממשק
+import { User } from '../../types/user.js'; 
+
 passport.use(
   new GoogleStrategy(
     {

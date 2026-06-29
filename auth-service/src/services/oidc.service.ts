@@ -1,39 +1,39 @@
 import { supabase } from '../config/supabase.js';
 
 export const findOrCreateGoogleUser = async (profile: any) => {
-  // const email = profile.emails[0].value;
+  const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
 
-  // // 1. בדיקה אם המשתמש כבר קיים לפי האימייל (employee_email)
-  // const { data: existingUser, error: searchError } = await supabase
-  //   .from('Users')
-  //   .select('*')
-  //   .eq('employee_email', email)
-  //   .single();
+  if (!email) {
+    throw new Error("No email address found in Google Account.");
+  }
 
-  // if (searchError && searchError.code !== 'PGRST116') {
-  //   throw new Error(`שגיאה בחיפוש משתמש: ${searchError.message}`);
-  // }
+  const { data: existingUser, error: searchError } = await supabase
+    .from('Users')
+    .select('*')
+    .eq('employee_email', email)
+    .single();
 
-  // // אם המשתמש קיים - נחזיר אותו מיד
-  // if (existingUser) {
-  //   return existingUser;
-  // }
+  if (searchError && searchError.code !== 'PGRST116') {
+    throw new Error(`Error searching for user: ${searchError.message}`);
+  }
 
-  // // 2. אם לא קיים - ניצור משתמש חדש
-  // // שימי לב: אנחנו מכניסים רק את מה שהסכמה מרשה (אימייל). סטטוס ו-ID ייווצרו אוטומטית.
-  // const { data: newUser, error: insertError } = await supabase
-  //   .from('Users')
-  //   .insert([{ 
-  //     employee_email: email 
-  //   }])
-  //   .select() // הפקודה הזו אומרת ל-Supabase להחזיר לנו את המשתמש שזה עתה נוצר
-  //   .single();
+  if (existingUser) {
+    return existingUser;
+  }
 
-  // if (insertError) {
-  //   throw new Error(`שגיאה ביצירת משתמש: ${insertError.message}`);
-  // }
+  const { data: newUser, error: insertError } = await supabase
+    .from('Users')
+    .insert([
+      { employee_email: email }
+    ])
+    .select() 
+    .single();
 
-  // return newUser;
+  if (insertError) {
+    throw new Error(`Error creating user: ${insertError.message}`);
+  }
+
+  return newUser;
 };
 
 export const getUserById = async (id: number) => { 

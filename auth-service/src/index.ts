@@ -30,8 +30,9 @@ console.log("Check Env:", {
     supabaseKey: process.env.SUPABASE_ANON_KEY
 });
 
+app.use(errorHandler);
+
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
 
-app.use(errorHandler);
