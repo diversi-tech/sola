@@ -1,10 +1,8 @@
 import { supabase } from '../config/supabase.js';
 
-export const findOrCreateGoogleUser = async (profile: any) => {
-  const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
-
-  if (!email) {
-    throw new Error("No email address found in Google Account.");
+export const findOrCreateOauthUser = async (email: string) => {
+if (!email) {
+    throw new Error("No email address provided.");
   }
 
   const { data: existingUser, error: searchError } = await supabase

@@ -1,6 +1,6 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { findOrCreateGoogleUser } from '../../services/oidc.service.js';
+import { findOrCreateOauthUser } from '../../services/oidc.service.js';
 import { getUserById } from '../../services/oidc.service.js';
 
 import { User } from '../../types/user.js'; 
@@ -14,7 +14,10 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
     try {
-        const user = await findOrCreateGoogleUser(profile);
+        const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
+        if (!email) return done(new Error("No email found from Google"), undefined);
+
+        const user = await findOrCreateOauthUser(email);
         return done(null, user);
       } catch (error) {
         return done(error as Error, undefined);
