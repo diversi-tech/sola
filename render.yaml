@@ -29,11 +29,9 @@ services:
     branch: main
     rootDir: ./speach-to-text-service          
     buildCommand: npm install && npm run build       
-    startCommand: npm start
+    startCommand:  NODE_ENV=production npm start
     autoDeploy: true                                  
-    envVars:
-      - key: NODE_ENV
-        value: production      
+    envVars: 
       - fromGroup: sola-project             
       
 # ==========================================
