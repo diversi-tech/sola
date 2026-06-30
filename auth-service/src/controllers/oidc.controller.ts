@@ -1,4 +1,3 @@
-// src/controllers/oidc.controller.ts
 import { Request, Response } from 'express';
 
 export const handleGoogleCallback = (req: Request, res: Response) => {
