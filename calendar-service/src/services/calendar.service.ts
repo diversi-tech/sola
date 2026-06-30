@@ -58,6 +58,7 @@ export const processGoogleCallback = async (code: string, state: string, error?:
         );
     }
 
+    
     const encryptedToken = encryptToken(tokenToSave);
 
     const { error: updateError } = await supabase
