@@ -17,7 +17,7 @@ passport.use(
         const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
         if (!email) return done(new Error("No email found from Google"), undefined);
 
-        const user = await findOrCreateOauthUser(email);
+        const user = await findOrCreateOauthUser(email);//todo
         return done(null, user);
       } catch (error) {
         return done(error as Error, undefined);
