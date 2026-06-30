@@ -1,7 +1,7 @@
 services:
 
 # ==========================================
-# 1. שירות אימות (Auth Service)
+# 1.(Auth Service)
 # ==========================================
   - type: web
     name: auth-service
@@ -19,7 +19,7 @@ services:
       - fromGroup: sola-project         
 
 # ==========================================
-# 2. שירות אודיו (Speech to Text Service)
+# 2. (Speech to Text Service)
 # ==========================================
   - type: web
     name: speach-to-text-service
@@ -76,7 +76,7 @@ services:
        
                
 # ==========================================
-# 4. WhatsApp Bot Service
+# 5. WhatsApp Bot Service
 # ==========================================
   - type: web
     name: whatsapp-bot-service
