@@ -20,26 +20,22 @@ export default function EmployeePage() {
     handleCloseModal,
   } = useEmployeeData();
 
-  // סטייט חדש לשמירת מילת החיפוש
   const [searchQuery, setSearchQuery] = useState('');
 
-  // סינון העובדים לפי שורת החיפוש
   const filteredEmployees = useMemo(() => {
     if (!searchQuery.trim()) return employeesWithReports;
-    
     const lowerCaseQuery = searchQuery.toLowerCase();
     return employeesWithReports.filter((item) =>
       item.employee.name.toLowerCase().includes(lowerCaseQuery)
     );
   }, [employeesWithReports, searchQuery]);
 
-  // עדכון הסטטיסטיקות כך שישקפו את הרשימה המסוננת
   const stats = useMemo(() => {
     const active = filteredEmployees.filter(e => e.employee.is_active).length;
-    return { 
-      total: filteredEmployees.length, 
-      active, 
-      inactive: filteredEmployees.length - active 
+    return {
+      total: filteredEmployees.length,
+      active,
+      inactive: filteredEmployees.length - active,
     };
   }, [filteredEmployees]);
 
@@ -107,8 +103,8 @@ export default function EmployeePage() {
           <p className="text-slate-500 text-sm">ממוין לפי תאריך הדוח האחרון</p>
         </div>
 
-        {/* ── Search Bar ── */}
-        <div className="mb-8">
+        {/* ── Search bar ── */}
+        <div className="mb-6">
           <div className="relative max-w-md">
             <input
               type="text"
@@ -121,6 +117,45 @@ export default function EmployeePage() {
               <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Stat cards ── */}
+        <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-5 flex items-center gap-4">
+            <div className="w-11 h-11 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-2xl font-extrabold text-slate-800">{stats.total}</p>
+              <p className="text-xs text-slate-400 font-medium">סה"כ עובדים</p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-5 flex items-center gap-4">
+            <div className="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-2xl font-extrabold text-slate-800">{stats.active}</p>
+              <p className="text-xs text-slate-400 font-medium">עובדים פעילים</p>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-5 flex items-center gap-4">
+            <div className="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-2xl font-extrabold text-slate-800">{stats.inactive}</p>
+              <p className="text-xs text-slate-400 font-medium">לא פעילים</p>
             </div>
           </div>
         </div>
@@ -150,8 +185,8 @@ export default function EmployeePage() {
             </div>
           ) : (
             <div className="py-20 text-center text-slate-400 font-medium">
-              {searchQuery.trim() 
-                ? 'לא נמצאו עובדים התואמים לחיפוש שלך.' 
+              {searchQuery.trim()
+                ? 'לא נמצאו עובדים התואמים לחיפוש שלך.'
                 : 'לא נמצאו עובדים עם דוחות במערכת.'}
             </div>
           )}

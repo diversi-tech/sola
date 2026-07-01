@@ -42,7 +42,7 @@ services:
     env: node
     plan: free
     repo: https://github.com/diversi-tech/sola
-    branch: main
+    branch: v2
     rootDir: ./report-service          
     buildCommand: npm install && npm run build       
     startCommand: npm start

@@ -5,6 +5,7 @@ import Button from '../features/login/components/Button';
 import logo from '../assets/sola-logo.png';
 
 //import { connectWithGoogle } from '../features/login/api/authApi';
+
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
 
@@ -16,9 +17,7 @@ export const LoginPage: React.FC = () => {
     try {
       //const result = await connectWithGoogle();
       //console.log('Google login successful:', result);
-      
       navigate('/EmployeePage');
-      
     } catch (error) {
       console.error('Failed to login with Google', error);
     }
@@ -57,8 +56,8 @@ export const LoginPage: React.FC = () => {
 
           {/* Social buttons */}
           <div className="flex flex-col gap-3 mb-6">
-            <button 
-              onClick={handleGoogleLogin} 
+            <button
+              onClick={handleGoogleLogin}
               className="flex items-center justify-center gap-3 w-full py-2.5 px-4 border border-slate-200 rounded-lg bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors shadow-sm"
             >
               <img
@@ -179,5 +178,3 @@ export const LoginPage: React.FC = () => {
     </div>
   );
 };
-
-

@@ -8,7 +8,8 @@ import categoryRoutes from './routes/category.routes.js';
 import employeeRoutes from './routes/employee.routes.js';
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:5173' }));
+const allowedOrigins = ['http://localhost:5173', 'https://v2.dashboard-client-d7t.pages.dev'];
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
 app.use('/api/reports', reportRoutes);

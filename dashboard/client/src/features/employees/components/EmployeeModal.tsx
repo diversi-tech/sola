@@ -88,7 +88,6 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
       <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
 
         {/* ── Gradient header ── */}
-        {/* התיקון כאן: הוספת shrink-0 כדי למנוע את כיווץ והעלמת הכותרת */}
         <div className="relative shrink-0 bg-gradient-to-l from-indigo-700 via-indigo-600 to-violet-600 px-8 pt-8 pb-0 overflow-hidden">
 
           {/* Decorative circles */}

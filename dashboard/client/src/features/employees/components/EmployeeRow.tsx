@@ -51,7 +51,6 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
           <span className="font-semibold text-slate-800 text-sm group-hover:text-indigo-700 transition-colors truncate">
             {employee.name}
           </span>
-      
         </div>
         <div className="flex items-center gap-3 text-xs text-slate-400">
           <span>#{employee.id}</span>
@@ -64,7 +63,15 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
 
       {/* Actions + Rating */}
       <div className="flex items-center gap-3 shrink-0">
-     
+        <button
+          onClick={(e) => { e.stopPropagation(); onViewMeetings(); }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 transition-colors duration-200"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          פגישות
+        </button>
 
         <div className="flex items-center gap-0.5 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 group-hover:bg-indigo-50/50 transition-colors duration-300">
           {[...Array(5)].map((_, i) => (

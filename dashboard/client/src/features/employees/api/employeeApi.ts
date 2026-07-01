@@ -31,7 +31,6 @@ export interface EmployeeWithReports {
   latest_report_date: string;
 }
 
-// הוספתי אינטרפייס עבור הקטגוריות
 export interface Category {
   id: number;
   name: string;
@@ -47,7 +46,7 @@ export const calculateEmployeeRating = (reports: Report[]): number => {
       count++;
     });
   });
-  return count > 0 ? Math.round((totalScore / count) ) : 0;
+  return count > 0 ? Math.round((totalScore / count)) : 0;
 };
 
 export const employeeApi = {
