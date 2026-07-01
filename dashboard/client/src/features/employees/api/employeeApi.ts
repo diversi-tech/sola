@@ -3,6 +3,7 @@ export interface Employee {
   id: number;
   name: string;
   is_active: boolean;
+  Email: string;
   rating?: number; 
 }
 

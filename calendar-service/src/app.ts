@@ -6,12 +6,20 @@ import { supabase } from './config/supabase.js';
 import calendarRoutes from './routes/calendar.route.js';
 import calendarAuthRoutes from './routes/calendarAuth.route.js';
 import errorHandler from './middleware/error.middleware.js';
+import cors from 'cors'
 
 if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
 app.use(express.json());
 
+const corsOptions = {
+  origin: ['http://localhost:5173','https://YOUR_DASHBOARD_URL.onrender.com'],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+};
+
+app.use(cors(corsOptions));
 app.get('/', (req, res) => res.send('Server is up and running!'));
 
 app.use('/api/calendar/auth', calendarAuthRoutes);
