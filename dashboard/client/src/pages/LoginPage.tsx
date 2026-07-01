@@ -4,11 +4,24 @@ import Input from '../features/login/components/Input';
 import Button from '../features/login/components/Button';
 import logo from '../assets/sola-logo.png';
 
+//import { connectWithGoogle } from '../features/login/api/authApi';
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSignIn = async (): Promise<void> => {
     navigate('/EmployeePage');
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      //const result = await connectWithGoogle();
+      //console.log('Google login successful:', result);
+      
+      navigate('/EmployeePage');
+      
+    } catch (error) {
+      console.error('Failed to login with Google', error);
+    }
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -44,7 +57,10 @@ export const LoginPage: React.FC = () => {
 
           {/* Social buttons */}
           <div className="flex flex-col gap-3 mb-6">
-            <button className="flex items-center justify-center gap-3 w-full py-2.5 px-4 border border-slate-200 rounded-lg bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors shadow-sm">
+            <button 
+              onClick={handleGoogleLogin} 
+              className="flex items-center justify-center gap-3 w-full py-2.5 px-4 border border-slate-200 rounded-lg bg-white text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors shadow-sm"
+            >
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
                 className="w-4.5 h-4.5 shrink-0"
@@ -114,7 +130,7 @@ export const LoginPage: React.FC = () => {
 
         {/* Footer */}
         <p className="text-xs text-slate-400 text-center mt-10">
-          © 2025 Sola · All rights reserved
+          © 2026 Sola · All rights reserved
         </p>
       </div>
 
@@ -163,3 +179,27 @@ export const LoginPage: React.FC = () => {
     </div>
   );
 };
+
+function connectWithGoogle() {
+  throw new Error('Function not implemented.');
+}
+
+
+function connectWithGoogle() {
+  throw new Error('Function not implemented.');
+}
+
+
+function connectWithGoogle() {
+  throw new Error('Function not implemented.');
+}
+
+
+function connectWithGoogle() {
+  throw new Error('Function not implemented.');
+}
+
+
+function connectWithGoogle() {
+  throw new Error('Function not implemented.');
+}
