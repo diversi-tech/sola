@@ -12,6 +12,7 @@ interface EmployeeRowProps {
   reportCount: number;
   latestReportDate: string;
   onClick: () => void;
+  onAuthClick: () => void;
   onViewMeetings: () => void;
 }
 
@@ -24,7 +25,7 @@ const AVATAR_GRADIENTS = [
 ];
 
 export const EmployeeRow: React.FC<EmployeeRowProps> = ({
-  employee, rating, reportCount, latestReportDate, onClick, onViewMeetings,
+  employee, rating, reportCount, latestReportDate, onClick, onAuthClick, onViewMeetings,
 }) => {
   const formattedDate = latestReportDate
     ? new Date(latestReportDate).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -62,7 +63,15 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
       </div>
 
       {/* Actions + Rating */}
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center gap-2 shrink-0">
+        <button
+          onClick={(e) => { e.stopPropagation(); onAuthClick(); }}
+          className="px-3 py-1.5 text-xs bg-violet-50 text-violet-600 rounded-lg hover:bg-violet-100 border border-violet-200 font-medium transition-colors duration-200"
+          title="אישור גישה ליומן Google"
+        >
+          אישור גישה ליומן
+        </button>
+
         <button
           onClick={(e) => { e.stopPropagation(); onViewMeetings(); }}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100 transition-colors duration-200"

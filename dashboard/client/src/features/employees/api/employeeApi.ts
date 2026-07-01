@@ -2,6 +2,8 @@ export interface Employee {
   id: number;
   name: string;
   is_active: boolean;
+  Email: string;
+  rating?: number;
 }
 
 export interface Meeting {
@@ -72,5 +74,6 @@ export const employeeApi = {
     if (!response.ok) throw new Error('Failed to fetch categories');
     const result = await response.json();
     return result.data ?? result;
+
   },
 };

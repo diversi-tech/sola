@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { generateGoogleAuthUrl } from '../services/googleAuth.service.js';
+import { sendCalendarAuthEmail } from '../services/email.service.js';
 
 export const generateAuthUrlHandler = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -12,10 +13,12 @@ export const generateAuthUrlHandler = async (req: Request, res: Response): Promi
     }
     const state = crypto.randomBytes(16).toString('hex');
     const authUrl = await generateGoogleAuthUrl(employee_email, state);
+    console.log('Auth URL:', authUrl);
 
-    res.status(200).json({ 
-      auth_url: authUrl 
-    });
+   await sendCalendarAuthEmail(employee_email, authUrl);
+   res.status(200).json({
+      message: 'קישור האישור נשלח בהצלחה למייל העובד' 
+   })
     
   } catch (err: any) {
     console.error('Unexpected error in handler:', err);
