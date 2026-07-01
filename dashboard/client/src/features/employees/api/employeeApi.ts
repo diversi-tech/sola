@@ -1,4 +1,3 @@
-
 export interface Employee {
   id: number;
   name: string;
@@ -32,6 +31,12 @@ export interface EmployeeWithReports {
   latest_report_date: string;
 }
 
+// הוספתי אינטרפייס עבור הקטגוריות
+export interface Category {
+  id: number;
+  name: string;
+}
+
 export const calculateEmployeeRating = (reports: Report[]): number => {
   if (!reports || reports.length === 0) return 0;
   let totalScore = 0;
@@ -42,7 +47,7 @@ export const calculateEmployeeRating = (reports: Report[]): number => {
       count++;
     });
   });
-  return count > 0 ? Math.round((totalScore / count) / 20) : 0;
+  return count > 0 ? Math.round((totalScore / count) ) : 0;
 };
 
 export const employeeApi = {
@@ -58,6 +63,14 @@ export const employeeApi = {
     const URL = `${import.meta.env.VITE_CALENDAR_SERVICE_URL}/api/meetings/employee/${employeeId}`;
     const response = await fetch(URL);
     if (!response.ok) throw new Error('Failed to fetch meetings');
+    const result = await response.json();
+    return result.data ?? result;
+  },
+
+  fetchCategories: async (): Promise<Category[]> => {
+    const URL = `${import.meta.env.VITE_REPORT_SERVICE_URL}/api/categories`;
+    const response = await fetch(URL);
+    if (!response.ok) throw new Error('Failed to fetch categories');
     const result = await response.json();
     return result.data ?? result;
   },

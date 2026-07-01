@@ -88,7 +88,8 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
       <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
 
         {/* ── Gradient header ── */}
-        <div className="relative bg-gradient-to-l from-indigo-700 via-indigo-600 to-violet-600 px-8 pt-8 pb-0 overflow-hidden">
+        {/* התיקון כאן: הוספת shrink-0 כדי למנוע את כיווץ והעלמת הכותרת */}
+        <div className="relative shrink-0 bg-gradient-to-l from-indigo-700 via-indigo-600 to-violet-600 px-8 pt-8 pb-0 overflow-hidden">
 
           {/* Decorative circles */}
           <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-white/5" />
@@ -113,13 +114,6 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             <div className="pb-5 flex-1">
               <div className="flex items-center gap-3 mb-1">
                 <h2 className="text-2xl font-extrabold text-white tracking-tight">{employee.name}</h2>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
-                  employee.is_active
-                    ? 'bg-emerald-400/20 text-emerald-200 border-emerald-400/30'
-                    : 'bg-white/10 text-white/50 border-white/20'
-                }`}>
-                  {employee.is_active ? 'פעיל' : 'לא פעיל'}
-                </span>
               </div>
 
               <div className="flex items-center gap-4 text-sm text-indigo-200">
