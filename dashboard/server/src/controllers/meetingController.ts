@@ -28,5 +28,20 @@ export const meetingController = {
       }
       res.status(500).json({ success: false, message: error.message });
     }
+  },
+
+  // שליפת פגישות לפי מזהה עובד
+  async getMeetingsByEmployee(req: Request, res: Response) {
+    try {
+      const employeeId = parseInt(req.params.employeeId as string, 10);
+      if (isNaN(employeeId)) {
+        return res.status(400).json({ success: false, message: "מזהה עובד חייב להיות מספר תקין" });
+      }
+
+      const meetings = await meetingService.getMeetingsByEmployee(employeeId);
+      res.status(200).json({ success: true, data: meetings });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
   }
 };
