@@ -18,12 +18,15 @@ export const processGoogleCallback = async (code: string, state: string, error?:
                 .update({ status: 'INACTIVE', state: null })
                 .eq('state', state);
         }
-
+        
         throw new CalendarServiceError(
-            'The connection was denied. You cannot access the calendar.',
+            "The connection was denied. You cannot access the calendar.",
             AuthErrorType.USER_DENIED
         );
     }
+
+
+
 
     const { data: authRecord, error: dbError } = await supabase
         .from('Users')
@@ -33,10 +36,7 @@ export const processGoogleCallback = async (code: string, state: string, error?:
         .single();
 
     if (dbError || !authRecord) {
-        throw new CalendarServiceError(
-            'Security error: The request is invalid or has expired.',
-            AuthErrorType.SECURITY_ERROR
-        );
+        throw new CalendarServiceError("Security error: The request is invalid or has expired.", AuthErrorType.SECURITY_ERROR);
     }
 
     let tokens;
@@ -44,18 +44,12 @@ export const processGoogleCallback = async (code: string, state: string, error?:
         const response = await oauth2Client.getToken(code);
         tokens = response.tokens;
     } catch (googleErr) {
-        throw new CalendarServiceError(
-            'Error with Google API during code exchange.',
-            AuthErrorType.GOOGLE_API_ERROR
-        );
+        throw new CalendarServiceError("Error with Google API during code exchange.", AuthErrorType.GOOGLE_API_ERROR);
     }
 
     const tokenToSave = tokens.refresh_token || authRecord.refresh_token;
     if (!tokenToSave) {
-        throw new CalendarServiceError(
-            'No refresh token received from Google.',
-            AuthErrorType.NO_REFRESH_TOKEN
-        );
+        throw new CalendarServiceError("No refresh token received from Google.", AuthErrorType.NO_REFRESH_TOKEN);
     }
 
     const encryptedToken = encryptToken(tokenToSave);
@@ -66,15 +60,12 @@ export const processGoogleCallback = async (code: string, state: string, error?:
             refresh_token: encryptedToken,
             status: 'ACTIVE',
             state: null,
-            updated_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
         })
         .eq('id', authRecord.id);
 
     if (updateError) {
-        throw new CalendarServiceError(
-            'Error saving data to the database.',
-            AuthErrorType.DB_SAVE_ERROR
-        );
+        throw new CalendarServiceError("Error saving data to the database.", AuthErrorType.DB_SAVE_ERROR);
     }
 
     return authRecord;

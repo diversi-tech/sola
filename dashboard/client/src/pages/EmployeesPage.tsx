@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import useEmployeeData from '../features/employees/hooks/useEmployeeData';
 import { EmployeeRow } from '../features/employees/components/EmployeeRow';
 import { EmployeeModal } from '../features/employees/components/EmployeeModal';
@@ -19,6 +19,26 @@ export default function EmployeePage() {
     handleViewMeetings,
     handleCloseModal,
   } = useEmployeeData();
+
+  const CALENDAR_API = import.meta.env.VITE_CALENDAR_SERVICE_URL;
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const handleAuthSubmit = async (email: string) => {
+    if (!email) return;
+    try {
+      const response = await fetch(`${CALENDAR_API}/api/calendar/auth/calendar-subscription`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ employee_email: email }),
+      });
+      if (!response.ok) throw new Error('שגיאה בשליחת הבקשה');
+      setSuccessMessage('המייל נשלח לעובד בהצלחה!');
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch {
+      setSuccessMessage('שגיאה בשליחת הבקשה');
+      setTimeout(() => setSuccessMessage(null), 3000);
+    }
+  };
 
   const stats = useMemo(() => {
     const active = employeesWithReports.filter(e => e.employee.is_active).length;
@@ -147,6 +167,7 @@ export default function EmployeePage() {
                   reportCount={item.reports.length}
                   latestReportDate={item.latest_report_date}
                   onClick={() => handleSelectEmployee(item)}
+                  onAuthClick={() => handleAuthSubmit(item.employee.Email)}
                   onViewMeetings={() => handleViewMeetings(item.employee)}
                 />
               ))}
@@ -169,6 +190,12 @@ export default function EmployeePage() {
           initialTab={initialTab}
           onClose={handleCloseModal}
         />
+      )}
+
+      {successMessage && (
+        <div className="fixed bottom-6 left-6 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg font-medium z-50">
+          {successMessage}
+        </div>
       )}
     </div>
   );

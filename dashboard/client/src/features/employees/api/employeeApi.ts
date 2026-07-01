@@ -3,6 +3,7 @@ export interface Employee {
   id: number;
   name: string;
   is_active: boolean;
+  Email: string;
   rating?: number;
 }
 
@@ -59,9 +60,10 @@ export const employeeApi = {
   },
 
   fetchEmployeeMeetings: async (employeeId: number): Promise<Meeting[]> => {
-    const URL = `${import.meta.env.VITE_API_BASE_URL}/api/meetings/employee/${employeeId}`;
+    const URL = `${import.meta.env.VITE_CALENDAR_SERVICE_URL}/api/meetings/employee/${employeeId}`;
     const response = await fetch(URL);
     if (!response.ok) throw new Error('Failed to fetch meetings');
-    return response.json();
+    const result = await response.json();
+    return result.data ?? result;
   },
 };
