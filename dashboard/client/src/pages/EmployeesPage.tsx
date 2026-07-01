@@ -17,10 +17,14 @@ export default function EmployeePage() {
     employees,
     selectedEmployee,
     currentReports,
+    currentMeetings,
     loading,
     modalLoading,
+    meetingsLoading,
     error,
+    initialTab,
     handleSelectEmployee,
+    handleViewMeetings,
     handleCloseModal
   } = useEmployeeData();
 
@@ -127,6 +131,7 @@ export default function EmployeePage() {
                     employee={employee}
                     rating={currentRating}
                     onClick={() => handleSelectEmployee({ ...employee, id: numericId } as Employee)}
+                    onViewMeetings={() => handleViewMeetings({ ...employee, id: numericId } as Employee)}
                   />
                 );
               })
@@ -142,7 +147,10 @@ export default function EmployeePage() {
           <EmployeeModal
             employee={selectedEmployee}
             reports={currentReports}
+            meetings={currentMeetings}
             loading={modalLoading}
+            meetingsLoading={meetingsLoading}
+            initialTab={initialTab}
             onClose={handleCloseModal}
           />
         )}

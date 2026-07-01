@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EmployeeMetrics } from './EmployeeMetrics';
 import { EmployeeReports } from './EmployeeReports';
-
-// --- הגדרת טיפוסים (Interfaces) ---
+import { EmployeeMeetings } from './EmployeeMeetings';
+import { Meeting } from '../api/employeeApi';
 
 interface Employee {
   id: string | number;
@@ -19,17 +19,27 @@ interface Report {
 interface EmployeeModalProps {
   employee: Employee;
   reports: Report[];
+  meetings: Meeting[];
   loading: boolean;
+  meetingsLoading: boolean;
+  initialTab?: 'overview' | 'reports' | 'meetings';
   onClose: () => void;
 }
 
-export const EmployeeModal: React.FC<EmployeeModalProps> = ({ 
-  employee, 
-  reports, 
-  loading, 
-  onClose 
+export const EmployeeModal: React.FC<EmployeeModalProps> = ({
+  employee,
+  reports,
+  meetings,
+  loading,
+  meetingsLoading,
+  initialTab = 'overview',
+  onClose
 }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'reports'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'reports' | 'meetings'>(initialTab);
+
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab, employee.id]);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-slate-900/50 backdrop-blur-sm animate-fade-in w-full h-full p-4 md:p-8" style={{ direction: 'rtl' }}>
@@ -58,22 +68,28 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
         </div>
 
         <div className="flex border-b border-gray-200 bg-white px-8 gap-4 shrink-0 shadow-sm z-10 overflow-x-auto">
-          <button 
-            onClick={() => setActiveTab('overview')} 
+          <button
+            onClick={() => setActiveTab('overview')}
             className={`py-4 px-2 font-bold text-sm border-b-2 transition-all whitespace-nowrap ${activeTab === 'overview' ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
           >
             📊 סקירה והתפתחות מדדים
           </button>
-          <button 
-            onClick={() => setActiveTab('reports')} 
+          <button
+            onClick={() => setActiveTab('reports')}
             className={`py-4 px-2 font-bold text-sm border-b-2 transition-all whitespace-nowrap ${activeTab === 'reports' ? 'border-indigo-600 text-indigo-700' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
           >
             📝 היסטוריית דוחות
           </button>
+          <button
+            onClick={() => setActiveTab('meetings')}
+            className={`py-4 px-2 font-bold text-sm border-b-2 transition-all whitespace-nowrap ${activeTab === 'meetings' ? 'border-blue-600 text-blue-700' : 'border-transparent text-gray-500 hover:text-gray-800'}`}
+          >
+            📅 פגישות
+          </button>
         </div>
 
         <div className="p-6 md:p-8 overflow-y-auto flex-1 bg-slate-50/50">
-          {loading ? (
+          {loading && activeTab !== 'meetings' ? (
             <div className="flex flex-col justify-center items-center h-full gap-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-indigo-600"></div>
               <p className="text-gray-500 text-sm font-bold tracking-wide">מעבד נתונים אנליטיים...</p>
@@ -82,6 +98,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             <div className="max-w-6xl mx-auto h-full">
               {activeTab === 'overview' && <EmployeeMetrics reports={reports} />}
               {activeTab === 'reports' && <EmployeeReports reports={reports} />}
+              {activeTab === 'meetings' && <EmployeeMeetings meetings={meetings} loading={meetingsLoading} />}
             </div>
           )}
         </div>

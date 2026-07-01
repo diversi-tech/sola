@@ -3,7 +3,18 @@ export interface Employee {
   id: number;
   name: string;
   is_active: boolean;
-  rating?: number; 
+  rating?: number;
+}
+
+export interface Meeting {
+  meeting_id: number;
+  title: string | null;
+  type: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  estimated_duration_minutes: number | null;
+  participants_count: number | null;
+  attendees: string[] | null;
 }
 
 export interface Report {
@@ -44,6 +55,13 @@ export const employeeApi = {
     const URL = `${import.meta.env.VITE_API_BASE_URL}/api/reports/${employeeId}`;
     const response = await fetch(URL);
     if (!response.ok) throw new Error('Failed to fetch reports');
+    return response.json();
+  },
+
+  fetchEmployeeMeetings: async (employeeId: number): Promise<Meeting[]> => {
+    const URL = `${import.meta.env.VITE_API_BASE_URL}/api/meetings/employee/${employeeId}`;
+    const response = await fetch(URL);
+    if (!response.ok) throw new Error('Failed to fetch meetings');
     return response.json();
   }
 };
