@@ -1,13 +1,31 @@
 import { Request, Response } from 'express';
-import { processAndSaveFeedback } from '../services/report.service.js';
+import { processAndSaveFeedback, getEmployeesWithReports } from '../services/report.service.js';
 import {
+<<<<<<< Updated upstream
   sendCreatedResult,
   sendErrorResult,
   sendBadRequestResult,
   sendNotFoundResult,
   HttpStatusCode
+=======
+    sendCreatedResult,
+    sendErrorResult,
+    sendBadRequestResult,
+    sendNotFoundResult,
+    sendSuccessResult,
+    HttpStatusCode
+>>>>>>> Stashed changes
 } from '../utils/responseHandler.js';
 import { PgError } from '../utils/dbErrors.js';
+
+export const handleGetEmployeesWithReports = async (req: Request, res: Response) => {
+    try {
+        const data = await getEmployeesWithReports();
+        return sendSuccessResult(res, data);
+    } catch (error: any) {
+        return sendErrorResult(res, error.message);
+    }
+};
 
 export const handleIncomingFeedback = async (req: Request, res: Response) => {
   try {
