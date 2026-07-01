@@ -31,7 +31,6 @@ export interface EmployeeWithReports {
   latest_report_date: string;
 }
 
-// הוספתי אינטרפייס עבור הקטגוריות
 export interface Category {
   id: number;
   name: string;

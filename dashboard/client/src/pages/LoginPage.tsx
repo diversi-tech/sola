@@ -4,7 +4,9 @@ import Input from '../features/login/components/Input';
 import Button from '../features/login/components/Button';
 import logo from '../assets/sola-logo.png';
 
-//import { connectWithGoogle } from '../features/login/api/authApi';
+
+
+import { connectWithGoogle } from '../features/login/api/authService.js';
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
 
@@ -12,16 +14,14 @@ export const LoginPage: React.FC = () => {
     navigate('/EmployeePage');
   };
 
-  const handleGoogleLogin = async () => {
+const handleGoogleLogin = async () => {
     try {
-      //const result = await connectWithGoogle();
-      //console.log('Google login successful:', result);
+      const result = await connectWithGoogle(); // 1. הדפדפן מקבל פקודה ללכת לגוגל
+      console.log('Google login successful:', result);
       
-      navigate('/EmployeePage');
       
-    } catch (error) {
-      console.error('Failed to login with Google', error);
-    }
+      
+    } catch (error) {  }
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -119,13 +119,7 @@ export const LoginPage: React.FC = () => {
             Sign in
           </button>
 
-          {/* Register link */}
-          <p className="text-center text-sm text-slate-500 mt-6">
-            Don't have an account?{' '}
-            <Link to="/signup" className="text-indigo-600 font-semibold hover:text-indigo-700 hover:underline">
-              Create one →
-            </Link>
-          </p>
+
         </div>
 
         {/* Footer */}
@@ -179,27 +173,3 @@ export const LoginPage: React.FC = () => {
     </div>
   );
 };
-
-function connectWithGoogle() {
-  throw new Error('Function not implemented.');
-}
-
-
-function connectWithGoogle() {
-  throw new Error('Function not implemented.');
-}
-
-
-function connectWithGoogle() {
-  throw new Error('Function not implemented.');
-}
-
-
-function connectWithGoogle() {
-  throw new Error('Function not implemented.');
-}
-
-
-function connectWithGoogle() {
-  throw new Error('Function not implemented.');
-}
