@@ -55,7 +55,14 @@ export const processAndSaveFeedback = async (manager_id: number, text: string) =
             throw error;
         }
 
-        return data;
+        const formattedData = data.map(report => ({
+            ...report,
+            created_at: new Date(report.created_at).toLocaleString('he-IL', {
+                timeZone: 'Asia/Jerusalem'
+            })
+        }));
+
+        return formattedData;
     } catch (error) {
         throw error;
     }
