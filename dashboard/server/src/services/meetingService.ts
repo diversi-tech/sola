@@ -28,5 +28,20 @@ export const meetingService = {
     }
 
     return data as IMeeting;
+  },
+
+  // שליפת כל הפגישות לפי מזהה עובד
+  async getMeetingsByEmployee(employeeId: number): Promise<IMeeting[]> {
+    const { data, error } = await supabase
+      .from('Meeting')
+      .select('*')
+      .eq('calendar_id', employeeId)
+      .order('start_time', { ascending: true });
+
+    if (error) {
+      throw new Error(`שגיאה בשליפת פגישות עובד: ${error.message}`);
+    }
+
+    return (data ?? []) as IMeeting[];
   }
 };
