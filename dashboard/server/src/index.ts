@@ -7,7 +7,7 @@ import meetingRoutes from './routes/meetingRoutes.js';
 import authorizedUserRoutes from './routes/authorizedUserRoutes.js';
 import cors from 'cors'; 
 const app = express();
-const PORT = 5006;
+const PORT = process.env.PORT;
 app.use(cors({
   origin: 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE'], 
