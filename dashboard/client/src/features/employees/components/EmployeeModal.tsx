@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EmployeeMetrics } from './EmployeeMetrics';
 import { EmployeeReports } from './EmployeeReports';
-import { calculateEmployeeRating } from '../api/employeeApi';
+import { EmployeeMeetings } from './EmployeeMeetings';
+import { calculateEmployeeRating, Meeting } from '../api/employeeApi';
 
 interface Employee {
   id: string | number;
@@ -18,7 +19,10 @@ interface Report {
 interface EmployeeModalProps {
   employee: Employee;
   reports: Report[];
+  meetings: Meeting[];
   loading: boolean;
+  meetingsLoading: boolean;
+  initialTab?: 'overview' | 'reports' | 'meetings';
   onClose: () => void;
 }
 
@@ -30,8 +34,20 @@ const AVATAR_GRADIENTS = [
   'from-pink-500 to-rose-400',
 ];
 
-export const EmployeeModal: React.FC<EmployeeModalProps> = ({ employee, reports, loading, onClose }) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'reports'>('overview');
+export const EmployeeModal: React.FC<EmployeeModalProps> = ({
+  employee,
+  reports,
+  meetings,
+  loading,
+  meetingsLoading,
+  initialTab = 'overview',
+  onClose,
+}) => {
+  const [activeTab, setActiveTab] = useState<'overview' | 'reports' | 'meetings'>(initialTab);
+
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab, employee.id]);
 
   const gradientIndex = typeof employee.id === 'number'
     ? employee.id % AVATAR_GRADIENTS.length
@@ -54,7 +70,14 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({ employee, reports,
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     )},
+    { key: 'meetings' as const, label: 'פגישות', icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    )},
   ];
+
+  const isLoading = activeTab === 'meetings' ? meetingsLoading : loading;
 
   return (
     <div
@@ -65,7 +88,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({ employee, reports,
       <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
 
         {/* ── Gradient header ── */}
-        <div className={`relative bg-gradient-to-l from-indigo-700 via-indigo-600 to-violet-600 px-8 pt-8 pb-0 overflow-hidden`}>
+        <div className="relative bg-gradient-to-l from-indigo-700 via-indigo-600 to-violet-600 px-8 pt-8 pb-0 overflow-hidden">
 
           {/* Decorative circles */}
           <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-white/5" />
@@ -99,7 +122,6 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({ employee, reports,
                 </span>
               </div>
 
-              {/* Key stats inline */}
               <div className="flex items-center gap-4 text-sm text-indigo-200">
                 <span>#{employee.id}</span>
                 <span className="w-1 h-1 rounded-full bg-indigo-400" />
@@ -143,7 +165,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({ employee, reports,
 
         {/* ── Content ── */}
         <div className="flex-1 overflow-y-auto bg-slate-50/60 p-6 md:p-8">
-          {loading ? (
+          {isLoading ? (
             <div className="flex flex-col items-center justify-center h-48 gap-4">
               <div className="w-10 h-10 rounded-full border-4 border-indigo-100 border-t-indigo-600 animate-spin" />
               <p className="text-slate-500 text-sm font-medium">טוען נתונים...</p>
@@ -151,7 +173,8 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({ employee, reports,
           ) : (
             <div className="max-w-5xl mx-auto">
               {activeTab === 'overview' && <EmployeeMetrics reports={reports} />}
-              {activeTab === 'reports'  && <EmployeeReports reports={reports} />}
+              {activeTab === 'reports' && <EmployeeReports reports={reports} />}
+              {activeTab === 'meetings' && <EmployeeMeetings meetings={meetings} loading={meetingsLoading} />}
             </div>
           )}
         </div>
