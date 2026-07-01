@@ -1,74 +1,85 @@
 import { useState, useEffect } from 'react';
-import { employeeApi, Employee, Report } from '../api/employeeApi';
+import { employeeApi, EmployeeWithReports, Employee, Report, Meeting } from '../api/employeeApi';
 
 interface UseEmployeeDataReturn {
-  employees: Employee[];
+  employeesWithReports: EmployeeWithReports[];
   selectedEmployee: Employee | null;
   currentReports: Report[];
+  currentMeetings: Meeting[];
   loading: boolean;
-  modalLoading: boolean;
+  meetingsLoading: boolean;
   error: string | null;
-  handleSelectEmployee: (employee: Employee) => Promise<void>;
+  initialTab: 'overview' | 'reports' | 'meetings';
+  handleSelectEmployee: (item: EmployeeWithReports) => void;
+  handleViewMeetings: (employee: Employee) => Promise<void>;
   handleCloseModal: () => void;
 }
 
 export default function useEmployeeData(): UseEmployeeDataReturn {
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [employeesWithReports, setEmployeesWithReports] = useState<EmployeeWithReports[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [currentReports, setCurrentReports] = useState<Report[]>([]);
+  const [currentMeetings, setCurrentMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [modalLoading, setModalLoading] = useState<boolean>(false);
+  const [meetingsLoading, setMeetingsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [initialTab, setInitialTab] = useState<'overview' | 'reports' | 'meetings'>('overview');
 
   useEffect(() => {
-    const loadEmployees = async (): Promise<void> => {
+    const load = async () => {
       try {
         setLoading(true);
-        const result = (await employeeApi.fetchAllEmployees()) as any;
-        
-        // חילוץ חכם: אם יש data ניקח אותו, אחרת ניקח את התוצאה כולה
-        const employeesArray = result.data ? result.data : result;
-        
-        // וידוא מוחלט שזה מערך לפני השמירה
-        setEmployees(Array.isArray(employeesArray) ? employeesArray : []);
+        const data = await employeeApi.fetchEmployeesWithReports();
+        setEmployeesWithReports(Array.isArray(data) ? data : []);
       } catch (err) {
         setError((err as Error).message || 'שגיאה בטעינת הנתונים');
       } finally {
         setLoading(false);
       }
     };
-    loadEmployees();
+    load();
   }, []);
 
-  const handleSelectEmployee = async (employee: Employee): Promise<void> => {
+  const handleSelectEmployee = (item: EmployeeWithReports): void => {
+    setInitialTab('overview');
+    setSelectedEmployee(item.employee);
+    setCurrentReports(item.reports);
+  };
+
+  const handleViewMeetings = async (employee: Employee): Promise<void> => {
+    setInitialTab('meetings');
     setSelectedEmployee(employee);
+    setCurrentReports([]);
     try {
-      setModalLoading(true);
-      const result = (await employeeApi.fetchEmployeeReports(employee.id)) as any;
-      
-      const reportsArray = result.data ? result.data : result;
-      setCurrentReports(Array.isArray(reportsArray) ? reportsArray : []);
+      setMeetingsLoading(true);
+      const result = (await employeeApi.fetchEmployeeMeetings(employee.id)) as any;
+      const meetingsArray = result.data ? result.data : result;
+      setCurrentMeetings(Array.isArray(meetingsArray) ? meetingsArray : []);
     } catch (err) {
-      console.error('שגיאה בטעינת דוחות העובד', err);
-      setCurrentReports([]);
+      console.error('שגיאה בטעינת פגישות העובד', err);
+      setCurrentMeetings([]);
     } finally {
-      setModalLoading(false);
+      setMeetingsLoading(false);
     }
   };
 
   const handleCloseModal = (): void => {
     setSelectedEmployee(null);
     setCurrentReports([]);
+    setCurrentMeetings([]);
   };
 
   return {
-    employees,
+    employeesWithReports,
     selectedEmployee,
     currentReports,
+    currentMeetings,
     loading,
-    modalLoading,
+    meetingsLoading,
     error,
+    initialTab,
     handleSelectEmployee,
-    handleCloseModal
+    handleViewMeetings,
+    handleCloseModal,
   };
 }

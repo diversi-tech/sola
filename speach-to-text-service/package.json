@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npm install && ts-node -T app.ts",
     "build": "tsc",
-    "start": "ts-node -T app.ts"
+    "start": "node dist/app.js"
   },
   "keywords": [],
   "author": "",
