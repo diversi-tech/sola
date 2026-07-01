@@ -1,6 +1,5 @@
 import React, { useState, useMemo, ChangeEvent } from 'react';
 
-
 interface MetricScores {
   [key: string]: number | string | null | undefined;
 }
@@ -56,7 +55,8 @@ export const EmployeeReports: React.FC<EmployeeReportsProps> = ({ reports }) => 
   }, [reports, filterMonth, filterCategory]);
 
   return (
-    <div className="animate-fade-in py-4 max-w-4xl mx-auto flex flex-col gap-6">
+    // הקטנתי ל- mt-6 במקום mt-12 כדי למנוע חלל ריק מדי מתחת לטאבים
+    <div className="animate-fade-in mt-6 pb-6 max-w-4xl mx-auto flex flex-col gap-6">    
       <div className="bg-white p-4 rounded-2xl border border-indigo-100 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="flex items-center gap-2 text-indigo-800 font-bold text-sm">סינון דוחות:</div>
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
@@ -86,7 +86,8 @@ export const EmployeeReports: React.FC<EmployeeReportsProps> = ({ reports }) => 
       </div>
 
       {filteredAndSortedReports.length > 0 ? (
-        <div className="relative border-r-2 border-indigo-100 pr-6 mr-3 space-y-8">
+        // שונה ל mr-8 כדי לתת לנקודת ה-Timeline מקום להתרנדר בלי לחרוג מגבולות הקונטיינר
+        <div className="relative border-r-2 border-indigo-100 pr-6 mr-8 space-y-8">
           {filteredAndSortedReports.map((report) => (
             <div key={report.id} className="relative bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:border-indigo-200 group">
               <div className="absolute -right-[35px] top-6 w-4 h-4 rounded-full bg-indigo-500 ring-4 ring-slate-50 group-hover:bg-indigo-600"></div>
@@ -96,7 +97,6 @@ export const EmployeeReports: React.FC<EmployeeReportsProps> = ({ reports }) => 
                   <div className="bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-sm font-bold">מזהה דו"ח: #{report.id}</div>
                   <span className="text-sm font-medium text-gray-500">📅 {new Date(report.created_at).toLocaleDateString('he-IL')}</span>
                 </div>
-                <span className="text-xs text-gray-500 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200">👤 מנהל: #{report.manager_id}</span>
               </div>
               
               <p className="text-slate-700 text-base mb-4 font-medium">{report.text_summary}</p>

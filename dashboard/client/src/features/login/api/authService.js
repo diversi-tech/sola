@@ -1,9 +1,8 @@
 
-const API_BASE_URL = 'http://localhost:5000'; 
 
 export const connectWithGoogle = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/auth/connect-with-google`, {
+    const response = await fetch(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/google`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

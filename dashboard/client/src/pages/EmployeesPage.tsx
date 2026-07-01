@@ -1,152 +1,174 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import useEmployeeData from '../features/employees/hooks/useEmployeeData';
 import { EmployeeRow } from '../features/employees/components/EmployeeRow';
 import { EmployeeModal } from '../features/employees/components/EmployeeModal';
 import logo from '../assets/sola-logo.png';
-import { Employee } from '../features/employees/api/employeeApi'; // ייבוא הממשק מהמקור הנכון
-
-// --- הגדרת ממשקים ---
-interface Stats {
-  total: number;
-  active: number;
-  inactive: number;
-}
+import { calculateEmployeeRating } from '../features/employees/api/employeeApi';
 
 export default function EmployeePage() {
   const {
-    employees,
+    employeesWithReports,
     selectedEmployee,
     currentReports,
+    currentMeetings,
     loading,
-    modalLoading,
+    meetingsLoading,
     error,
+    initialTab,
     handleSelectEmployee,
-    handleCloseModal
+    handleViewMeetings,
+    handleCloseModal,
   } = useEmployeeData();
 
-  const stats = useMemo<Stats>(() => {
-    // הוספת הגנה: מוודאים ש-employees הוא אכן מערך לפני שעושים עליו filter
-    if (!employees || !Array.isArray(employees)) {
-      return { total: 0, active: 0, inactive: 0 };
-    }
-    const active = employees.filter(emp => emp.is_active).length;
-    return {
-      total: employees.length,
-      active: active,
-      inactive: employees.length - active
-    };
-  }, [employees]);
+  // סטייט חדש לשמירת מילת החיפוש
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  // סינון העובדים לפי שורת החיפוש
+  const filteredEmployees = useMemo(() => {
+    if (!searchQuery.trim()) return employeesWithReports;
+    
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    return employeesWithReports.filter((item) =>
+      item.employee.name.toLowerCase().includes(lowerCaseQuery)
+    );
+  }, [employeesWithReports, searchQuery]);
+
+  // עדכון הסטטיסטיקות כך שישקפו את הרשימה המסוננת
+  const stats = useMemo(() => {
+    const active = filteredEmployees.filter(e => e.employee.is_active).length;
+    return { 
+      total: filteredEmployees.length, 
+      active, 
+      inactive: filteredEmployees.length - active 
+    };
+  }, [filteredEmployees]);
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.currentTarget;
     target.style.display = 'none';
     if (target.parentNode) {
-      (target.parentNode as HTMLElement).innerHTML = 
-        '<span class="text-2xl font-black text-slate-800">sola<span class="text-blue-600">.</span></span>';
+      (target.parentNode as HTMLElement).innerHTML =
+        '<span class="text-xl font-black text-slate-800">sola<span style="color:#4f46e5">.</span></span>';
     }
   };
 
   if (loading) {
     return (
-      <div className="flex flex-col justify-center items-center h-screen gap-5 bg-blue-50/50" style={{ direction: 'rtl' }}>
-        <div className="animate-spin rounded-full h-14 w-14 border-4 border-blue-200 border-t-blue-600 shadow-sm" />
-        <p className="text-slate-700 font-semibold text-lg animate-pulse">
-          טוען נתוני מערכת...
-        </p>
+      <div className="flex flex-col justify-center items-center h-screen gap-4 bg-slate-50" style={{ direction: 'rtl' }}>
+        <div className="relative">
+          <div className="w-16 h-16 rounded-full border-4 border-indigo-100" />
+          <div className="w-16 h-16 rounded-full border-4 border-t-indigo-600 animate-spin absolute inset-0" />
+        </div>
+        <p className="text-slate-600 font-semibold">טוען נתוני מערכת...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-8 max-w-2xl mx-auto mt-16 bg-red-50 border border-red-200 rounded-3xl text-center shadow-lg" style={{ direction: 'rtl' }}>
-        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
+      <div className="flex items-center justify-center h-screen bg-slate-50" style={{ direction: 'rtl' }}>
+        <div className="max-w-md w-full mx-4 bg-white border border-red-100 rounded-2xl p-8 text-center shadow-lg">
+          <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 className="text-slate-900 text-lg font-bold mb-1">שגיאה בטעינת הנתונים</h3>
+          <p className="text-slate-500 text-sm">{error}</p>
         </div>
-        <h3 className="text-red-900 text-xl font-bold mb-2">שגיאה בטעינת העמוד</h3>
-        <p className="text-red-600 font-medium">{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50/80 via-slate-50 to-blue-50/50" style={{ direction: 'rtl' }}>
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-          <div>
-            <div className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full bg-blue-100/50 border border-blue-200 shadow-sm backdrop-blur-sm">
-              <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-              <span className="text-xs font-bold text-blue-700 tracking-wide">
-                פורטל HR ראשי
-              </span>
-            </div>
-            
-            <h1 className="text-4xl font-black text-slate-800 tracking-tight mb-2">
-              מערכת ניהול עובדים
-            </h1>
-            <p className="text-slate-500 font-medium text-sm">
-              צפייה וניהול של תיקי עובדים, מדדי ביצוע ודוחות מערכת.
-            </p>
-          </div>
+    <div className="min-h-screen bg-slate-50" style={{ direction: 'rtl' }}>
 
-          <div className="shrink-0 bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center h-20 w-auto">
-            <img 
-              src={logo} 
-              alt="Sola Logo" 
-              className="h-full object-contain"
-              onError={handleImageError}
+      {/* ── Top bar ── */}
+      <div className="bg-white border-b border-slate-100 sticky top-0 z-20 shadow-sm">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <span className="font-bold text-slate-800 text-lg">HR Dashboard</span>
+          </div>
+          <img src={logo} alt="Sola" className="h-7 object-contain" onError={handleImageError} />
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-6 py-8">
+
+        {/* ── Page header ── */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">ניהול עובדים</h1>
+          <p className="text-slate-500 text-sm">ממוין לפי תאריך הדוח האחרון</p>
+        </div>
+
+        {/* ── Search Bar ── */}
+        <div className="mb-8">
+          <div className="relative max-w-md">
+            <input
+              type="text"
+              placeholder="חיפוש עובד לפי שם..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white border border-slate-200 text-sm rounded-xl pl-4 pr-11 py-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-sm transition-all"
             />
+            <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
+              <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
           </div>
         </div>
-        <div className="mb-8 h-1 w-full bg-gradient-to-l from-blue-600 via-sky-400 to-transparent rounded-full opacity-80" />
 
-        <div className="rounded-3xl p-6 bg-white/70 backdrop-blur-xl border border-blue-100/50 shadow-xl shadow-blue-900/5 relative">
-          <div className="flex items-center justify-between mb-6 border-b border-slate-100 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-1.5 h-6 rounded-full bg-blue-600" />
-              <h2 className="text-lg font-bold text-slate-800">
-                אינדקס עובדים
-              </h2>
-            </div>
-            <span className="text-xs font-semibold text-slate-400 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
-              לחץ על שורת עובד לפירוט מלא
+        {/* ── Employee list ── */}
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h2 className="font-bold text-slate-800">רשימת עובדים</h2>
+            <span className="text-xs text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full font-medium">
+              {stats.total} עובדים
             </span>
           </div>
 
-          <div className="space-y-1">
-            {Array.isArray(employees) && employees.length > 0 ? (
-              employees.map((employee: Employee) => {
-                const numericId = typeof employee.id === 'string' ? parseInt(employee.id, 10) : employee.id;
-                const currentRating = (numericId % 3) + 3;
-                
-                return (
-                  <EmployeeRow
-                    key={employee.id}
-                    employee={employee}
-                    rating={currentRating}
-                    onClick={() => handleSelectEmployee({ ...employee, id: numericId } as Employee)}
-                  />
-                );
-              })
-            ) : (
-              <div className="text-center py-12 text-slate-500 font-medium">
-                לא נמצאו עובדים במערכת.
-              </div>
-            )}
-          </div>
+          {filteredEmployees.length > 0 ? (
+            <div className="divide-y divide-slate-50">
+              {filteredEmployees.map((item) => (
+                <EmployeeRow
+                  key={item.employee.id}
+                  employee={item.employee}
+                  rating={calculateEmployeeRating(item.reports)}
+                  reportCount={item.reports.length}
+                  latestReportDate={item.latest_report_date}
+                  onClick={() => handleSelectEmployee(item)}
+                  onViewMeetings={() => handleViewMeetings(item.employee)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="py-20 text-center text-slate-400 font-medium">
+              {searchQuery.trim() 
+                ? 'לא נמצאו עובדים התואמים לחיפוש שלך.' 
+                : 'לא נמצאו עובדים עם דוחות במערכת.'}
+            </div>
+          )}
         </div>
-
-        {selectedEmployee && (
-          <EmployeeModal
-            employee={selectedEmployee}
-            reports={currentReports}
-            loading={modalLoading}
-            onClose={handleCloseModal}
-          />
-        )}
       </div>
+
+      {selectedEmployee && (
+        <EmployeeModal
+          employee={selectedEmployee}
+          reports={currentReports}
+          meetings={currentMeetings}
+          loading={false}
+          meetingsLoading={meetingsLoading}
+          initialTab={initialTab}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   );
 }

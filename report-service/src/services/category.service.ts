@@ -34,3 +34,13 @@ export const updateCategory = async (id: number | string, newName: string) => {
     if (error) throw error;
     return data;
 };
+
+
+export const getAllCategories = async () => {
+    const { data, error } = await supabase
+        .from('ReportCategory')
+        .select('*');
+
+    if (error) throw error;
+    return data;
+};
