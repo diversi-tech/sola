@@ -11,9 +11,6 @@ router.get('/google/callback', passport.authenticate('google', { failureRedirect
 router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
 router.get('/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/login' }), authController.handleGoogleCallback);
 
-router.get('/apple', passport.authenticate('apple'));
-router.post('/apple/callback', passport.authenticate('apple', { failureRedirect: '/login' }), authController.handleGoogleCallback); // שימי לב שאפל עושים POST לקולבק, לא GET!
-
 router.get('/profile', requireAuth, authController.getProfile);
 router.get('/logout', authController.logout);
 
