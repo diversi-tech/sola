@@ -1,7 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import webhookRoutes from './routes/webhook.routes';
-import messageRoutes from './routes/message.routes';
+//import messageRoutes from './routes/message.routes';
 import dns from 'dns';
 dns.setDefaultResultOrder('ipv4first');
 
@@ -10,7 +10,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-app.use('/messages', messageRoutes);
+//app.use('/messages', messageRoutes);
 
 const PORT = process.env.PORT || 5001;
 
