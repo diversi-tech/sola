@@ -14,11 +14,12 @@ const getOAuth2Client = () => {
 
 async function insertAuthSession(employeeEmail: string, state: string): Promise<void> {
   const { error } = await supabase
-    .from('Users')
+    .from('Employee_token')
     .insert([
       {
         employee_email: employeeEmail,
         state: state,
+        status: 'INACTIVE'
       },
     ]);
 

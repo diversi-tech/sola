@@ -5,8 +5,10 @@ import router from './routes/meeting.route.js';
 import { supabase } from './config/supabase.js';
 import calendarRoutes from './routes/calendar.route.js';
 import calendarAuthRoutes from './routes/calendarAuth.route.js';
+ import webhookRoutes from './routes/webhook.route.js';
 import errorHandler from './middleware/error.middleware.js';
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
@@ -17,12 +19,14 @@ app.get('/', (req, res) => res.send('Server is up and running!'));
 app.use('/api/calendar/auth', calendarAuthRoutes);
 app.use('/auth', calendarRoutes);
 app.use('/api/meetings', router);
+app.use('/webhooks', webhookRoutes);
 app.use(errorHandler);
-
 app.use((req, res) => {
     console.log(`[404] Route not found: ${req.method} ${req.originalUrl}`);
     res.status(404).json({ error: `Cannot ${req.method} ${req.originalUrl}` });
 });
+
+
 
 
 async function testConnection() {

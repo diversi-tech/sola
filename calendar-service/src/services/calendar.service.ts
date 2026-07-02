@@ -3,6 +3,7 @@ import { google } from 'googleapis';
 import { encryptToken } from '../utils/crypto.util.js';
 import { CalendarServiceError } from '../middleware/error.middleware.js';
 import { AuthErrorType } from '../types/authErrors.enum.js'
+import { registerWebhookChannel } from './webhook.service.js';
 
 const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -14,7 +15,7 @@ export const processGoogleCallback = async (code: string, state: string, error?:
     if (error) {
         if (state) {
             await supabase
-                .from('Users')
+                .from('Employee_token')
                 .update({ status: 'INACTIVE', state: null })
                 .eq('state', state);
         }
@@ -26,7 +27,7 @@ export const processGoogleCallback = async (code: string, state: string, error?:
     }
 
     const { data: authRecord, error: dbError } = await supabase
-        .from('Users')
+        .from('Employee_token')
         .select('*')
         .eq('state', state)
         .eq('status', 'INACTIVE')
@@ -61,7 +62,7 @@ export const processGoogleCallback = async (code: string, state: string, error?:
     const encryptedToken = encryptToken(tokenToSave);
 
     const { error: updateError } = await supabase
-        .from('Users')
+        .from('Employee_token')
         .update({
             refresh_token: encryptedToken,
             status: 'ACTIVE',
@@ -75,6 +76,12 @@ export const processGoogleCallback = async (code: string, state: string, error?:
             'Error saving data to the database.',
             AuthErrorType.DB_SAVE_ERROR
         );
+    }
+
+    try {
+        await registerWebhookChannel(authRecord.id, encryptedToken);
+    } catch (webhookErr: any) {
+        console.error(`[Webhook] Failed to register channel for user ${authRecord.id}:`, webhookErr.message);
     }
 
     return authRecord;
