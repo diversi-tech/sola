@@ -6,7 +6,7 @@ export async function validateUserAndToken(
   refreshToken: string
 ): Promise<{ valid: boolean; error?: string }> {
   const { data: user, error: userError } = await supabase
-    .from('Users')
+    .from('Employee_token')
     .select('id, refresh_token')
     .eq('id', user_id)
     .single();
@@ -46,7 +46,7 @@ export async function getAllActiveUsers(): Promise<
   Array<{ id: number; employee_email: string; refresh_token: string }>
 > {
   const { data: users, error } = await supabase
-    .from('Users')
+    .from('Employee_token')
     .select('id, employee_email, refresh_token')
     .not('refresh_token', 'is', null);
 

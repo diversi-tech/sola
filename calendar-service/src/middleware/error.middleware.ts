@@ -25,8 +25,27 @@ export class BadRequestError extends Error {
 
 interface AppError extends Error {
 	status?: number;
-	statusCode?: number;
+	statusCode?: number | AuthErrorType;
 	details?: any;
+}
+const AUTH_ERROR_HTTP_STATUS: Record<AuthErrorType, number> = {
+	[AuthErrorType.USER_DENIED]: 403,
+	[AuthErrorType.SECURITY_ERROR]: 400,
+	[AuthErrorType.GOOGLE_API_ERROR]: 502,
+	[AuthErrorType.NO_REFRESH_TOKEN]: 400,
+	[AuthErrorType.DB_SAVE_ERROR]: 500,
+};
+
+function resolveHttpStatus(rawStatus: unknown): number {
+	if (typeof rawStatus === 'number' && Number.isInteger(rawStatus)) {
+		return rawStatus;
+	}
+
+	if (typeof rawStatus === 'string' && rawStatus in AUTH_ERROR_HTTP_STATUS) {
+		return AUTH_ERROR_HTTP_STATUS[rawStatus as AuthErrorType];
+	}
+
+	return 500;
 }
 
 export default function errorHandler(
