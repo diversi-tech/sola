@@ -1,42 +1,30 @@
 import { supabase } from '../config/supabase.js';
 
-export const findOrCreateOauthUser = async (email: string) => {
-if (!email) {
+export const verifyAndFindOauthEmployee = async (email: string) => {
+  if (!email) {
     throw new Error("No email address provided.");
   }
 
-  const { data: existingUser, error: searchError } = await supabase
-    .from('Users')
+  const { data: existingEmployee, error: searchError } = await supabase
+    .from('Employees')
     .select('*')
-    .eq('employee_email', email)
+    .eq('Email', email) 
     .single();
 
   if (searchError && searchError.code !== 'PGRST116') {
-    throw new Error(`Error searching for user: ${searchError.message}`);
+    throw new Error(`Error searching for employee: ${searchError.message}`);
   }
 
-  if (existingUser) {
-    return existingUser;
+  if (!existingEmployee) {
+    return null; 
   }
 
-  const { data: newUser, error: insertError } = await supabase
-    .from('Users')
-    .insert([
-      { employee_email: email }
-    ])
-    .select() 
-    .single();
-
-  if (insertError) {
-    throw new Error(`Error creating user: ${insertError.message}`);
-  }
-
-  return newUser;
+  return existingEmployee;
 };
 
-export const getUserById = async (id: number) => { 
+export const getEmployeeById = async (id: number) => { 
   const { data, error } = await supabase
-    .from('Users')
+    .from('Employees')
     .select('*')
     .eq('id', id)
     .single();

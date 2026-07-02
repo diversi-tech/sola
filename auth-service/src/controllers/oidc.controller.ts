@@ -1,12 +1,16 @@
 import { Request, Response } from 'express';
 
-export const handleGoogleCallback = (req: Request, res: Response) => {
+export const handleOauthCallback = (req: Request, res: Response) => {
 
-  res.redirect('http://localhost:5173/dashboard'); 
+  res.json({ 
+    message: 'Successfully authenticated!', 
+    employee: req.user 
+  });
+  //res.redirect('http://localhost:5173/dashboard'); 
 };
 
 export const getProfile = (req: Request, res: Response) => {
-  res.json({ user: req.user });
+  res.json({ employee: req.user });
 };
 
 export const logout = (req: Request, res: Response, next: any) => {

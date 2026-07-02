@@ -1,9 +1,7 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { findOrCreateOauthUser } from '../../services/oidc.service.js';
-import { getUserById } from '../../services/oidc.service.js';
-
-import { User } from '../../types/user.js'; 
+import { verifyAndFindOauthEmployee, getEmployeeById } from '../../services/oidc.service.js';
+import { Employee } from '../../types/user.js'; 
 
 passport.use(
   new GoogleStrategy(
@@ -13,12 +11,17 @@ passport.use(
       callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/api/auth/google/callback',
     },
     async (accessToken, refreshToken, profile, done) => {
-    try {
+      try {
         const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
         if (!email) return done(new Error("No email found from Google"), undefined);
 
-        const user = await findOrCreateOauthUser(email);//todo
-        return done(null, user);
+        const employee = await verifyAndFindOauthEmployee(email);
+        
+        if (!employee) {
+          return done(null, false, { message: 'Your email is not registered in the system.' });
+        }
+
+        return done(null, employee);
       } catch (error) {
         return done(error as Error, undefined);
       }
@@ -27,14 +30,14 @@ passport.use(
 );
 
 passport.serializeUser((user: Express.User, done) => {
-  const userData = user as User; 
+  const userData = user as Employee; 
   done(null, userData.id);
 });
 
 passport.deserializeUser(async (id: number, done) => {
   try {
-    const user = await getUserById(id); 
-    done(null, user); 
+    const employee = await getEmployeeById(id); 
+    done(null, employee); 
   } catch (error) {
     done(error, null);
   }

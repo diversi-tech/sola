@@ -1,9 +1,7 @@
-export interface User {
-  id: number;                  
-  employee_email: string;      
-  state?: string;
-  status: string;         
-  refresh_token?: string;
-  created_at: Date;
-  updated_at?: Date;
+export interface Employee {
+  id: number;
+  name: string;            
+  Email?: string;         
+  "Phone number"?: string; 
+  auth_id?: string;       
 }

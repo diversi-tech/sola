@@ -1,6 +1,6 @@
 import passport from 'passport';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
-import { findOrCreateOauthUser } from '../../services/oidc.service.js';
+import { verifyAndFindOauthEmployee } from '../../services/oidc.service.js';
 
 passport.use(
   new FacebookStrategy(
@@ -15,11 +15,18 @@ passport.use(
         const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
         if (!email) return done(new Error("No email found from Facebook"), undefined);
         
-        const user = await findOrCreateOauthUser(email);
-        return done(null, user);
+        const employee = await verifyAndFindOauthEmployee(email);
+        
+        if (!employee) {
+          return done(null, false, { message: 'Your email is not registered in the system.' });
+        }
+
+        return done(null, employee);
       } catch (error) {
         return done(error as Error, undefined);
       }
     }
   )
 );
+
+export default passport;
