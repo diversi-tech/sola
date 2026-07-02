@@ -13,7 +13,6 @@ export interface IReport {
   employee_id: number;
   manager_id: number;
   text_summary: string;
-  audio_link: string | null;
   metric_scores: Record<string, any>; // מתאים לשדה jsonb
 }
 export interface IMeeting {

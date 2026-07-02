@@ -12,7 +12,6 @@ export interface Report {
   employee_id: number;
   manager_id: number;
   text_summary: string;
-  audio_link: string | null;
   metric_scores: Record<string, number>; 
 }
 
