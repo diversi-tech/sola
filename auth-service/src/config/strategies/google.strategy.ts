@@ -1,7 +1,6 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { verifyAndFindOauthEmployee, getEmployeeById } from '../../services/oidc.service.js';
-import { Employee } from '../../types/user.js'; 
+import { verifyAndFindOauthEmployee } from '../../services/oidc.service.js';
 
 passport.use(
   new GoogleStrategy(
@@ -28,19 +27,3 @@ passport.use(
     }
   )
 );
-
-passport.serializeUser((user: Express.User, done) => {
-  const userData = user as Employee; 
-  done(null, userData.id);
-});
-
-passport.deserializeUser(async (id: number, done) => {
-  try {
-    const employee = await getEmployeeById(id); 
-    done(null, employee); 
-  } catch (error) {
-    done(error, null);
-  }
-});
-
-export default passport;
