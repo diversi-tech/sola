@@ -11,7 +11,7 @@ concurrency:
 
 # ── Per-project config (the only lines that differ between repos) ──
 env:
-  PROJECT_NAME: dashboard-client
+  PROJECT_NAME: dashboard-client2
   PUBLISH_DIR: dashboard/client/dist
   BUILD_CMD: cd dashboard/client && npm install && npm run build
   
