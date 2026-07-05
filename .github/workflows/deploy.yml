@@ -2,7 +2,7 @@ name: Deploy to Cloudflare Pages
 
 on:
   push:
-    branches: [v2]
+    branches: [main]
   workflow_dispatch: {}
 
 concurrency:
@@ -14,6 +14,8 @@ env:
   PROJECT_NAME: dashboard-client
   PUBLISH_DIR: dashboard/client/dist
   BUILD_CMD: cd dashboard/client && npm install && npm run build
+  VITE_REPORT_SERVICE_URL: https://report-service-kw4h.onrender.com
+  VITE_AUTH_SERVICE_URL: https://auth-service-zq1w.onrender.com
   
 jobs:
   deploy:

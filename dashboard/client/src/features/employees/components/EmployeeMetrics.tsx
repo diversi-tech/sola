@@ -3,7 +3,6 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer, Legend,
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
-// ייבוא ה-API (וודאי שהנתיב תואם למיקום הקובץ בפרויקט שלך)
 import { employeeApi } from '../api/employeeApi'; 
 
 interface MetricScores {
@@ -20,7 +19,6 @@ interface EmployeeMetricsProps {
   reports: Report[];
 }
 
-// הגדרת הטיפוסים עבור ה-Tooltip של Recharts
 interface CustomTooltipProps {
   active?: boolean;
   payload?: any[];
@@ -138,7 +136,6 @@ export const EmployeeMetrics: React.FC<EmployeeMetricsProps> = ({ reports }) => 
            <h3 className="text-lg font-bold text-gray-800 mb-2">פרופיל מדדים עדכני</h3>
            <div className="flex-1 w-full min-h-[250px]">
              <ResponsiveContainer width="100%" height="100%">
-               {/* מספר הקודקודים יהיה לפי כמות הקטגוריות במשתנה latestRadarData */}
                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={latestRadarData}>
                  <PolarGrid stroke="#e5e7eb" />
                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#4b5563', fontSize: 12, fontWeight: 600 }} />
