@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { employeeApi, EmployeeWithReports, Employee, Report, Meeting } from '../api/employeeApi';
+import { employeeApi  } from '../api/employeeApi';
+import { EmployeeWithReports, Employee, Report, Meeting } from '../types/employee.types';
+
 
 interface UseEmployeeDataReturn {
   employeesWithReports: EmployeeWithReports[];

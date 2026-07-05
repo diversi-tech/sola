@@ -1,5 +1,5 @@
 import React from 'react';
-import { Meeting } from '../api/employeeApi';
+import { Meeting } from '../types/employee.types';
 
 interface EmployeeMeetingsProps {
   meetings: Meeting[];

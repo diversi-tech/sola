@@ -3,9 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import Input from '../features/login/components/Input';
 import Button from '../features/login/components/Button';
 import logo from '../assets/sola-logo.png';
-
-
-
 import { connectWithGoogle } from '../features/login/api/authService.js';
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();

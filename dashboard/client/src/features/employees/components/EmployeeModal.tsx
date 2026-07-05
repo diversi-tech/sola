@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { EmployeeMetrics } from './EmployeeMetrics';
 import { EmployeeReports } from './EmployeeReports';
 import { EmployeeMeetings } from './EmployeeMeetings';
-import { calculateEmployeeRating, Meeting } from '../api/employeeApi';
+import {  Meeting } from '../types/employee.types';
+import { calculateEmployeeRating } from '../api/employeeApi';
+
 
 interface Employee {
   id: string | number;

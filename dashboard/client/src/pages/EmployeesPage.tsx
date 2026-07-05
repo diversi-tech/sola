@@ -33,7 +33,7 @@ export default function EmployeePage() {
     );
   }, [employeesWithReports, searchQuery]);
 
-  // עדכון הסטטיסטיקות כך שישקפו את הרשימה המסוננת
+  // עדכון הסטטיסטיקות כך שישקפו את הרשימה המסוננת///למחוק
   const stats = useMemo(() => {
     const active = filteredEmployees.filter(e => e.employee.is_active).length;
     return { 
