@@ -1,12 +1,7 @@
 import { Request, Response } from 'express';
 
 export const handleOauthCallback = (req: Request, res: Response) => {
-
-  res.json({ 
-    message: 'Successfully authenticated!', 
-    employee: req.user 
-  });
-  //res.redirect('http://localhost:5173/dashboard'); 
+  res.redirect('http://localhost:5173/dashboard'); 
 };
 
 export const getProfile = (req: Request, res: Response) => {
