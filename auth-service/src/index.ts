@@ -6,6 +6,7 @@ import authRoutes from './routes/authorization.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import dotenv from 'dotenv';
 import session from 'express-session';
+import localAuthRoutes from './routes/localAuth.routes.js';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use(express.json());
 
 app.use('/auth', authRoutes);
 app.use('/api/auth', oidc);
+app.use('/api/local-auth', localAuthRoutes);
 
 console.log("Check Env:", {
     port: process.env.PORT,
