@@ -89,15 +89,12 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     >
       <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
 
-        {/* ── Gradient header ── */}
-        {/* התיקון כאן: הוספת shrink-0 כדי למנוע את כיווץ והעלמת הכותרת */}
+       
         <div className="relative shrink-0 bg-gradient-to-l from-indigo-700 via-indigo-600 to-violet-600 px-8 pt-8 pb-0 overflow-hidden">
 
-          {/* Decorative circles */}
           <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-white/5" />
           <div className="absolute top-0 left-1/3 w-24 h-24 rounded-full bg-white/5" />
 
-          {/* Close button */}
           <button
             onClick={onClose}
             className="absolute top-4 left-4 p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
@@ -107,7 +104,6 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             </svg>
           </button>
 
-          {/* Employee identity */}
           <div className="flex items-end gap-5 relative z-10">
             <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${AVATAR_GRADIENTS[gradientIndex]} flex items-center justify-center text-white text-2xl font-extrabold shadow-lg border-2 border-white/20 mb-5`}>
               {employee.name.charAt(0).toUpperCase()}
@@ -140,7 +136,6 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             </div>
           </div>
 
-          {/* Tabs */}
           <div className="flex gap-1 relative z-10">
             {tabs.map(tab => (
               <button
@@ -159,7 +154,6 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
           </div>
         </div>
 
-        {/* ── Content ── */}
         <div className="flex-1 overflow-y-auto bg-slate-50/60 p-6 md:p-8">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-48 gap-4">

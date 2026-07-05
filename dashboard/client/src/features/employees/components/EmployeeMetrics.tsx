@@ -28,10 +28,8 @@ interface CustomTooltipProps {
 }
 
 export const EmployeeMetrics: React.FC<EmployeeMetricsProps> = ({ reports }) => {
-  // סטייט דינמי לשמירת הקטגוריות מהדטאבייס
   const [categoriesFromDB, setCategoriesFromDB] = useState<string[]>([]);
 
-  // שליפת הקטגוריות בעת טעינת הקומפוננטה
   useEffect(() => {
     const loadCategories = async () => {
       try {

@@ -40,12 +40,10 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
       className="group flex items-center gap-4 px-6 py-4 hover:bg-indigo-50/40 cursor-pointer transition-colors duration-150"
       style={{ direction: 'rtl' }}
     >
-      {/* Avatar */}
       <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${AVATAR_GRADIENTS[gradientIndex]} flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-sm`}>
         {employee.name ? employee.name.charAt(0).toUpperCase() : '?'}
       </div>
 
-      {/* Name + meta */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
           <span className="font-semibold text-slate-800 text-sm group-hover:text-indigo-700 transition-colors truncate">
@@ -62,7 +60,6 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
         </div>
       </div>
 
-      {/* Actions + Rating */}
       <div className="flex items-center gap-3 shrink-0">
      
 
@@ -84,7 +81,6 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
         </div>
       </div>
 
-      {/* Chevron */}
       <svg className="w-4 h-4 text-slate-300 group-hover:text-indigo-400 shrink-0 transition-colors rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
       </svg>

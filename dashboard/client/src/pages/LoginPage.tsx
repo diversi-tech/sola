@@ -13,7 +13,7 @@ export const LoginPage: React.FC = () => {
 
 const handleGoogleLogin = async () => {
     try {
-      const result = await connectWithGoogle(); // 1. הדפדפן מקבל פקודה ללכת לגוגל
+      const result = await connectWithGoogle(); 
       console.log('Google login successful:', result);
       
       
@@ -33,10 +33,8 @@ const handleGoogleLogin = async () => {
   return (
     <div className="flex min-h-screen font-sans">
 
-      {/* ── Left: Form Panel ── */}
       <div className="flex flex-col w-full lg:w-[46%] bg-white px-8 py-10 lg:px-14">
 
-        {/* Logo */}
         <div className="mb-12">
           <img
             src={logo}
@@ -46,13 +44,11 @@ const handleGoogleLogin = async () => {
           />
         </div>
 
-        {/* Form — vertically centered */}
         <div className="flex flex-col justify-center flex-1 max-w-[360px] mx-auto w-full">
 
           <h1 className="text-2xl font-bold text-slate-900 mb-1">Sign in to your account</h1>
           <p className="text-sm text-slate-500 mb-8">Welcome back! Enter your details to continue.</p>
 
-          {/* Social buttons */}
           <div className="flex flex-col gap-3 mb-6">
             <button 
               onClick={handleGoogleLogin} 
@@ -74,14 +70,12 @@ const handleGoogleLogin = async () => {
             </button>
           </div>
 
-          {/* Divider */}
           <div className="flex items-center gap-3 mb-6">
             <div className="flex-1 h-px bg-slate-200" />
             <span className="text-xs text-slate-400 font-medium">or sign in with email</span>
             <div className="flex-1 h-px bg-slate-200" />
           </div>
 
-          {/* Email */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
             <Input
@@ -91,7 +85,6 @@ const handleGoogleLogin = async () => {
             />
           </div>
 
-          {/* Password */}
           <div className="mb-2">
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
             <Input
@@ -101,14 +94,12 @@ const handleGoogleLogin = async () => {
             />
           </div>
 
-          {/* Forgot password */}
           <div className="flex justify-end mb-6">
             <a href="#" className="text-xs text-indigo-600 font-medium hover:text-indigo-700 hover:underline">
               Forgot password?
             </a>
           </div>
 
-          {/* Sign in button */}
           <button
             onClick={handleSignIn}
             className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
@@ -119,16 +110,13 @@ const handleGoogleLogin = async () => {
 
         </div>
 
-        {/* Footer */}
         <p className="text-xs text-slate-400 text-center mt-10">
           © 2026 Sola · All rights reserved
         </p>
       </div>
 
-      {/* ── Right: Brand Panel ── */}
       <div className="hidden lg:flex lg:w-[54%] bg-gradient-to-br from-indigo-600 via-indigo-700 to-blue-800 flex-col items-center justify-center p-16 relative overflow-hidden">
 
-        {/* Decorative circles */}
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/5" />
         <div className="absolute top-1/3 -right-16 w-64 h-64 rounded-full bg-white/5" />
         <div className="absolute -bottom-20 -left-16 w-80 h-80 rounded-full bg-white/5" />
@@ -136,7 +124,6 @@ const handleGoogleLogin = async () => {
 
         <div className="relative z-10 max-w-md text-center">
 
-          {/* Icon */}
           <div className="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center mx-auto mb-8 shadow-lg backdrop-blur-sm border border-white/20">
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8"
@@ -151,7 +138,6 @@ const handleGoogleLogin = async () => {
             One place to track employee performance, monitor meetings, and generate reports — all in real time.
           </p>
 
-          {/* Feature list */}
           <div className="flex flex-col gap-4 text-left">
             {[
               { icon: '📊', text: 'Real-time employee metrics & reports' },

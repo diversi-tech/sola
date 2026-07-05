@@ -55,7 +55,6 @@ export const EmployeeReports: React.FC<EmployeeReportsProps> = ({ reports }) => 
   }, [reports, filterMonth, filterCategory]);
 
   return (
-    // הקטנתי ל- mt-6 במקום mt-12 כדי למנוע חלל ריק מדי מתחת לטאבים
     <div className="animate-fade-in mt-6 pb-6 max-w-4xl mx-auto flex flex-col gap-6">    
       <div className="bg-white p-4 rounded-2xl border border-indigo-100 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="flex items-center gap-2 text-indigo-800 font-bold text-sm">סינון דוחות:</div>
