@@ -17,7 +17,7 @@ export const generateAuthUrlHandler = async (req: Request, res: Response): Promi
 
    await sendCalendarAuthEmail(employee_email, authUrl);
    res.status(200).json({
-      message: 'קישור האישור נשלח בהצלחה למייל העובד' 
+      message: "The request was successfully sent to the employee's email" 
    })
     
   } catch (err: any) {

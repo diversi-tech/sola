@@ -59,7 +59,6 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({ employee, rating, onCl
         >
           שלח בקשת אישור גישה ליומן
         </button>
-
         <div className="flex items-center gap-1 shrink-0 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 group-hover:bg-indigo-50/50 transition-colors duration-300">
           {[...Array(5)].map((_, index) => (
             <svg
