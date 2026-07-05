@@ -7,6 +7,7 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import dotenv from 'dotenv';
 import session from 'express-session';
 import passport from './config/strategies/passport.config.js'; 
+import localAuthRoutes from './routes/localAuth.routes.js';
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use(express.json());
 
 app.use('/auth', authRoutes);
 app.use('/api/auth', oidc);
+app.use('/api/local-auth', localAuthRoutes);
 
 app.use(errorHandler);
 
