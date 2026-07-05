@@ -17,7 +17,6 @@ app.use('/auth', authRoutes);
 console.log("Check Env:", {
     port: process.env.PORT,
     supabaseUrl: process.env.SUPABASE_URL,
-    supabaseKey: process.env.SUPABASE_ANON_KEY
 });
 
 app.listen(PORT, () => {

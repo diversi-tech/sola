@@ -39,7 +39,7 @@ export default function EmployeePage() {
         });
 
         if (!response.ok) {
-            throw new Error('שגיאה בשליחת הבקשה');
+            throw new Error('Error sending request');
         }
         setSuccessMessage('המייל נשלח לעובד בהצלחה!');
         setTimeout(() => setSuccessMessage(null), 3000);

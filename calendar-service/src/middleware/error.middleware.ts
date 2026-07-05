@@ -1,27 +1,25 @@
-import {AuthErrorType}from '../types/authErrors.enum.js';
+import { AuthErrorType } from '../types/authErrors.enum.js';
 import { Request, Response, NextFunction } from 'express';
 
 
 export class CalendarServiceError extends Error {
-  public statusCode: AuthErrorType;
-
-  constructor(message: string, statusCode: AuthErrorType) {
-    super(message);
-    this.statusCode = statusCode;
-    this.name = this.constructor.name; 
-    Error.captureStackTrace(this, this.constructor);
-  }
+	public statusCode: AuthErrorType;
+	constructor(message: string, statusCode: AuthErrorType) {
+		super(message);
+		this.statusCode = statusCode;
+		this.name = this.constructor.name;
+		Error.captureStackTrace(this, this.constructor);
+	}
 }
 
 
 export class BadRequestError extends Error {
-    statusCode: number;
-    
-    constructor(message: string) {
-        super(message);
-        this.statusCode = 400;
-        Object.setPrototypeOf(this, BadRequestError.prototype);
-    }
+	statusCode: number;
+	constructor(message: string) {
+		super(message);
+		this.statusCode = 400;
+		Object.setPrototypeOf(this, BadRequestError.prototype);
+	}
 }
 
 
@@ -37,8 +35,11 @@ export default function errorHandler(
 	res: Response,
 	next: NextFunction
 ) {
-	const status = err?.status || err?.statusCode || 500;
-	const message = err?.message || 'Internal Server Error';
+	const status = typeof err?.statusCode === 'number'
+		? err.statusCode
+		: typeof err?.status === 'number'
+			? err.status
+			: 500; const message = err?.message || 'Internal Server Error';
 
 	console.error('[Error]', {
 		message,
