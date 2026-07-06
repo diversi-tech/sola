@@ -4,11 +4,9 @@ import oidc from './routes/oidc.routes.js';
 import express from 'express';
 import authRoutes from './routes/authorization.routes.js';
 import { errorHandler } from './middlewares/errorHandler.js';
-import dotenv from 'dotenv';
 import session from 'express-session';
 import localAuthRoutes from './routes/localAuth.routes.js';
 
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
