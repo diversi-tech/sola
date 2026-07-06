@@ -12,7 +12,6 @@ export const useAdminData = () => {
     const loadData = async () => {
       try {
         setLoading(true);
-        // Promise.all מאפשר משיכת שני הנתונים במקביל לביצועים אופטימליים
         const [employeesData, permissionsData] = await Promise.all([
           adminApi.fetchEmployees(),
           adminApi.fetchPermissions(),
@@ -39,18 +38,14 @@ export const useAdminData = () => {
       ? employee.permissions.filter(id => id !== permissionId)
       : [...employee.permissions, permissionId];
 
-    // Optimistic UI Update: עדכון התצוגה מיד כדי לתת חווית משתמש מהירה
     setEmployees(prev =>
       prev.map(emp => (emp.id === employeeId ? { ...emp, permissions: updatedPermissions } : emp))
     );
-
-    // שליחת העדכון לשרת ברקע
     try {
       await adminApi.updateEmployeePermissions(employeeId, updatedPermissions);
     } catch (err) {
       console.error('Failed to update permission:', err);
       alert('שגיאה בעדכון ההרשאות בשרת, השינוי יבוטל.');
-      // שחזור למצב הקודם במקרה של שגיאת שרת (Rollback)
       setEmployees(prev =>
         prev.map(emp => (emp.id === employeeId ? { ...emp, permissions: employee.permissions } : emp))
       );

@@ -3,7 +3,6 @@ import { useAdminData } from '../features/admin/hooks/useAdminData';
 import { PermissionsTable } from '../features/admin/components/PermissionsTable';
 
 const AdminPage: React.FC = () => {
-  // שאיבת כל הנתונים והפונקציות מההוק החכם שיצרנו
   const { employees, permissions, loading, error, togglePermission } = useAdminData();
 
   if (loading) {
