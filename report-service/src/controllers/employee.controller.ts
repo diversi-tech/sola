@@ -10,7 +10,7 @@ import {
 
 export const createNewEmployee = async (req: Request, res: Response) => {
     try {
-        const { name, Email, phoneNumber } = req.body;
+        const { name, email, phone_number } = req.body;
 
 
         if (!name || name.trim() === '') {
@@ -19,8 +19,8 @@ export const createNewEmployee = async (req: Request, res: Response) => {
 
         const employeeData = {
             name: name.trim(),
-            Email: Email ? Email.trim() : null,
-            "Phone number": phoneNumber ? phoneNumber.trim() : null
+            email: email ? email.trim() : null,
+            phone_number: phone_number ? phone_number.trim() : null
         };
 
         const newEmployee = await addEmployee(employeeData);
@@ -36,7 +36,7 @@ export const createNewEmployee = async (req: Request, res: Response) => {
 export const editExistingEmployee = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { name, Email, phoneNumber } = req.body;
+        const { name, email, phone_number } = req.body;
 
 
         if (name !== undefined && name.trim() === '') {
@@ -45,8 +45,8 @@ export const editExistingEmployee = async (req: Request, res: Response) => {
 
         const updateData: any = {};
         if (name !== undefined) updateData.name = name.trim();
-        if (Email !== undefined) updateData.Email = Email ? Email.trim() : null;
-        if (phoneNumber !== undefined) updateData["Phone number"] = phoneNumber ? phoneNumber.trim() : null;
+        if (email !== undefined) updateData.email = email ? email.trim() : null;
+        if (phone_number !== undefined) updateData.phone_number = phone_number ? phone_number.trim() : null;
 
         const updatedEmployee = await updateEmployee(Number(id), updateData);
         return sendSuccessResult(res, updatedEmployee);

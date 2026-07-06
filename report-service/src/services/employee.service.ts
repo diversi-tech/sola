@@ -22,8 +22,8 @@ export const addEmployee = async (employeeData: any) => {
         .insert([
             {
                 name: employeeData.name,
-                Email: employeeData.Email,
-                "Phone number": employeeData["Phone number"]
+                email: employeeData.email,
+                phone_number: employeeData.phone_number
             }
         ])
         .select()
@@ -39,8 +39,8 @@ export const updateEmployee = async (id: number, updateData: any) => {
         .from('Employees')
         .update({
             name: updateData.name,
-            Email: updateData.Email,
-            "Phone number": updateData["Phone number"]
+            email: updateData.email,
+            phone_number: updateData.phone_number
         })
         .eq('id', id)
         .select()
