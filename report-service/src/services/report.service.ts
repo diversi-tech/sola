@@ -28,7 +28,6 @@ export const getEmployeesWithReports = async () => {
     }
   }
 
-  // order is preserved from the query (desc by created_at), so first entry per employee = most recent
   return Array.from(employeeMap.values());
 };
 
@@ -39,9 +38,11 @@ export const processAndSaveFeedback = async (manager_id: number, text: string) =
     try {
         const categories = await getActiveCategories();
 
-        const llmMetrics = await aiProvider.analyzeFeedback(text, categories);
+        const llmResult = await aiProvider.analyzeFeedback(text, categories);
 
-        const extractedName = llmMetrics.employee_name;
+        const detectedLanguage = llmResult.detected_language;
+        const feedbackData = llmResult.employee_feedback;
+        const extractedName = feedbackData.employee_name;
         if (!extractedName) {
             throw new Error("The AI could not identify an employee name in the text.");
         }
@@ -65,15 +66,12 @@ export const processAndSaveFeedback = async (manager_id: number, text: string) =
         }
 
         const employeeId = matchedEmployees[0].id;
-        console.log(`Matched extracted name "${extractedName}" to DB Employee ID: ${employeeId} (Name: ${matchedEmployees[0].name})`);
-
-
-
+        console.log(`Matched extracted name "${extractedName}" to DB Employee ID: ${employeeId} (Name: ${matchedEmployees[0].name})`);   
         const realData = {
             employee_id: employeeId,
             manager_id: manager_id || null,
-            metric_scores: llmMetrics.metric_scores,
-            text_summary: llmMetrics.text_summary,
+            metric_scores: feedbackData.metrics,
+            text_summary: feedbackData.summary,
         };
 
         const { data, error } = await supabase
@@ -85,7 +83,11 @@ export const processAndSaveFeedback = async (manager_id: number, text: string) =
             throw error;
         }
 
-        return data;
+        return {
+            savedReport: data,
+            detected_language: detectedLanguage
+        };
+        
     } catch (error) {
         throw error;
     }

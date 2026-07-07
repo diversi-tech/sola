@@ -46,14 +46,10 @@ export const editExistingCategory = async (req: Request, res: Response) => {
 
 export const fetchAllCategories = async (req: Request, res: Response) => {
     try {
-        // קריאה לפונקציית ה-service
         const categories = await getAllCategories();
-        
-        // החזרת תשובה חיובית באמצעות פונקציית העזר
         return sendSuccessResult(res, categories);
 
     } catch (error: any) {
-        // הדפסת השגיאה והחזרת תשובת שגיאה אחידה
         console.error("Error fetching categories:", error);
         return sendErrorResult(res, "Failed to fetch categories", HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
