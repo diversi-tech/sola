@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { LoginPage } from './pages/LoginPage';
 import EmployeePage from './pages/EmployeesPage';
 import AdminPage from './pages/AdminPage';
+import { UpdatePasswordPage } from './pages/UpdatePasswordPage';
+
 import './index.css';
 function App() {
   return (
@@ -11,6 +13,7 @@ function App() {
         <Route path="/admin" element={<AdminPage/>} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/update-password" element={<UpdatePasswordPage />} />
       </Routes>
     </Router>
   );

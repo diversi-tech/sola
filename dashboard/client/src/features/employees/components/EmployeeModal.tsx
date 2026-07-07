@@ -4,7 +4,7 @@ import { EmployeeReports } from './EmployeeReports';
 import { EmployeeMeetings } from './EmployeeMeetings';
 import {  Meeting } from '../types/employee.types';
 import { calculateEmployeeRating } from '../api/employeeApi';
-
+import { localAuthService } from '../../login/api/authService';
 
 interface Employee {
   id: string | number;
@@ -56,6 +56,19 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     : employee.name.charCodeAt(0) % AVATAR_GRADIENTS.length;
 
   const rating = calculateEmployeeRating(reports as any);
+
+  const handleAddEmployee = async () => {
+    try {
+        const result = await localAuthService.createEmployee(
+            "employee@email.com", 
+            "שם העובד", 
+            "0501234567", 
+        );
+        alert(result.message); 
+    } catch (err: any) {
+        console.error("נכשלה יצירת עובד:", err.message);
+    }
+};
 
   const latestDate = reports.length > 0
     ? new Date(reports[0].created_at).toLocaleDateString('he-IL', { day: '2-digit', month: 'long', year: 'numeric' })
