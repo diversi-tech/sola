@@ -11,7 +11,7 @@ concurrency:
 
 # ── Per-project config (the only lines that differ between repos) ──
 env:
-  PROJECT_NAME: dashboard-client
+  PROJECT_NAME: dashboard-client2
   PUBLISH_DIR: dashboard/client/dist
   BUILD_CMD: cd dashboard/client && npm install && npm run build
   
@@ -46,6 +46,9 @@ jobs:
 
       - name: Build
         shell: bash
+        env:
+          VITE_REPORT_SERVICE_URL: ${{ secrets.VITE_REPORT_SERVICE_URL }}
+          VITE_CALENDAR_SERVICE_URL: ${{ secrets.VITE_CALENDAR_SERVICE_URL }}
         run: |
           set -eo pipefail
           eval "$BUILD_CMD" 2>&1 | tee build.log

@@ -3,12 +3,20 @@ import passport from './config/strategies/google.strategy.js';
 import oidc from './routes/oidc.routes.js';
 import express from 'express';
 import authRoutes from './routes/authorization.routes.js';
+import adminRoutes from './routes/admin.routes.js';
+import cors from 'cors'; 
+
 import { errorHandler } from './middlewares/errorHandler.js';
 import session from 'express-session';
 import localAuthRoutes from './routes/localAuth.routes.js';
 
 
 const app = express();
+app.use(cors({
+  origin: 'http://localhost:5173', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 const PORT = process.env.PORT;
 app.use(session({
   secret: process.env.SESSION_SECRET || 'supersecret',
@@ -24,6 +32,7 @@ app.use('/auth', authRoutes);
 app.use('/api/auth', oidc);
 app.use('/api/local-auth', localAuthRoutes);
 
+app.use('/admin', adminRoutes);
 console.log("Check Env:", {
     port: process.env.PORT,
     supabaseUrl: process.env.SUPABASE_URL,
@@ -35,4 +44,6 @@ app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
+
+app.use(errorHandler);
 
