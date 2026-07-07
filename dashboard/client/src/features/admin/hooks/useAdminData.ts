@@ -29,9 +29,9 @@ export const useAdminData = () => {
     loadData();
   }, []);
 
-  const addEmployee = async (employee: { name: string; email: string; permissions: number[] }) => {
+  const addEmployee = async (employee: { name: string; email: string; phoneNumber?: string; permissionIds: number[] }) => {
     const created = await adminApi.createEmployee(employee);
-    setEmployees(prev => [...prev, { ...created, permissions: employee.permissions }]);
+    setEmployees(prev => [...prev, { ...created, permissions: employee.permissionIds }]);
   };
 
   const togglePermission = async (employeeId: number, permissionId: number) => {

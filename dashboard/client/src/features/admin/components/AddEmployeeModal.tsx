@@ -4,12 +4,13 @@ import { Permission } from '../api/adminApi';
 interface AddEmployeeModalProps {
   permissions: Permission[];
   onClose: () => void;
-  onCreate: (employee: { name: string; email: string; permissions: number[] }) => Promise<void>;
+  onCreate: (employee: { name: string; email: string; phoneNumber?: string; permissionIds: number[] }) => Promise<void>;
 }
 
 export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ permissions, onClose, onCreate }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -40,7 +41,8 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ permissions,
       await onCreate({
         name: name.trim(),
         email: email.trim(),
-        permissions: selectedPermissions,
+        phoneNumber: phoneNumber.trim() || undefined,
+        permissionIds: selectedPermissions,
       });
       onClose();
     } catch (err) {
@@ -86,6 +88,17 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ permissions,
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="employee@company.com"
+              className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">טלפון</label>
+            <input
+              type="tel"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              placeholder="+972501234567"
               className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
             />
           </div>

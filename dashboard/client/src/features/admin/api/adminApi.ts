@@ -25,20 +25,21 @@ export const adminApi = {
     return result.data ?? result;
   },
 
-  // מתחבר ל-route של הצוות: router.post('/create-employee', requireAuth, createEmployeeByAdmin)
-  // עדיין לא זמין בשרת (לוקאלי אצל הצוות) - יעלה בהמשך
-  createEmployee: async (employee: { name: string; email: string; permissions: number[] }): Promise<EmployeeWithPermissions> => {
-    const response = await fetch(`${import.meta.env.VITE_AUTH_SERVICE_URL}/create-employee`, {
+  // מתחבר ל-route האמיתי שהתמזג ל-main: POST /api/local-auth/create-employee (requireAuth)
+  // דורש טוקן מחובר ב-localStorage תחת המפתח 'token' (נשמר שם אחרי login)
+  createEmployee: async (employee: { name: string; email: string; phoneNumber?: string; permissionIds: number[] }): Promise<EmployeeWithPermissions> => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/local-auth/create-employee`, {
       method: 'POST',
-      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       body: JSON.stringify(employee),
     });
     if (!response.ok) throw new Error('Failed to create employee');
     const result = await response.json();
-    return result.data ?? result;
+    return result.employee ?? result.data ?? result;
   },
 
   updateEmployeePermissions: async (employeeId: number, permissionIds: number[]): Promise<void> => {
