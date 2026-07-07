@@ -9,10 +9,7 @@ import employeeRoutes from './routes/employee.routes.js';
 
 const app = express();
 app.use(cors({ 
-  origin: process.env.FRONTEND_URL || 
-  'http://localhost:5173' || 
-  'https://fabulous-creponne-41d225.netlify.app/EmployeePage' ||
-  'https://fabulous-creponne-41d225.netlify.app'
+  origin: process.env.FRONTEND_URL
 }));
 app.use(express.json());
 
