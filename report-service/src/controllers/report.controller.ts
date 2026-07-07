@@ -16,13 +16,13 @@ export const handleIncomingFeedback = async (req: Request, res: Response) => {
         if (!text || text.trim() === '') {
             return sendBadRequestResult(res, "Feedback text is missing or empty");
         }
-        const savedReport = await processAndSaveFeedback(manager_id, text);
-
+        const { savedReport, detected_language } = await processAndSaveFeedback(manager_id, text);
 
         return sendCreatedResult(res, {
             message: "Report successfully processed and saved!",
             manager_id: manager_id,
-            savedReport: savedReport
+            savedReport: savedReport,
+            detected_language: detected_language
         });
 
     } catch (error: any) {
