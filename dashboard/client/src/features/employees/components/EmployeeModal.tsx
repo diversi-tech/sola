@@ -10,6 +10,7 @@ interface Employee {
   id: string | number;
   name: string;
   is_active: boolean;
+  email: string;
 }
 
 interface Report {
