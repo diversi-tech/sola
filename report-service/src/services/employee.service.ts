@@ -16,36 +16,36 @@ export const findEmployeeByName = async (name: string) => {
     return data.id;
 };
 
-export const addEmployee = async (employeeData: any) => {
-    const { data, error } = await supabase
-        .from('Employees')
-        .insert([
-            {
-                name: employeeData.name,
-                email: employeeData.email,
-                phone_number: employeeData.phone_number
-            }
-        ])
-        .select()
-        .single();
+// export const addEmployee = async (employeeData: any) => {
+//     const { data, error } = await supabase
+//         .from('Employees')
+//         .insert([
+//             {
+//                 name: employeeData.name,
+//                 email: employeeData.email,
+//                 phone_number: employeeData.phone_number
+//             }
+//         ])
+//         .select()
+//         .single();
 
-    if (error) throw error;
-    return data;
-};
+//     if (error) throw error;
+//     return data;
+// };
 
 
-export const updateEmployee = async (id: number, updateData: any) => {
-    const { data, error } = await supabase
-        .from('Employees')
-        .update({
-            name: updateData.name,
-            email: updateData.email,
-            phone_number: updateData.phone_number
-        })
-        .eq('id', id)
-        .select()
-        .single();
+// export const updateEmployee = async (id: number, updateData: any) => {
+//     const { data, error } = await supabase
+//         .from('Employees')
+//         .update({
+//             name: updateData.name,
+//             email: updateData.email,
+//             phone_number: updateData.phone_number
+//         })
+//         .eq('id', id)
+//         .select()
+//         .single();
 
-    if (error) throw error;
-    return data;
-};
+//     if (error) throw error;
+//     return data;
+// };
