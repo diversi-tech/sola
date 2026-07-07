@@ -29,6 +29,11 @@ export const useAdminData = () => {
     loadData();
   }, []);
 
+  const addEmployee = async (employee: { name: string; email: string; permissions: number[] }) => {
+    const created = await adminApi.createEmployee(employee);
+    setEmployees(prev => [...prev, { ...created, permissions: employee.permissions }]);
+  };
+
   const togglePermission = async (employeeId: number, permissionId: number) => {
     const employee = employees.find(e => e.id === employeeId);
     if (!employee) return;
@@ -57,6 +62,7 @@ export const useAdminData = () => {
     permissions,
     loading,
     error,
+    addEmployee,
     togglePermission,
   };
 };

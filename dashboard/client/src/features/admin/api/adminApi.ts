@@ -25,6 +25,22 @@ export const adminApi = {
     return result.data ?? result;
   },
 
+  // מתחבר ל-route של הצוות: router.post('/create-employee', requireAuth, createEmployeeByAdmin)
+  // עדיין לא זמין בשרת (לוקאלי אצל הצוות) - יעלה בהמשך
+  createEmployee: async (employee: { name: string; email: string; permissions: number[] }): Promise<EmployeeWithPermissions> => {
+    const response = await fetch(`${import.meta.env.VITE_AUTH_SERVICE_URL}/create-employee`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(employee),
+    });
+    if (!response.ok) throw new Error('Failed to create employee');
+    const result = await response.json();
+    return result.data ?? result;
+  },
+
   updateEmployeePermissions: async (employeeId: number, permissionIds: number[]): Promise<void> => {
     const response = await fetch(`${import.meta.env.VITE_AUTH_SERVICE_URL}/admin/employees/${employeeId}/permissions`, {
       method: 'PUT',

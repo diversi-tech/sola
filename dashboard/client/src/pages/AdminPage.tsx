@@ -2,14 +2,18 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminData } from '../features/admin/hooks/useAdminData';
 import { PermissionsTable } from '../features/admin/components/PermissionsTable';
+import { AddEmployeeModal } from '../features/admin/components/AddEmployeeModal';
 import logo from '../assets/sola-logo.png';
 
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
-  const { employees, permissions, loading, error, togglePermission } = useAdminData();
+  const { employees, permissions, loading, error, addEmployee, togglePermission } = useAdminData();
 
   // סטייט לשמירת מילת החיפוש
   const [searchQuery, setSearchQuery] = useState('');
+
+  // סטייט לפתיחה/סגירה של מודל הוספת עובד
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // סינון העובדים לפי שורת החיפוש
   const filteredEmployees = useMemo(() => {
@@ -119,9 +123,20 @@ const AdminPage: React.FC = () => {
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h2 className="font-bold text-slate-800">רשימת הרשאות</h2>
-            <span className="text-xs text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full font-medium">
-              {filteredEmployees.length} עובדים
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full font-medium">
+                {filteredEmployees.length} עובדים
+              </span>
+              <button
+                onClick={() => setIsAddModalOpen(true)}
+                className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                </svg>
+                הוספת עובד
+              </button>
+            </div>
           </div>
 
           {filteredEmployees.length > 0 ? (
@@ -139,6 +154,14 @@ const AdminPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {isAddModalOpen && (
+        <AddEmployeeModal
+          permissions={permissions}
+          onClose={() => setIsAddModalOpen(false)}
+          onCreate={addEmployee}
+        />
+      )}
     </div>
   );
 };

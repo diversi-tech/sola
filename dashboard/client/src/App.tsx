@@ -10,7 +10,7 @@ function App() {
         <Route path="/EmployeePage" element={<EmployeePage />} />
         <Route path="/admin" element={<AdminPage/>} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<Navigate to="/admin" />} />
       </Routes>
     </Router>
   );
