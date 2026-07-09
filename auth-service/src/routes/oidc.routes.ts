@@ -12,3 +12,4 @@ router.get('/profile', requireAuth, authController.getProfile);
 router.get('/logout', authController.logout);
 
 export default router;
+

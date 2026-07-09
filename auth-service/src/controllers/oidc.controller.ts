@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 
 export const handleOauthCallback = (req: Request, res: Response) => {
-
   res.redirect('http://localhost:5173/dashboard'); 
 };
 
