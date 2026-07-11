@@ -7,7 +7,8 @@ export enum HttpStatusCode {
   UNAUTHORIZED = 401,
   FORBIDDEN = 403,
   NOT_FOUND = 404,
-  INTERNAL_SERVER_ERROR = 500
+  INTERNAL_SERVER_ERROR = 500,
+  SERVICE_UNAVAILABLE = 503
 }
 
 export const sendSuccessResult = (res: Response, data: any, statusCode: HttpStatusCode = HttpStatusCode.OK) => {

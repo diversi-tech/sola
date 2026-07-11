@@ -3,11 +3,12 @@ import { downloadAudioFile } from './media.services';
 import { sendToReports } from './reports.service';
 import { transcribeAudioFile } from './speech-to-text.service';
 import { ReportIncomingData } from '../types/reports.types';
-import { translateForUser } from './translator.service'; // <-- הייבוא החדש שלנו
+import { translateForUser } from './translator.service'; 
 import axios from 'axios';
 import fs from 'fs';
 
 const WHATSAPP_BUSINESS = 'whatsapp_business_account';
+ const DEFAULT_META_API_URL = 'https://graph.facebook.com/v18.0';
 
 export const sendWhatsAppMessage = async (to: string, text: string) => {
     try {
@@ -165,4 +166,3 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
     return null;
 
 };
-    const DEFAULT_META_API_URL = 'https://graph.facebook.com/v18.0';

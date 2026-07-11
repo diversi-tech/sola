@@ -17,8 +17,11 @@ export const sendToReports = async (data: ReportIncomingData): Promise<any> => {
         const { data: responseData } = await axios.post(reportsServiceUrl, data);        
         console.log("Data successfully delivered to Reports Team!");
         return responseData;
-    } catch (error) {
-        console.error("Failed to send data to Reports Service:", error);
-        return null;
+      } catch (error: any) {
+        if (error.response) {
+            console.error("Error from Reports Service:", error.response.data);
+        } else {
+            console.error("Failed to send data to Reports Service:", error.message);
+        }        return null;
     }
 };
