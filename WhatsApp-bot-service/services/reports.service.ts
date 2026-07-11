@@ -18,8 +18,11 @@ export const sendToReports = async (data: ReportIncomingData): Promise<boolean> 
         
         console.log("Data successfully delivered to Reports Team!");
         return true;
-    } catch (error) {
-        console.error("Failed to send data to Reports Service:", error);
-        return false;
+      } catch (error: any) {
+        if (error.response) {
+            console.error("Error from Reports Service:", error.response.data);
+        } else {
+            console.error("Failed to send data to Reports Service:", error.message);
+        }        return false;
     }
 };

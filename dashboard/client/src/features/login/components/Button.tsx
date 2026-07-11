@@ -1,5 +1,4 @@
 import React, { ButtonHTMLAttributes } from 'react';
-import './Button&Input.css';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'base' | string;
@@ -14,7 +13,7 @@ const Button: React.FC<ButtonProps> = ({
   className, 
   ...props   
 }) => {
-  
+
   const baseClass = variant === 'primary' ? 'main-continue-btn' : 'social-btn';
   
   const combinedClassName = className ? `${baseClass} ${className}` : baseClass;

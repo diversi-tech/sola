@@ -4,14 +4,14 @@
 // Must be updated once the Reports team sends the official API specification!
 
 export interface ReportIncomingData {
-    userId: string;          
-    content: string;         
+    manager_id: string;          
+    text: string;         
     timestamp: string;      
     messageId: string;       
 }
 
 export interface ReportOutboundCommand {
-    userId: string;          
+    manager_id: string;          
     text: string;           
     status?: 'success' | 'error'; 
 }
