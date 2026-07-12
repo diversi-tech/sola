@@ -7,6 +7,7 @@ import { supabase } from './config/supabase.js';
 import calendarRoutes from './routes/calendar.route.js';
 import calendarAuthRoutes from './routes/calendarAuth.route.js';
 import errorHandler from './middleware/error.middleware.js';
+import employeeRoutes from './routes/employee.route.js';
 
 if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
 
@@ -26,6 +27,8 @@ app.get('/', (req, res) => res.send('Server is up and running!'));
 app.use('/api/calendar/auth', calendarAuthRoutes);
 app.use('/auth', calendarRoutes);
 app.use('/api/meetings', router);
+app.use('/api/employees', employeeRoutes);
+
 app.use(errorHandler);
 
 app.use((req, res) => {

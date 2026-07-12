@@ -21,13 +21,30 @@ export const employeeApi = {
     return result.data ?? result;
   },
 
-  fetchEmployeeMeetings: async (employeeId: number): Promise<Meeting[]> => {
-    const URL = `${import.meta.env.VITE_CALENDAR_SERVICE_URL}/api/meetings/employee/${employeeId}`;
-    const response = await fetch(URL);
-    if (!response.ok) throw new Error('Failed to fetch meetings');
-    const result = await response.json();
-    return result.data ?? result;
-  },
+  fetchEmployeeMeetings: async (employeeId: number, employeeEmail: string): Promise<Meeting[]> => {
+  const baseURL = import.meta.env.VITE_CALENDAR_SERVICE_URL;
+ 
+  const [attendeeRes, createdRes] = await Promise.all([
+    fetch(`${baseURL}/api/employees/meetings/attendee/${employeeEmail}`),
+    fetch(`${baseURL}/api/employees/${employeeId}/created-meetings`),
+  ]);
+
+  if (!attendeeRes.ok) throw new Error('Failed to fetch attendee meetings');
+  if (!createdRes.ok) throw new Error('Failed to fetch created meetings');
+
+  const attendeeData = await attendeeRes.json();
+  const createdData = await createdRes.json();
+
+  const attendeeMeetings: Meeting[] = attendeeData.data ?? attendeeData;
+  const createdMeetings: Meeting[] = createdData.data ?? createdData;
+
+  const merged = new Map<number, Meeting>();
+  [...attendeeMeetings, ...createdMeetings].forEach((m) => {
+    merged.set(m.meeting_id, m);
+  });
+
+  return Array.from(merged.values());
+},
 
   fetchCategories: async (): Promise<Category[]> => {
     const URL = `${import.meta.env.VITE_REPORT_SERVICE_URL}/api/categories`;
