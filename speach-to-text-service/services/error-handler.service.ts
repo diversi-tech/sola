@@ -3,7 +3,11 @@ export function handleProcessResult(status: number, info: string, userId: string
         return info;
     }
 
-    const lowerCaseMessage = info.toLowerCase();
+    if (status === 404 || (info && info.trim().startsWith("<!DOCTYPE"))) {
+        return "The requested service endpoint could not be found or the URL is invalid. Please check your request path.";
+    }
+
+    const lowerCaseMessage = info ? info.toLowerCase() : "";
 
     if (lowerCaseMessage.includes("no audio") ||
         lowerCaseMessage.includes("missing file") ||
@@ -11,9 +15,13 @@ export function handleProcessResult(status: number, info: string, userId: string
         return "No audio file was detected. Please ensure the recording was sent properly and try again.";
     }
 
-    if (lowerCaseMessage.includes("multiple") || lowerCaseMessage.includes("multiple files")) {
-        return "Multiple files detected. Please upload only one audio file at a time.";
-    }
+    if (lowerCaseMessage.includes("multiple") || 
+    lowerCaseMessage.includes("multiple files") || 
+    lowerCaseMessage.includes("too many files") || 
+    lowerCaseMessage.includes("unexpected field") ||
+    lowerCaseMessage.includes("unexpected_file")) { 
+    return "Multiple files detected. Please upload only one audio file at a time.";
+}
 
     if (lowerCaseMessage.includes("25mb") ||
         lowerCaseMessage.includes("too large") ||

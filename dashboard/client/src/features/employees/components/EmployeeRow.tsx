@@ -1,10 +1,5 @@
 import React from 'react';
-
-interface Employee {
-  id: string | number;
-  name: string;
-  is_active: boolean;
-}
+import { Employee } from '../types/employee.types';
 
 interface EmployeeRowProps {
   employee: Employee;
