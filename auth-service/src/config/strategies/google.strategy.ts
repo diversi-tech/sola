@@ -1,6 +1,6 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import { verifyAndFindOauthEmployee } from '../../services/oidc.service.js';
+import { verifyAndFindOauthEmployee } from '../../services/OIDC.service.js';
 
 passport.use(
   new GoogleStrategy(

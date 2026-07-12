@@ -19,7 +19,7 @@ const getWhatsappPermissionId = async (): Promise<number | null> => {
   return whatsappPermissionId;
 };
 
-export const getUserByPhone = async (phone_number: string) => {
+export const getEmployeeByPhoneNumber = async (phone_number: string) => {
   const { data: employee, error: empError } = await supabase
     .from('Employees')
     .select('id, name')
@@ -44,6 +44,6 @@ export const getUserByPhone = async (phone_number: string) => {
 };
 
 export const authenticateUser = async (phone_number: string) => {
-  const user = await getUserByPhone(phone_number);
+  const user = await getEmployeeByPhoneNumber(phone_number);
   return user; 
 };

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import passport from 'passport'; 
-import * as authController from '../controllers/oidc.controller.js';
-import { requireAuth } from '../middlewares/oidc.middleware.js';
+import * as authController from '../controllers/OIDC.controller.js';
+import { requireAuth } from '../middlewares/OIDC.middleware.js';
 
 const router = Router();
 

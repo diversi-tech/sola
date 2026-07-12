@@ -1,12 +1,12 @@
 import passport from 'passport';
-import { getEmployeeById } from '../../services/oidc.service.js';
-import { Employee } from '../../types/user.js'; 
+import { getEmployeeById } from '../../services/OIDC.service.js';
+import { Employee } from '../../types/employee.js'; 
 
 import './google.strategy.js';
 
-passport.serializeUser((user: Express.User, done) => {
-  const userData = user as Employee; 
-  done(null, userData.id);
+passport.serializeUser((employee: Express.User, done) => {
+  const employeeData = employee as Employee; 
+  done(null, employeeData.id);
 });
 
 passport.deserializeUser(async (id: number, done) => {

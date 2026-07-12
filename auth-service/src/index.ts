@@ -1,10 +1,9 @@
 import 'dotenv/config';
-import oidc from './routes/oidc.routes.js';
+import oidc from './routes/OIDC.routes.js';
 import cors from 'cors';
 import express from 'express';
 import authRoutes from './routes/authorization.routes.js';
 import adminRoutes from './routes/admin.routes.js';
-import cors from 'cors'; 
 
 import { errorHandler } from './middlewares/errorHandler.js';
 import session from 'express-session';
@@ -21,7 +20,7 @@ app.use(cors({
 const PORT = process.env.PORT;
 
 app.use(cors({
-  origin:process.env.CLIENT_URL || 'http://localhost:5173', 
+  origin:process.env.FRONTEND_URL, 
   credentials: true 
 }));
 
