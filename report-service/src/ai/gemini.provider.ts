@@ -1,5 +1,6 @@
 import { baseLLMProvider } from './base-llm.provider.js';
 import { genAI } from './gemini.client.js';
+import { Schema } from '@google/generative-ai';
 import fs from 'fs';
 import path from 'path';
 
@@ -41,7 +42,7 @@ export class GeminiProvider extends baseLLMProvider {
             model: this.modelName,
             generationConfig: {
                 responseMimeType: "application/json",
-                responseSchema: schema,
+                responseSchema: schema as Schema,
                 temperature: this.temperature
             }
         });
