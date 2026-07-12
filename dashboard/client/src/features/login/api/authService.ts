@@ -1,8 +1,10 @@
+
 export const connectWithGoogle = () => {
   window.location.href = `${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/google`;
 };
 
-const API_BASE_URL = 'http://localhost:5005/api/local-auth'; 
+// const API_BASE_URL = 'http://localhost:5005/api/local-auth'; 
+const API_BASE_URL = import.meta.env.FRONTEND_URL
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token'); 

@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import dns from 'dns';
+import cors from 'cors';
 import router from './routes/meeting.route.js';
 import { supabase } from './config/supabase.js';
 import calendarRoutes from './routes/calendar.route.js';
@@ -11,6 +12,14 @@ if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
 app.use(express.json());
+
+const corsOptions = {
+  origin: [ process.env.FRONTEND_URL || ''],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+};
+
+app.use(cors(corsOptions));
 
 app.get('/', (req, res) => res.send('Server is up and running!'));
 
