@@ -38,7 +38,6 @@ export const employeeApi = {
   const attendeeMeetings: Meeting[] = attendeeData.data ?? attendeeData;
   const createdMeetings: Meeting[] = createdData.data ?? createdData;
 
-  // מיזוג + הסרת כפילויות לפי meeting_id (אם פגישה מופיעה בשתי הרשימות)
   const merged = new Map<number, Meeting>();
   [...attendeeMeetings, ...createdMeetings].forEach((m) => {
     merged.set(m.meeting_id, m);

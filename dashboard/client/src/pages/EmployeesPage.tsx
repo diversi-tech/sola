@@ -23,10 +23,8 @@ export default function EmployeePage() {
     handleCloseModal,
   } = useEmployeeData();
 
-  // סטייט חדש לשמירת מילת החיפוש
   const [searchQuery, setSearchQuery] = useState('');
 
-  // סינון העובדים לפי שורת החיפוש
   const filteredEmployees = useMemo(() => {
     if (!searchQuery.trim()) return employeesWithReports;
     
@@ -36,7 +34,6 @@ export default function EmployeePage() {
     );
   }, [employeesWithReports, searchQuery]);
 
-  // עדכון הסטטיסטיקות כך שישקפו את הרשימה המסוננת///למחוק
   const stats = useMemo(() => {
     const active = filteredEmployees.filter(e => e.employee.is_active).length;
     return { 
