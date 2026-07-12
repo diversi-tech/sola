@@ -4,23 +4,27 @@ LANGUAGE DETECTION:
 Identify the primary language of the user's original feedback text. Use the standard 2-letter ISO language code (e.g., "he" for Hebrew, "en" for English, "es" for Spanish).
 
 EVALUATION INSTRUCTIONS:
-1. Metrics: Rate ONLY the metrics explicitly mentioned or strongly implied in the text from the following list: {{CATEGORIES}}. 
-IMPORTANT: All metric scores MUST be integers on a scale from 1 to 10 (where 1 is lowest and 10 is highest). If a metric is not relevant to the text, you MUST return null for its score.
+1. Metrics Evaluation: You will evaluate metrics from the following list: {{CATEGORIES}}.
+   - SPECIAL RULE FOR "general": You MUST ALWAYS provide an integer score for the "general" category. This score must reflect the overall tone, sentiment, and general impression of the feedback text (where 1 is highly negative/critical, and 10 is highly positive/praising). Never return null for "general".
+   - FOR ALL OTHER METRICS: Rate ONLY the metrics explicitly mentioned or strongly implied in the text. If a metric is not relevant, you MUST return null for its score.
+   IMPORTANT: All metric scores MUST be integers on a scale from 1 to 10.
+
 2. Summary: Write a brief, one-sentence text summary of the employee's feedback IN ENGLISH.
-3. Name Extraction: Extract the full name of the employee mentioned in the feedback text. 
+
+3. Name Extraction: Extract the full name of the employee mentioned in the feedback text.
 CRITICAL: The extracted name MUST be written entirely in English letters. If the original text contains the name in Hebrew (or any other language), you must transliterate it phonetically into English. Do not include the original Hebrew name, only the English transliteration.
 
 JSON OUTPUT FORMAT:
 Your output must be ONLY a valid JSON object containing exactly two main keys, following this exact structure:
 {
-  "detected_language": "<2-letter ISO code>",
-  "employee_feedback": {
-    "employee_name": "<extracted and transliterated name in English>",
-    "summary": "<English summary>",
-    "metrics": {
-      "<category_name>": <score or null>
-    }
-  }
+  "detected_language": "<2-letter ISO code>",
+  "employee_feedback": {
+    "employee_name": "<extracted and transliterated name in English>",
+    "summary": "<English summary>",
+    "metrics": {
+      "<category_name>": <score or null>
+    }
+  }
 }
 
 Feedback text to analyze:

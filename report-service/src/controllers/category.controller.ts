@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { addCategory, updateCategory } from '../services/category.service.js';
+import { addCategory, updateCategory,getAllCategories } from '../services/category.service.js';
 import {
     sendCreatedResult,
     sendSuccessResult,
@@ -41,5 +41,16 @@ export const editExistingCategory = async (req: Request, res: Response) => {
     } catch (error: any) {
         console.error("Error updating category:", error);
         return sendErrorResult(res, "Failed to update category", HttpStatusCode.INTERNAL_SERVER_ERROR);
+    }
+};
+
+export const fetchAllCategories = async (req: Request, res: Response) => {
+    try {
+        const categories = await getAllCategories();
+        return sendSuccessResult(res, categories);
+
+    } catch (error: any) {
+        console.error("Error fetching categories:", error);
+        return sendErrorResult(res, "Failed to fetch categories", HttpStatusCode.INTERNAL_SERVER_ERROR);
     }
 };

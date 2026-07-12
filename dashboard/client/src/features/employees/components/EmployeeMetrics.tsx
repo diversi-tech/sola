@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as ChartTooltip, ResponsiveContainer, Legend,
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
+import { employeeApi } from '../api/employeeApi'; 
 
 interface MetricScores {
   [key: string]: number; 
@@ -18,7 +19,6 @@ interface EmployeeMetricsProps {
   reports: Report[];
 }
 
-// הגדרת הטיפוסים עבור ה-Tooltip של Recharts
 interface CustomTooltipProps {
   active?: boolean;
   payload?: any[];
@@ -26,42 +26,80 @@ interface CustomTooltipProps {
 }
 
 export const EmployeeMetrics: React.FC<EmployeeMetricsProps> = ({ reports }) => {
-  const CATEGORIES = ['teamwork', 'independence', 'responsibility'] as const;
+  const [categoriesFromDB, setCategoriesFromDB] = useState<string[]>([]);
 
-  const { timelineData, latestRadarData } = useMemo(() => {
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await employeeApi.fetchCategories();
+        setCategoriesFromDB(data.map(cat => cat.name));
+      } catch (error) {
+        console.error("שגיאה בטעינת קטגוריות לגרפים:", error);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  const { timelineData, latestRadarData, activeCategories } = useMemo(() => {
     if (!reports || !Array.isArray(reports) || reports.length === 0) {
-      return { timelineData: [], latestRadarData: [] };
+      return { timelineData: [], latestRadarData: [], activeCategories: [] };
     }
 
     const sortedReports = [...reports].sort((a, b) => 
       new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
     );
     
-    const timeline = sortedReports.map(report => ({
-      date: new Date(report.created_at).toLocaleDateString('he-IL', { day: 'numeric', month: 'short', year: 'numeric' }),
-      reportId: report.id,
-      ...report.metric_scores
-    }));
+    const reportCategoryKeys = new Set<string>();
+    sortedReports.forEach(report => {
+      if (report.metric_scores) {
+        Object.keys(report.metric_scores).forEach(key => reportCategoryKeys.add(key.toLowerCase()));
+      }
+    });
+
+    const combinedCategories = Array.from(new Set([
+      ...categoriesFromDB.map(c => c.toLowerCase()),
+      ...Array.from(reportCategoryKeys)
+    ]));
+
+    const timeline = sortedReports.map(report => {
+      const normalizedScores: Record<string, number> = {};
+      if (report.metric_scores) {
+        Object.entries(report.metric_scores).forEach(([key, value]) => {
+          normalizedScores[key.toLowerCase()] = value;
+        });
+      }
+
+      return {
+        date: new Date(report.created_at).toLocaleDateString('he-IL', { day: 'numeric', month: 'short', year: 'numeric' }),
+        reportId: report.id,
+        ...normalizedScores
+      };
+    });
 
     const latestReport = sortedReports[sortedReports.length - 1];
+    const latestNormalizedScores: Record<string, number> = {};
+    if (latestReport && latestReport.metric_scores) {
+      Object.entries(latestReport.metric_scores).forEach(([key, value]) => {
+        latestNormalizedScores[key.toLowerCase()] = value;
+      });
+    }
     
-    const radar = CATEGORIES.map(cat => ({
+    const radar = combinedCategories.map(cat => ({
       subject: cat,
-      score: (latestReport.metric_scores && latestReport.metric_scores[cat]) ? latestReport.metric_scores[cat] : 0,
+      score: latestNormalizedScores[cat] || 0,
       fullMark: 10,
     }));
 
-    return { timelineData: timeline, latestRadarData: radar };
-  }, [reports]);
+    return { timelineData: timeline, latestRadarData: radar, activeCategories: combinedCategories };
+  }, [reports, categoriesFromDB]);
 
-  const colors = ['#4f46e5', '#0ea5e9', '#10b981'];
+  const colors = ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6'];
 
   const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
     if (active && payload && payload.length) {
-      // גישה לכל הנתונים של הנקודה הספציפית שעליה מרחפים
       const currentPointData = payload[0].payload; 
       const reportId = currentPointData.reportId;
-      const reportDate = currentPointData.date; // שולפים את התאריך מהנתונים
+      const reportDate = currentPointData.date; 
 
       return (
         <div className="bg-white p-4 border border-gray-200 shadow-xl rounded-xl" style={{ direction: 'rtl' }}>
@@ -115,7 +153,6 @@ export const EmployeeMetrics: React.FC<EmployeeMetricsProps> = ({ reports }) => 
                <LineChart data={timelineData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
                  <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
                  
-                 {/* שינוי בציר ה-X: שימוש ב-reportId במקום בתאריך, ופירמוט לתצוגה */}
                  <XAxis 
                    dataKey="reportId" 
                    tickFormatter={(value) => {
@@ -131,7 +168,8 @@ export const EmployeeMetrics: React.FC<EmployeeMetricsProps> = ({ reports }) => 
                  <YAxis domain={[0, 10]} tick={{ fill: '#6b7280', fontSize: 12 }} axisLine={false} tickLine={false} dx={-10} />
                  <ChartTooltip content={<CustomTooltip />} cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '3 3' }} />
                  <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                 {CATEGORIES.map((cat, index) => (
+                 
+                 {activeCategories.map((cat, index) => (
                    <Line 
                      key={cat} 
                      type="monotone" 
