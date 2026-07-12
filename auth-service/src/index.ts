@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import oidc from './routes/oidc-temp.routes.js';
+import oidc from './routes/OIDC.routes.js';
 import cors from 'cors';
 import express from 'express';
 import authRoutes from './routes/authorization.routes.js';
