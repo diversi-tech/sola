@@ -183,6 +183,7 @@ export default function EmployeePage() {
           meetingsLoading={meetingsLoading}
           initialTab={initialTab}
           onClose={handleCloseModal}
+           onRequestMeetings={handleViewMeetings} 
         />
       )}
     </div>

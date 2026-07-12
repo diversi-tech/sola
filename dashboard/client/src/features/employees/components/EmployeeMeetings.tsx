@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo, ChangeEvent } from 'react';
 import { Meeting } from '../types/employee.types';
 
 interface EmployeeMeetingsProps {
@@ -19,6 +19,34 @@ function formatDateTime(dateStr: string | null): string {
 }
 
 export const EmployeeMeetings: React.FC<EmployeeMeetingsProps> = ({ meetings, loading }) => {
+  const [filterMonth, setFilterMonth] = useState('');
+  const [filterType, setFilterType] = useState<string>('all');
+  const [filterTitle, setFilterTitle] = useState('');
+  const availableTypes = useMemo(() => {
+    const types = new Set(meetings.map((m) => m.type).filter((t): t is string => !!t));
+    return Array.from(types);
+  }, [meetings]);
+
+  const filteredMeetings = useMemo(() => {
+    return meetings
+      .filter((m) => {
+        if (filterMonth && m.start_time) {
+          const meetingMonth = m.start_time.slice(0, 7);
+          if (meetingMonth !== filterMonth) return false;
+        }
+        if (filterType !== 'all' && m.type !== filterType) return false;
+        if (filterTitle.trim() && !(m.title ?? '').toLowerCase().includes(filterTitle.trim().toLowerCase())) {
+          return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const ta = a.start_time ? new Date(a.start_time).getTime() : 0;
+        const tb = b.start_time ? new Date(b.start_time).getTime() : 0;
+        return tb - ta;
+      });
+  }, [meetings, filterMonth, filterType, filterTitle]);
+
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center h-48 gap-4">
@@ -40,60 +68,109 @@ export const EmployeeMeetings: React.FC<EmployeeMeetingsProps> = ({ meetings, lo
   }
 
   return (
-    <div className="space-y-3">
-      {meetings.map((meeting) => (
-        <div
-          key={meeting.meeting_id}
-          className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col gap-2"
-        >
-          <div className="flex items-start justify-between gap-3">
-            <h4 className="font-bold text-gray-800 text-sm leading-snug">
-              {meeting.title ?? 'ללא כותרת'}
-            </h4>
-            {meeting.type && (
-              <span className="shrink-0 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">
-                {meeting.type}
-              </span>
-            )}
-          </div>
-
-          <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-gray-500">
-            <span>
-              <span className="font-semibold text-gray-600">התחלה: </span>
-              {formatDateTime(meeting.start_time)}
-            </span>
-            <span>
-              <span className="font-semibold text-gray-600">סיום: </span>
-              {formatDateTime(meeting.end_time)}
-            </span>
-            {meeting.estimated_duration_minutes != null && (
-              <span>
-                <span className="font-semibold text-gray-600">משך משוער: </span>
-                {meeting.estimated_duration_minutes} דקות
-              </span>
-            )}
-            {meeting.participants_count != null && (
-              <span>
-                <span className="font-semibold text-gray-600">משתתפים: </span>
-                {meeting.participants_count}
-              </span>
-            )}
-          </div>
-
-          {meeting.attendees && meeting.attendees.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-1">
-              {meeting.attendees.map((attendee, i) => (
-                <span
-                  key={i}
-                  className="text-[11px] px-2 py-0.5 rounded-md bg-gray-50 border border-gray-200 text-gray-600"
-                >
-                  {attendee}
-                </span>
-              ))}
-            </div>
+    <div className="animate-fade-in mt-6 pb-6 max-w-4xl mx-auto flex flex-col gap-6">
+      <div className="bg-white p-4 rounded-2xl border border-indigo-100 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="flex items-center gap-2 text-indigo-800 font-bold text-sm">סינון פגישות:</div>
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          <input
+            type="text"
+            value={filterTitle}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterTitle(e.target.value)}
+            placeholder="חיפוש לפי נושא..."
+            className="bg-slate-50 border border-slate-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 w-full sm:w-48"
+          />
+          <input
+            type="month"
+            value={filterMonth}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterMonth(e.target.value)}
+            className="bg-slate-50 border border-slate-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500"
+          />
+          <select
+            value={filterType}
+            onChange={(e: ChangeEvent<HTMLSelectElement>) => setFilterType(e.target.value)}
+            className="bg-slate-50 border border-slate-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500"
+          >
+            <option value="all">כל הסוגים</option>
+            {availableTypes.map((type) => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+          {(filterMonth || filterType !== 'all' || filterTitle) && (
+            <button
+              onClick={() => {
+                setFilterMonth(''); setFilterType('all'); setFilterTitle('');
+              }}
+              className="text-xs font-bold text-red-500 bg-red-50 px-3 py-2.5 rounded-xl"
+            >
+              איפוס
+            </button>
           )}
         </div>
-      ))}
+      </div>
+
+      {filteredMeetings.length > 0 ? (
+        <div className="relative border-r-2 border-indigo-100 pr-6 mr-8 space-y-8">
+          {filteredMeetings.map((meeting) => (
+            <div
+              key={meeting.meeting_id}
+              className="relative bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:border-indigo-200 group"
+            >
+              <div className="absolute -right-[35px] top-6 w-4 h-4 rounded-full bg-indigo-500 ring-4 ring-slate-50 group-hover:bg-indigo-600"></div>
+
+              <div className="flex justify-between items-center border-b border-gray-50 pb-4 mb-4 gap-4 flex-wrap">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <div className="bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-sm font-bold">
+                    {meeting.title ?? 'ללא כותרת'}
+                  </div>
+                  {meeting.type && (
+                    <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-100">
+                      {meeting.type}
+                    </span>
+                  )}
+                </div>
+                <span className="text-sm font-medium text-gray-500">
+                  📅 {formatDateTime(meeting.start_time)}
+                </span>
+              </div>
+
+              <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-slate-500 mb-3">
+                <span><span className="font-semibold text-slate-600">התחלה: </span>{formatDateTime(meeting.start_time)}</span>
+                <span><span className="font-semibold text-slate-600">סיום: </span>{formatDateTime(meeting.end_time)}</span>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mb-4">
+                {meeting.estimated_duration_minutes != null && (
+                  <span className="text-[10px] uppercase font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
+                    משך משוער: <span className="text-indigo-600">{meeting.estimated_duration_minutes} דק'</span>
+                  </span>
+                )}
+                {meeting.participants_count != null && (
+                  <span className="text-[10px] uppercase font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
+                    משתתפים: <span className="text-indigo-600">{meeting.participants_count}</span>
+                  </span>
+                )}
+              </div>
+
+              {meeting.attendees && meeting.attendees.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {meeting.attendees.map((attendee, i) => (
+                    <span
+                      key={i}
+                      className="text-[11px] px-2 py-0.5 rounded-md bg-gray-50 border border-gray-200 text-gray-600"
+                    >
+                      {attendee}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm mt-4">
+          <p className="text-slate-600 font-bold text-lg">לא נמצאו פגישות התואמות לסינון.</p>
+        </div>
+      )}
     </div>
   );
 };
