@@ -8,7 +8,6 @@ import calendarRoutes from './routes/calendar.route.js';
 import calendarAuthRoutes from './routes/calendarAuth.route.js';
 import errorHandler from './middleware/error.middleware.js';
 import employeeRoutes from './routes/employee.route.js';
-import cors from 'cors'
 
 if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
 

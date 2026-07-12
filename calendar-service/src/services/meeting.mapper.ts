@@ -50,15 +50,11 @@ export function mapEventToMeeting(event: any, user_id: number): Meeting | null {
     title:                      event.summary ?? 'Untitled Meeting',
     type:                       inferMeetingType(event, participantsCount),
     created_at:                 event.created ?? new Date().toISOString(),
-    created_to:                 event.start.dateTime,
     estimated_duration_minutes: estimatedMinutes,
     participants_count:         participantsCount,
-    manager_id:                 undefined,
     calendar_id:                user_id,
     start_time:                 event.start.dateTime,
     end_time:                   event.end.dateTime,
-    actual_time:                null,
-    efficiency_score:           undefined,
     attendees:                  extractAttendees(event),
   };
 }
