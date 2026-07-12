@@ -164,7 +164,7 @@ export default function EmployeePage() {
                   latestReportDate={item.latest_report_date}
                   onClick={() => handleSelectEmployee(item)}
                   onViewMeetings={() => handleViewMeetings(item.employee)}
-                  onAuthClick={() => handleAuthSubmit(item.employee.email)}
+                  onGoogleCalendarAuth ={() => handleAuthSubmit(item.employee.email)}
                 />
               ))}
             </div>

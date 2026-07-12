@@ -15,7 +15,7 @@ interface EmployeeRowProps {
   latestReportDate: string;
   onClick: () => void;
   onViewMeetings: () => void;
-    onAuthClick: () => void;
+    onGoogleCalendarAuth : () => void;
 
 }
 
@@ -28,7 +28,7 @@ const AVATAR_GRADIENTS = [
 ];
 
 export const EmployeeRow: React.FC<EmployeeRowProps> = ({
-  employee, rating, reportCount, latestReportDate, onClick, onViewMeetings,onAuthClick
+  employee, rating, reportCount, latestReportDate, onClick, onViewMeetings,onGoogleCalendarAuth 
 }) => {
   const formattedDate = latestReportDate
     ? new Date(latestReportDate).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -68,7 +68,7 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
          <button
           onClick={(e) => {
             e.stopPropagation();
-            onAuthClick();
+            onGoogleCalendarAuth ();
           }}
           className="px-3 py-1.5 text-xs bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 border border-blue-200 font-medium transition-colors duration-200"
           title="אישור גישה ליומן Google"
