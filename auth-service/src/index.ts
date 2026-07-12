@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import passport from './config/strategies/google.strategy.js'; 
+import oidc from './routes/oidc.routes.js';
 import express from 'express';
 import authRoutes from './routes/authorization.routes.js';
 import adminRoutes from './routes/admin.routes.js';
@@ -11,7 +12,7 @@ import localAuthRoutes from './routes/localAuth.routes.js';
 
 const app = express();
 app.use(cors({
-  origin: 'http://localhost:5173', 
+  origin: process.env.FRONTEND_URL,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
@@ -27,6 +28,9 @@ app.use(passport.session());
 app.use(express.json());
 
 app.use('/auth', authRoutes);
+app.use('/api/auth', oidc);
+app.use('/api/local-auth', localAuthRoutes);
+
 app.use('/admin', adminRoutes);
 // app.use('/api/auth', oidc);
 app.use('/api/local-auth', localAuthRoutes);
@@ -36,6 +40,8 @@ console.log("Check Env:", {
     supabaseUrl: process.env.SUPABASE_URL,
     supabaseKey: process.env.SUPABASE_ANON_KEY
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
