@@ -1,66 +1,25 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useEmployeeData from '../features/employees/hooks/useEmployeeData';
-import { EmployeeRow } from '../features/employees/components/EmployeeRow';
-import { EmployeeModal } from '../features/employees/components/EmployeeModal';
+import { useAdminData } from '../features/admin/hooks/useAdminData';
+import { PermissionsTable } from '../features/admin/components/PermissionsTable';
 import logo from '../assets/sola-logo.png';
-import { calculateEmployeeRating } from '../features/employees/api/employeeApi';
 
-export default function EmployeePage() {
+const AdminPage: React.FC = () => {
   const navigate = useNavigate();
+  const { employees, permissions, loading, error, togglePermission } = useAdminData();
 
-  const {
-    employeesWithReports,
-    selectedEmployee,
-    currentReports,
-    currentMeetings,
-    loading,
-    meetingsLoading,
-    error,
-    initialTab,
-    handleSelectEmployee,
-    handleViewMeetings,
-    handleCloseModal,
-  } = useEmployeeData();
-
-
-  const CALENDAR_API = import.meta.env.VITE_CALENDAR_SERVICE_URL;
-  const [successMessage,setsuccessMessage] = useState<string | null>(null);
-  const handleAuthSubmit = async (email: string) => {
-    const response = await fetch( `${CALENDAR_API}/api/calendar/auth/calendar-subscription`,{
-      method : 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ employee_email: email }),
-    });
-
-    if(!response.ok){
-      throw new Error('Error sending request');
-    }
-    setsuccessMessage('המייל נשלח לעובד בהצלחה!')
-    setTimeout(()=> setsuccessMessage(null), 3000);
-  }
-
+  // סטייט לשמירת מילת החיפוש
   const [searchQuery, setSearchQuery] = useState('');
 
+  // סינון העובדים לפי שורת החיפוש
   const filteredEmployees = useMemo(() => {
-    if (!searchQuery.trim()) return employeesWithReports;
-    
-    const lowerCaseQuery = searchQuery.toLowerCase();
-    return employeesWithReports.filter((item) =>
-      item.employee.name.toLowerCase().includes(lowerCaseQuery)
-    );
-  }, [employeesWithReports, searchQuery]);
+    if (!searchQuery.trim()) return employees;
 
-  const stats = useMemo(() => {
-    const active = filteredEmployees.filter(e => e.employee.is_active).length;
-    return { 
-      total: filteredEmployees.length, 
-      active, 
-      inactive: filteredEmployees.length - active 
-    };
-  }, [filteredEmployees]);
+    const lowerCaseQuery = searchQuery.toLowerCase();
+    return employees.filter((employee) =>
+      employee.name.toLowerCase().includes(lowerCaseQuery)
+    );
+  }, [employees, searchQuery]);
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const target = e.currentTarget;
@@ -109,7 +68,7 @@ export default function EmployeePage() {
             <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
             <span className="font-bold text-slate-800 text-lg">HR Dashboard</span>
@@ -117,14 +76,13 @@ export default function EmployeePage() {
 
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate('/admin')}
+              onClick={() => navigate(-1)}
               className="flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              ניהול הרשאות
+              חזרה לניהול עובדים
             </button>
             <img src={logo} alt="Sola" className="h-7 object-contain" onError={handleImageError} />
           </div>
@@ -135,8 +93,8 @@ export default function EmployeePage() {
 
         {/* ── Page header ── */}
         <div className="mb-6">
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">ניהול עובדים</h1>
-          <p className="text-slate-500 text-sm">ממוין לפי תאריך הדוח האחרון</p>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">ניהול הרשאות מערכת</h1>
+          <p className="text-slate-500 text-sm">ניהול הרשאות וגישה לעובדים במערכת Sola</p>
         </div>
 
         {/* ── Search Bar ── */}
@@ -157,57 +115,32 @@ export default function EmployeePage() {
           </div>
         </div>
 
-        {/* ── Employee list ── */}
+        {/* ── Permissions card ── */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="font-bold text-slate-800">רשימת עובדים</h2>
+            <h2 className="font-bold text-slate-800">רשימת הרשאות</h2>
             <span className="text-xs text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full font-medium">
-              {stats.total} עובדים
+              {filteredEmployees.length} עובדים
             </span>
           </div>
 
           {filteredEmployees.length > 0 ? (
-            <div className="divide-y divide-slate-50">
-              {filteredEmployees.map((item) => (
-                <EmployeeRow
-                  key={item.employee.id}
-                  employee={item.employee}
-                  rating={calculateEmployeeRating(item.reports)}
-                  reportCount={item.reports.length}
-                  latestReportDate={item.latest_report_date}
-                  onClick={() => handleSelectEmployee(item)}
-                  onViewMeetings={() => handleViewMeetings(item.employee)}
-                  onGoogleCalendarAuth ={() => handleAuthSubmit(item.employee.email)}
-                />
-              ))}
+            <div className="p-6">
+              <PermissionsTable
+                employees={filteredEmployees}
+                permissions={permissions}
+                onTogglePermission={togglePermission}
+              />
             </div>
           ) : (
             <div className="py-20 text-center text-slate-400 font-medium">
-              {searchQuery.trim() 
-                ? 'לא נמצאו עובדים התואמים לחיפוש שלך.' 
-                : 'לא נמצאו עובדים עם דוחות במערכת.'}
+              לא נמצאו עובדים התואמים לחיפוש שלך.
             </div>
           )}
         </div>
       </div>
-
-      {selectedEmployee && (
-        <EmployeeModal
-          employee={selectedEmployee}
-          reports={currentReports}
-          meetings={currentMeetings}
-          loading={false}
-          meetingsLoading={meetingsLoading}
-          initialTab={initialTab}
-          onClose={handleCloseModal}
-           onRequestMeetings={handleViewMeetings} 
-        />
-      )}
-      {successMessage && (
-        <div className="fixed bottom-6 left-6 bg-green-500 text-white px-6 py-3 rounded-xl shadow-1g font-medium">
-          {successMessage}
-        </div>
-      )}
     </div>
   );
-}
+};
+
+export default AdminPage;

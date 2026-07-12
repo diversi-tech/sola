@@ -11,7 +11,7 @@
   "author": "Yaeli Rosner Efrat Madmon and Malka Gedelovitch",
   "license": "ISC",
   "type": "module",
-  "devDependencies": {
+   "devDependencies": {
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2"
   },

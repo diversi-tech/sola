@@ -12,14 +12,19 @@ export const loginHandler = async (req: Request, res: Response, next: NextFuncti
       return;
     }
 
-    const user = await authenticateUser(phone_number);
+    const employee = await authenticateUser(phone_number);
 
-    if (user) {
-      sendSuccessResponse(res, HttpStatusCode.OK, "User is authorized", { phone_number, userId: user.user_id });
+    if (employee) {
+      sendSuccessResponse(res, HttpStatusCode.OK, "User is authorized", { 
+        phone_number, 
+        userId: employee.id,
+        name: employee.name 
+      });
     } else {
-      sendErrorResponse(res, HttpStatusCode.UNAUTHORIZED, "User is not authorized");
+      sendErrorResponse(res, HttpStatusCode.UNAUTHORIZED, "User is not authorized or lacks required permissions");
     }
   } catch (error) {
     next(error);
   }
 };
+

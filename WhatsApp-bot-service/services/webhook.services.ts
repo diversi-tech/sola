@@ -3,6 +3,7 @@ import { downloadAudioFile } from './media.services';
 import { sendToReports } from './reports.service';
 import { transcribeAudioFile } from './speech-to-text.service';
 import { ReportIncomingData } from '../types/reports.types';
+import { translateForUser } from './translator.service'; 
 import axios from 'axios';
 import fs from 'fs';
 
@@ -46,11 +47,18 @@ const handleTextMessage = async (userId: string, message: any, senderPhoneNumber
         timestamp: String(message.timestamp)
     };
 
-    const isSuccess = await sendToReports(reportData);
-    if (isSuccess) {
+  const reportsResponse: any = await sendToReports(reportData); 
+    
+    if (reportsResponse && reportsResponse.message) {
+ 
+        const translatedMessage = await translateForUser(reportsResponse.message, reportsResponse.detected_language);
+        await sendWhatsAppMessage(senderPhoneNumber, translatedMessage);
+    } else if (reportsResponse) {
+        
         await sendWhatsAppMessage(senderPhoneNumber, "The report was received successfully! Thank you for the update");
     } else {
-        await sendWhatsAppMessage(senderPhoneNumber,"Sorry, an error occurred while processing the report. Please try again.");
+        
+        await sendWhatsAppMessage(senderPhoneNumber, "Sorry, an error occurred while processing the report. Please try again.");
     }
 };
 
@@ -92,10 +100,17 @@ const handleAudioMessage = async (userId: string, message: any, senderPhoneNumbe
        timestamp: String(message.timestamp)
     };
 
-    const isSuccess = await sendToReports(reportData);
-    if (isSuccess) {
-        await sendWhatsAppMessage(senderPhoneNumber,"The voice report was received and processed successfully!");
+  const reportsResponse: any = await sendToReports(reportData);
+    
+    if (reportsResponse && reportsResponse.message) {
+        
+        const translatedMessage = await translateForUser(reportsResponse.message, reportsResponse.detected_language);
+        await sendWhatsAppMessage(senderPhoneNumber, translatedMessage);
+    } else if (reportsResponse) {
+   
+        await sendWhatsAppMessage(senderPhoneNumber, "The voice report was received and processed successfully!");
     } else {
+       
         await sendWhatsAppMessage(senderPhoneNumber, "The voice report was received, but an error occurred while saving it to the system.");
     }
 };
