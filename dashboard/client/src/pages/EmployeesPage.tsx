@@ -23,10 +23,27 @@ export default function EmployeePage() {
     handleCloseModal,
   } = useEmployeeData();
 
-  // סטייט חדש לשמירת מילת החיפוש
+
+  const CALENDAR_API = import.meta.env.VITE_CALENDAR_SERVICE_URL;
+  const [successMessage,setsuccessMessage] = useState<string | null>(null);
+  const handleAuthSubmit = async (email: string) => {
+    const response = await fetch( `${CALENDAR_API}/api/calendar/auth/calendar-subscription`,{
+      method : 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ employee_email: email }),
+    });
+
+    if(!response.ok){
+      throw new Error('Error sending request');
+    }
+    setsuccessMessage('המייל נשלח לעובד בהצלחה!')
+    setTimeout(()=> setsuccessMessage(null), 3000);
+  }
+
   const [searchQuery, setSearchQuery] = useState('');
 
-  // סינון העובדים לפי שורת החיפוש
   const filteredEmployees = useMemo(() => {
     if (!searchQuery.trim()) return employeesWithReports;
     
@@ -36,7 +53,6 @@ export default function EmployeePage() {
     );
   }, [employeesWithReports, searchQuery]);
 
-  // עדכון הסטטיסטיקות כך שישקפו את הרשימה המסוננת///למחוק
   const stats = useMemo(() => {
     const active = filteredEmployees.filter(e => e.employee.is_active).length;
     return { 
@@ -161,6 +177,7 @@ export default function EmployeePage() {
                   latestReportDate={item.latest_report_date}
                   onClick={() => handleSelectEmployee(item)}
                   onViewMeetings={() => handleViewMeetings(item.employee)}
+                  onGoogleCalendarAuth ={() => handleAuthSubmit(item.employee.email)}
                 />
               ))}
             </div>
@@ -183,7 +200,13 @@ export default function EmployeePage() {
           meetingsLoading={meetingsLoading}
           initialTab={initialTab}
           onClose={handleCloseModal}
+           onRequestMeetings={handleViewMeetings} 
         />
+      )}
+      {successMessage && (
+        <div className="fixed bottom-6 left-6 bg-green-500 text-white px-6 py-3 rounded-xl shadow-1g font-medium">
+          {successMessage}
+        </div>
       )}
     </div>
   );
