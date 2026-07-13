@@ -4,7 +4,7 @@ import { sendToReports } from './reports.service';
 import { transcribeAudioFile } from './speech-to-text.service';
 import { ReportIncomingData } from '../types/reports.types';
 import { translateForUser } from './translator.service'; 
-import { insertIncomingMessage, updateMessageStatus } from './database.service';
+import { insertIncomingMessage, updateMessageStatus } from '../repositories/whatsapp-messages.repository';
 import axios from 'axios';
 import fs from 'fs';
 
