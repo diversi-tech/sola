@@ -46,7 +46,15 @@ export const employeeApi = {
   return Array.from(merged.values());
 },
 
-  fetchCategories: async (): Promise<Category[]> => {
+fetchAllMeetings: async (): Promise<Meeting[]> => {
+  const URL = `${import.meta.env.VITE_CALENDAR_SERVICE_URL}/api/meetings`;
+  const response = await fetch(URL);
+  if (!response.ok) throw new Error('Failed to fetch all meetings');
+  const result = await response.json();
+  return result.data ?? result;
+},
+  
+fetchCategories: async (): Promise<Category[]> => {
     const URL = `${import.meta.env.VITE_REPORT_SERVICE_URL}/api/categories`;
     const response = await fetch(URL);
     if (!response.ok) throw new Error('Failed to fetch categories');
