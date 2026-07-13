@@ -2,8 +2,7 @@ import { google } from 'googleapis';
 import { Meeting } from '../models/meeting.model.js';
 import { decryptToken } from '../utils/crypto.util.js';
 import { mapEventsToMeetings, getLastWeekDate, getNextMonthDate } from './meeting.mapper.js';
-import { validateUserAndToken, saveMeetings, getAllActiveUsers } from './meeting.repository.js';
-
+import { validateUserAndToken, saveMeetings, getAllActiveUsers, getAllMeetings as getAllMeetingsFromDb } from './meeting.repository.js';
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
@@ -84,4 +83,7 @@ export async function syncAllActiveUsers(): Promise<void> {
       console.error(`[Sync] failed for ${user.employee_email}:`, err);
     }
   }
+}
+export async function getAllMeetings(): Promise<Meeting[]> {
+  return await getAllMeetingsFromDb();
 }

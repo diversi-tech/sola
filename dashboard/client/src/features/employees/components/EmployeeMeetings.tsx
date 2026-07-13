@@ -46,6 +46,41 @@ export const EmployeeMeetings: React.FC<EmployeeMeetingsProps> = ({ meetings, lo
         return tb - ta;
       });
   }, [meetings, filterMonth, filterType, filterTitle]);
+  const totalMinutes = useMemo(() => {
+    return filteredMeetings.reduce((sum, m) => sum + (m.estimated_duration_minutes ?? 0), 0);
+  }, [filteredMeetings]);
+
+  const formattedTotalTime = useMemo(() => {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (hours === 0) return `${minutes} דקות`;
+    if (minutes === 0) return `${hours} שעות`;
+    return `${hours} שעות ו-${minutes} דקות`;
+  }, [totalMinutes]);
+  const monthLabel = useMemo(() => {
+    if (!filterMonth) return null;
+    const [year, month] = filterMonth.split('-');
+    const monthNames = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
+    return `${monthNames[parseInt(month, 10) - 1]} ${year}`;
+  }, [filterMonth]);
+
+  const summaryParts = useMemo(() => {
+    const parts: JSX.Element[] = [];
+    if (filterType !== 'all') {
+      parts.push(
+        <span key="type"> מסוג "<span dir="ltr" className="inline-block">{filterType}</span>"</span>
+      );
+    }
+    if (filterTitle.trim()) {
+      parts.push(
+        <span key="title"> בנושא "<span dir="ltr" className="inline-block">{filterTitle.trim()}</span>"</span>
+      );
+    }
+    if (monthLabel) {
+      parts.push(<span key="month"> בחודש {monthLabel}</span>);
+    }
+    return parts;
+  }, [filterType, filterTitle, monthLabel]);
 
   if (loading) {
     return (
@@ -71,6 +106,7 @@ export const EmployeeMeetings: React.FC<EmployeeMeetingsProps> = ({ meetings, lo
     <div className="animate-fade-in mt-6 pb-6 max-w-4xl mx-auto flex flex-col gap-6">
       <div className="bg-white p-4 rounded-2xl border border-indigo-100 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
         <div className="flex items-center gap-2 text-indigo-800 font-bold text-sm">סינון פגישות:</div>
+
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           <input
             type="text"
@@ -107,6 +143,10 @@ export const EmployeeMeetings: React.FC<EmployeeMeetingsProps> = ({ meetings, lo
           )}
         </div>
       </div>
+
+      <p className="text-indigo-600 text-sm font-semibold mt-3 mb-2">
+        ⏱️ סך הכל זמן שהושקע בפגישות{summaryParts}: {formattedTotalTime}
+      </p>
 
       {filteredMeetings.length > 0 ? (
         <div className="relative border-r-2 border-indigo-100 pr-6 mr-8 space-y-8">
