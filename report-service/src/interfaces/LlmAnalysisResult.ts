@@ -1,7 +1,10 @@
 export interface LLMAnalysisResult {
-    metric_scores: Record<string, number | null>;
-    text_summary: string;
-    employee_name: string | null;
+    detected_language: string;
+    employee_feedback: {
+        employee_name: string | null;
+        summary: string;
+        metrics: Record<string, number | null>;
+    };
 }
 
 export interface ILLMProvider {
