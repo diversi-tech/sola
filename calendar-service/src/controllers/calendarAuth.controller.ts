@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { generateGoogleAuthUrl } from '../services/googleAuth.service.js';
+import { sendCalendarAuthEmail } from '../services/email.service.js';
 
 export const generateAuthUrlHandler = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -13,8 +14,9 @@ export const generateAuthUrlHandler = async (req: Request, res: Response): Promi
     const state = crypto.randomBytes(16).toString('hex');
     const authUrl = await generateGoogleAuthUrl(employee_email, state);
 
+    await sendCalendarAuthEmail(employee_email, authUrl);
     res.status(200).json({ 
-      auth_url: authUrl 
+      message: "The request was successfully sent to the employee's email" 
     });
     
   } catch (err: any) {

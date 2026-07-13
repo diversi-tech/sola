@@ -2,15 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { EmployeeMetrics } from './EmployeeMetrics';
 import { EmployeeReports } from './EmployeeReports';
 import { EmployeeMeetings } from './EmployeeMeetings';
-import {  Meeting } from '../types/employee.types';
+import { Meeting, Employee } from '../types/employee.types';
 import { calculateEmployeeRating } from '../api/employeeApi';
 
 
-interface Employee {
-  id: string | number;
-  name: string;
-  is_active: boolean;
-}
 
 interface Report {
   id: string | number;
@@ -26,6 +21,7 @@ interface EmployeeModalProps {
   meetingsLoading: boolean;
   initialTab?: 'overview' | 'reports' | 'meetings';
   onClose: () => void;
+  onRequestMeetings: (employee: Employee) => void;
 }
 
 const AVATAR_GRADIENTS = [
@@ -44,6 +40,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
   meetingsLoading,
   initialTab = 'overview',
   onClose,
+  onRequestMeetings,
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'reports' | 'meetings'>(initialTab);
 
@@ -62,21 +59,27 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     : null;
 
   const tabs = [
-    { key: 'overview' as const, label: 'סקירה ומדדים', icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-      </svg>
-    )},
-    { key: 'reports' as const, label: 'היסטוריית דוחות', icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-      </svg>
-    )},
-    { key: 'meetings' as const, label: 'פגישות', icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
-    )},
+    {
+      key: 'overview' as const, label: 'סקירה ומדדים', icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      )
+    },
+    {
+      key: 'reports' as const, label: 'היסטוריית דוחות', icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      )
+    },
+    {
+      key: 'meetings' as const, label: 'פגישות', icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      )
+    },
   ];
 
   const isLoading = activeTab === 'meetings' ? meetingsLoading : loading;
@@ -89,7 +92,7 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
     >
       <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
 
-       
+
         <div className="relative shrink-0 bg-gradient-to-l from-indigo-700 via-indigo-600 to-violet-600 px-8 pt-8 pb-0 overflow-hidden">
 
           <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-white/5" />
@@ -140,12 +143,16 @@ export const EmployeeModal: React.FC<EmployeeModalProps> = ({
             {tabs.map(tab => (
               <button
                 key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-2 px-5 py-3 text-sm font-semibold rounded-t-xl transition-all ${
-                  activeTab === tab.key
+                onClick={() => {
+                  setActiveTab(tab.key);
+                  if (tab.key === 'meetings') {
+                    onRequestMeetings(employee);
+                  }
+                }}
+                className={`flex items-center gap-2 px-5 py-3 text-sm font-semibold rounded-t-xl transition-all ${activeTab === tab.key
                     ? 'bg-white text-indigo-700'
                     : 'text-indigo-200 hover:text-white hover:bg-white/10'
-                }`}
+                  }`}
               >
                 {tab.icon}
                 {tab.label}

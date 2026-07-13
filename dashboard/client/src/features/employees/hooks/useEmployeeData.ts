@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { employeeApi  } from '../api/employeeApi';
+import { employeeApi } from '../api/employeeApi';
 import { EmployeeWithReports, Employee, Report, Meeting } from '../types/employee.types';
 
 
@@ -47,15 +47,10 @@ export default function useEmployeeData(): UseEmployeeDataReturn {
     setSelectedEmployee(item.employee);
     setCurrentReports(item.reports);
   };
-
   const handleViewMeetings = async (employee: Employee): Promise<void> => {
-    setInitialTab('meetings');
-    setSelectedEmployee(employee);
-    setCurrentReports([]);
     try {
       setMeetingsLoading(true);
-      const result = (await employeeApi.fetchEmployeeMeetings(employee.id)) as any;
-      const meetingsArray = result.data ? result.data : result;
+      const meetingsArray = await employeeApi.fetchEmployeeMeetings(employee.id, employee.email);
       setCurrentMeetings(Array.isArray(meetingsArray) ? meetingsArray : []);
     } catch (err) {
       console.error('שגיאה בטעינת פגישות העובד', err);

@@ -1,22 +1,32 @@
 import 'dotenv/config';
 import express from 'express';
 import dns from 'dns';
+import cors from 'cors';
 import router from './routes/meeting.route.js';
 import { supabase } from './config/supabase.js';
 import calendarRoutes from './routes/calendar.route.js';
 import calendarAuthRoutes from './routes/calendarAuth.route.js';
 import errorHandler from './middleware/error.middleware.js';
+import employeeRoutes from './routes/employee.route.js';
 
 if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
 
 const app = express();
 app.use(express.json());
 
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+}));
+
 app.get('/', (req, res) => res.send('Server is up and running!'));
 
 app.use('/api/calendar/auth', calendarAuthRoutes);
 app.use('/auth', calendarRoutes);
 app.use('/api/meetings', router);
+app.use('/api/employees', employeeRoutes);
+
 app.use(errorHandler);
 
 app.use((req, res) => {
