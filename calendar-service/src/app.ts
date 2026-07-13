@@ -14,13 +14,11 @@ if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
 const app = express();
 app.use(express.json());
 
-const corsOptions = {
-  origin: [ process.env.FRONTEND_URL || ''],
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
-};
-
-app.use(cors(corsOptions));
+}));
 
 app.get('/', (req, res) => res.send('Server is up and running!'));
 
