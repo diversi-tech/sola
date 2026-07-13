@@ -66,8 +66,10 @@ export const authenticateUser = async (email: string, password: string) => {
 };
 
 export const sendPasswordReset = async (email: string) => {
+    const frontendUrl = process.env.FRONTEND_URL || '';
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'http://localhost:5173/update-password',
+        redirectTo: `${frontendUrl}/update-password`,
     });
 
     if (error) {

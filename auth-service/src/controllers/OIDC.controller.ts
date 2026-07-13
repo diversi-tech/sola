@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 
 export const handleOauthCallback = (req: Request, res: Response) => {
-  res.redirect('http://localhost:5173/dashboard'); 
+  const dashboardUrl = process.env.DASHBOARD_URL;
+  if (!dashboardUrl) {
+    return res.status(500).send("Server configuration error: DASHBOARD_URL is missing.");
+  }
+  res.redirect(dashboardUrl);
 };
 
 export const getProfile = (req: Request, res: Response) => {
