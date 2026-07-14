@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 const FRONTEND_URL = process.env.FRONTEND_URL;
 
 export const handleOauthCallback = (req: Request, res: Response) => {
-  res.redirect(`${FRONTEND_URL}/dashboard`);
+  res.redirect(`${FRONTEND_URL}/EmployeePage`);
 };
 
 export const getProfile = (req: Request, res: Response) => {
