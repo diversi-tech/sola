@@ -1,21 +1,10 @@
-import { Employee, Report, EmployeeWithReports, Meeting, Category } from '../types/employee.types';
-export const calculateEmployeeRating = (reports: Report[]): number => {
-  if (!reports || reports.length === 0) return 0;
-  let totalScore = 0;
-  let count = 0;
-  reports.forEach(report => {
-    Object.values(report.metric_scores).forEach(score => {
-      totalScore += score;
-      count++;
-    });
-  });
-  return count > 0 ? Math.round((totalScore / count) ) : 0;
-};
+import { EmployeeWithReports, Meeting, Category } from '../types/employee.types';
+import { getAuthHeaders } from '../../../lib/authHeaders';
 
 export const employeeApi = {
   fetchEmployeesWithReports: async (): Promise<EmployeeWithReports[]> => {
     const URL = `${import.meta.env.VITE_REPORT_SERVICE_URL}/api/reports/by-employee`;
-    const response = await fetch(URL);
+    const response = await fetch(URL, { headers: getAuthHeaders() });
     if (!response.ok) throw new Error('Failed to fetch employees with reports');
     const result = await response.json();
     return result.data ?? result;
@@ -25,8 +14,8 @@ export const employeeApi = {
   const baseURL = import.meta.env.VITE_CALENDAR_SERVICE_URL;
  
   const [attendeeRes, createdRes] = await Promise.all([
-    fetch(`${baseURL}/api/employees/meetings/attendee/${employeeEmail}`),
-    fetch(`${baseURL}/api/employees/${employeeId}/created-meetings`),
+    fetch(`${baseURL}/api/employees/meetings/attendee/${employeeEmail}`, { headers: getAuthHeaders() }),
+    fetch(`${baseURL}/api/employees/${employeeId}/created-meetings`, { headers: getAuthHeaders() }),
   ]);
 
   if (!attendeeRes.ok) throw new Error('Failed to fetch attendee meetings');
@@ -48,7 +37,7 @@ export const employeeApi = {
 
 fetchAllMeetings: async (): Promise<Meeting[]> => {
   const URL = `${import.meta.env.VITE_CALENDAR_SERVICE_URL}/api/meetings`;
-  const response = await fetch(URL);
+  const response = await fetch(URL, { headers: getAuthHeaders() });
   if (!response.ok) throw new Error('Failed to fetch all meetings');
   const result = await response.json();
   return result.data ?? result;
@@ -56,7 +45,7 @@ fetchAllMeetings: async (): Promise<Meeting[]> => {
   
 fetchCategories: async (): Promise<Category[]> => {
     const URL = `${import.meta.env.VITE_REPORT_SERVICE_URL}/api/categories`;
-    const response = await fetch(URL);
+    const response = await fetch(URL, { headers: getAuthHeaders() });
     if (!response.ok) throw new Error('Failed to fetch categories');
     const result = await response.json();
     return result.data ?? result;

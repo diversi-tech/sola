@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(cors({
   origin: process.env.FRONTEND_URL,
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.get('/', (req, res) => res.send('Server is up and running!'));

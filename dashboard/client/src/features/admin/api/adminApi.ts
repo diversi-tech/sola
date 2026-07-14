@@ -1,3 +1,5 @@
+import { getAuthHeaders } from '../../../lib/authHeaders';
+
 export interface Permission {
   id: number;
   name: string;
@@ -12,14 +14,18 @@ export interface EmployeeWithPermissions {
 
 export const adminApi = {
   fetchPermissions: async (): Promise<Permission[]> => {
-    const response = await fetch(`${import.meta.env.VITE_AUTH_SERVICE_URL}/admin/permissions`);
+    const response = await fetch(`${import.meta.env.VITE_AUTH_SERVICE_URL}/admin/permissions`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Failed to fetch permissions');
     const result = await response.json();
     return result.data ?? result;
   },
 
   fetchEmployees: async (): Promise<EmployeeWithPermissions[]> => {
-    const response = await fetch(`${import.meta.env.VITE_AUTH_SERVICE_URL}/admin/employees`);
+    const response = await fetch(`${import.meta.env.VITE_AUTH_SERVICE_URL}/admin/employees`, {
+      headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error('Failed to fetch employees');
     const result = await response.json();
     return result.data ?? result;
@@ -30,6 +36,7 @@ export const adminApi = {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        ...getAuthHeaders(),
       },
       body: JSON.stringify({ permissions: permissionIds }),
     });
