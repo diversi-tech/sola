@@ -6,11 +6,6 @@ import { Meeting, Employee } from '../types/employee.types';
 import { calculateEmployeeRating } from '../api/employeeApi';
 import { localAuthService } from '../../login/api/authService';
 
-// interface Employee {
-//   id: string | number;
-//   name: string;
-//   is_active: boolean;
-// }
 
 interface Report {
   id: string | number;

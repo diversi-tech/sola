@@ -4,6 +4,7 @@ import EmployeePage from './pages/EmployeesPage';
 import AdminPage from './pages/AdminPage';
 import { UpdatePasswordPage } from './pages/UpdatePasswordPage';
 
+import AllMeetingsPage from './pages/AllMeetingsPage';
 import './index.css';
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/EmployeePage" element={<EmployeePage />} />
         <Route path="/admin" element={<AdminPage/>} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/meetings" element={<AllMeetingsPage />} />
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/update-password" element={<UpdatePasswordPage />} />
       </Routes>
