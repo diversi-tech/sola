@@ -23,10 +23,8 @@ export default function EmployeePage() {
     handleCloseModal,
   } = useEmployeeData();
 
-  // סטייט חדש לשמירת מילת החיפוש
   const [searchQuery, setSearchQuery] = useState('');
 
-  // סינון העובדים לפי שורת החיפוש
   const filteredEmployees = useMemo(() => {
     if (!searchQuery.trim()) return employeesWithReports;
     
@@ -36,7 +34,6 @@ export default function EmployeePage() {
     );
   }, [employeesWithReports, searchQuery]);
 
-  // עדכון הסטטיסטיקות כך שישקפו את הרשימה המסוננת///למחוק
   const stats = useMemo(() => {
     const active = filteredEmployees.filter(e => e.employee.is_active).length;
     return { 
@@ -85,8 +82,6 @@ export default function EmployeePage() {
 
   return (
     <div className="min-h-screen bg-slate-50" style={{ direction: 'rtl' }}>
-
-      {/* ── Top bar ── */}
       <div className="bg-white border-b border-slate-100 sticky top-0 z-20 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -116,14 +111,11 @@ export default function EmployeePage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-8">
-
-        {/* ── Page header ── */}
         <div className="mb-6">
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">ניהול עובדים</h1>
           <p className="text-slate-500 text-sm">ממוין לפי תאריך הדוח האחרון</p>
         </div>
 
-        {/* ── Search Bar ── */}
         <div className="mb-8">
           <div className="relative max-w-md">
             <input
@@ -141,7 +133,6 @@ export default function EmployeePage() {
           </div>
         </div>
 
-        {/* ── Employee list ── */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h2 className="font-bold text-slate-800">רשימת עובדים</h2>

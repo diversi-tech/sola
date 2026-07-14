@@ -9,13 +9,10 @@ const AdminPage: React.FC = () => {
   const navigate = useNavigate();
   const { employees, permissions, loading, error, addEmployee, togglePermission } = useAdminData();
 
-  // סטייט לשמירת מילת החיפוש
   const [searchQuery, setSearchQuery] = useState('');
 
-  // סטייט לפתיחה/סגירה של מודל הוספת עובד
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  // סינון העובדים לפי שורת החיפוש
   const filteredEmployees = useMemo(() => {
     if (!searchQuery.trim()) return employees;
 
@@ -64,8 +61,6 @@ const AdminPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50" style={{ direction: 'rtl' }}>
-
-      {/* ── Top bar ── */}
       <div className="bg-white border-b border-slate-100 sticky top-0 z-20 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -94,14 +89,11 @@ const AdminPage: React.FC = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-8">
-
-        {/* ── Page header ── */}
         <div className="mb-6">
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">ניהול הרשאות מערכת</h1>
           <p className="text-slate-500 text-sm">ניהול הרשאות וגישה לעובדים במערכת Sola</p>
         </div>
 
-        {/* ── Search Bar ── */}
         <div className="mb-8">
           <div className="relative max-w-md">
             <input
@@ -119,7 +111,6 @@ const AdminPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ── Permissions card ── */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h2 className="font-bold text-slate-800">רשימת הרשאות</h2>

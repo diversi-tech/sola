@@ -25,8 +25,6 @@ export const adminApi = {
     return result.data ?? result;
   },
 
-  // מתחבר ל-route האמיתי שהתמזג ל-main: POST /api/local-auth/create-employee (requireAuth)
-  // דורש טוקן מחובר ב-localStorage תחת המפתח 'token' (נשמר שם אחרי login)
   createEmployee: async (employee: { name: string; email: string; phoneNumber?: string; permissionIds: number[] }): Promise<EmployeeWithPermissions> => {
     const token = localStorage.getItem('token');
     const response = await fetch(`${import.meta.env.VITE_AUTH_SERVICE_URL}/api/local-auth/create-employee`, {
