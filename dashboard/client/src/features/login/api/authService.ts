@@ -3,7 +3,7 @@ export const connectWithGoogle = () => {
   window.location.href = `${import.meta.env.VITE_AUTH_SERVICE_URL}/api/auth/google`;
 };
 
-const API_BASE_URL = import.meta.env.FRONTEND_URL
+const API_BASE_URL = `${import.meta.env.VITE_AUTH_SERVICE_URL}/api/local-auth`;
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token'); 
@@ -57,11 +57,11 @@ export const localAuthService = {
         return data;
     },
 
-    setNewPassword: async (newPassword: string) => {
+    setNewPassword: async (newPassword: string, accessToken: string) => {
         const response = await fetch(`${API_BASE_URL}/set-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ newPassword })
+            body: JSON.stringify({ newPassword, accessToken })
         });
 
         const data = await response.json();

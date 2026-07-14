@@ -83,8 +83,13 @@ export const sendPasswordReset = async (email: string) => {
     }
 };
 
-export const updatePassword = async (newPassword: string) => {
-    const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+export const updatePassword = async (accessToken: string, newPassword: string) => {
+    const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(accessToken);
+    if (userError || !userData.user) {
+        throw { statusCode: 401, message: "Invalid or expired password reset link. Please request a new one." };
+    }
+
+    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(userData.user.id, { password: newPassword });
     if (error) {
         throw { statusCode: 400, message: `Error updating the password: ${error.message}` };
     }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Input from '../features/login/components/Input';
-import { supabase } from '../config/supabaseClient';
+import { localAuthService } from '../features/login/api/authService';
 
 export const UpdatePasswordPage: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -9,16 +9,19 @@ export const UpdatePasswordPage: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [sessionReady, setSessionReady] = useState(false);
+  const [accessToken, setAccessToken] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        setSessionReady(true);
-      } else {
-        setError('קישור לא תקין או שפג תוקפו. בקש/י קישור חדש.');
-      }
-    });
+    const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const token = params.get('access_token');
+
+    if (token && params.get('type') === 'recovery') {
+      setAccessToken(token);
+      setSessionReady(true);
+    } else {
+      setError('קישור לא תקין או שפג תוקפו. בקש/י קישור חדש.');
+    }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,15 +37,14 @@ export const UpdatePasswordPage: React.FC = () => {
       return;
     }
 
-    const { error: updateError } = await supabase.auth.updateUser({ password });
-
-    if (updateError) {
-      setError(updateError.message || 'שגיאה בעדכון הסיסמה.');
+    try {
+      await localAuthService.setNewPassword(password, accessToken);
+    } catch (err: any) {
+      setError(err.message || 'שגיאה בעדכון הסיסמה.');
       return;
     }
 
     setSuccess(true);
-    await supabase.auth.signOut();
     setTimeout(() => navigate('/'), 2000);
   };
 
