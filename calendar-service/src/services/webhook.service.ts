@@ -15,8 +15,13 @@ if (!WEBHOOK_CALLBACK_URL) {
   console.warn('[Webhook] WEBHOOK_CALLBACK_URL is not set in environment variables.');
 }
 
+function getChannelRenewalThreshold(): number {
+  const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
+  return Date.now() + twoDaysMs;
+}
+
 export async function registerWebhookChannel(
-  user_id: number,
+  employee_id: number,
   encryptedRefreshToken: string
 ): Promise<void> {
   const decryptedToken = decryptToken(encryptedRefreshToken);
@@ -37,26 +42,26 @@ export async function registerWebhookChannel(
       },
     });
   } catch (err: any) {
-    throw new Error(`Failed to register webhook channel for user ${user_id}: ${err.message}`);
+    throw new Error(`Failed to register webhook channel for employee ${employee_id}: ${err.message}`);
   }
 
   const resourceId = response.data.resourceId;
   const expiration = response.data.expiration;
 
   if (!resourceId || !expiration) {
-    throw new Error(`Google did not return resourceId/expiration for user ${user_id}`);
+    throw new Error(`Google did not return resourceId/expiration for employee ${employee_id}`);
   }
 
-  await saveWebhookChannel(user_id, {
+  await saveWebhookChannel(employee_id, {
     webhook_channel_id: channelId,
     webhook_resource_id: resourceId,
     webhook_expiration: Number(expiration),
   });
 
-  console.log(`[Webhook] Registered channel for user ${user_id}, expires ${new Date(Number(expiration)).toISOString()}`);
+  console.log(`[Webhook] Registered channel for employee ${employee_id}, expires ${new Date(Number(expiration)).toISOString()}`);
 }
 
-export async function stopWebhookChannel(
+export async function unregisterWebhookChannel(
   channelId: string,
   resourceId: string,
   encryptedRefreshToken: string
@@ -74,33 +79,32 @@ export async function stopWebhookChannel(
       },
     });
   } catch (err: any) {
-    console.warn(`[Webhook] Failed to stop channel ${channelId}: ${err.message}`);
+    console.warn(`[Webhook] Failed to unregister channel ${channelId}: ${err.message}`);
   }
 }
 
 export async function renewExpiringChannels(): Promise<void> {
-  const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
-  const threshold = Date.now() + twoDaysMs;
+  const threshold = getChannelRenewalThreshold();
 
-  const expiringUsers = await getExpiringChannels(threshold);
+  const expiringEmployees = await getExpiringChannels(threshold);
 
-  if (expiringUsers.length === 0) {
+  if (expiringEmployees.length === 0) {
     console.log('[Webhook] No channels need renewal.');
     return;
   }
 
-  for (const user of expiringUsers) {
+  for (const employee of expiringEmployees) {
     try {
-      if (user.webhook_channel_id && user.webhook_resource_id) {
-        await stopWebhookChannel(
-          user.webhook_channel_id,
-          user.webhook_resource_id,
-          user.refresh_token
+      if (employee.webhook_channel_id && employee.webhook_resource_id) {
+        await unregisterWebhookChannel(
+          employee.webhook_channel_id,
+          employee.webhook_resource_id,
+          employee.refresh_token
         );
       }
-      await registerWebhookChannel(user.id, user.refresh_token);
+      await registerWebhookChannel(employee.id, employee.refresh_token);
     } catch (err: any) {
-      console.error(`[Webhook] Renewal failed for user ${user.id}: ${err.message}`);
+      console.error(`[Webhook] Renewal failed for employee ${employee.id}: ${err.message}`);
     }
   }
 }

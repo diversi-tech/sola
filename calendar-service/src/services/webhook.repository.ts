@@ -17,7 +17,7 @@ export interface EmployeeWebhookRecord {
 }
 
 export async function saveWebhookChannel(
-  user_id: number,
+  employee_id: number,
   channelData: WebhookChannelData
 ): Promise<void> {
   const { error } = await supabase
@@ -28,7 +28,7 @@ export async function saveWebhookChannel(
       webhook_expiration: channelData.webhook_expiration,
       updated_at: new Date().toISOString(),
     })
-    .eq('id', user_id);
+    .eq('id', employee_id);
 
   if (error) {
     throw new Error(`Failed to save webhook channel: ${error.message}`);
@@ -36,7 +36,7 @@ export async function saveWebhookChannel(
 }
 
 export async function saveSyncToken(
-  user_id: number,
+  employee_id: number,
   syncToken: string
 ): Promise<void> {
   const { error } = await supabase
@@ -45,14 +45,14 @@ export async function saveSyncToken(
       sync_token: syncToken,
       updated_at: new Date().toISOString(),
     })
-    .eq('id', user_id);
+    .eq('id', employee_id);
 
   if (error) {
     throw new Error(`Failed to save sync token: ${error.message}`);
   }
 }
 
-export async function getUserByChannelId(
+export async function getEmployeeByChannelId(
   channelId: string
 ): Promise<EmployeeWebhookRecord | null> {
   const { data, error } = await supabase
@@ -66,20 +66,6 @@ export async function getUserByChannelId(
   }
 
   return data;
-}
-
-export async function getAllUsersWithWebhookData(): Promise<EmployeeWebhookRecord[]> {
-  const { data, error } = await supabase
-    .from('Employee_token')
-    .select('id, employee_email, refresh_token, webhook_channel_id, webhook_resource_id, webhook_expiration, sync_token')
-    .eq('status', 'ACTIVE')
-    .not('refresh_token', 'is', null);
-
-  if (error) {
-    throw new Error(`Failed to fetch users with webhook data: ${error.message}`);
-  }
-
-  return data ?? [];
 }
 
 export async function getExpiringChannels(

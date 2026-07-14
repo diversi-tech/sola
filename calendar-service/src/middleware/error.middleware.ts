@@ -1,6 +1,7 @@
 import { AuthErrorType } from '../types/authErrors.enum.js';
 import { Request, Response, NextFunction } from 'express';
 
+const DEFAULT_HTTP_STATUS = 500;
 
 export class CalendarServiceError extends Error {
 	public statusCode: AuthErrorType;
@@ -28,12 +29,13 @@ interface AppError extends Error {
 	statusCode?: number | AuthErrorType;
 	details?: any;
 }
+
 const AUTH_ERROR_HTTP_STATUS: Record<AuthErrorType, number> = {
 	[AuthErrorType.USER_DENIED]: 403,
 	[AuthErrorType.SECURITY_ERROR]: 400,
 	[AuthErrorType.GOOGLE_API_ERROR]: 502,
 	[AuthErrorType.NO_REFRESH_TOKEN]: 400,
-	[AuthErrorType.DB_SAVE_ERROR]: 500,
+	[AuthErrorType.DB_SAVE_ERROR]: DEFAULT_HTTP_STATUS,
 };
 
 function resolveHttpStatus(rawStatus: unknown): number {
@@ -45,7 +47,7 @@ function resolveHttpStatus(rawStatus: unknown): number {
 		return AUTH_ERROR_HTTP_STATUS[rawStatus as AuthErrorType];
 	}
 
-	return 500;
+	return DEFAULT_HTTP_STATUS;
 }
 
 export default function errorHandler(
@@ -58,7 +60,9 @@ export default function errorHandler(
 		? err.statusCode
 		: typeof err?.status === 'number'
 			? err.status
-			: 500; const message = err?.message || 'Internal Server Error';
+			: DEFAULT_HTTP_STATUS;
+
+	const message = err?.message || 'Internal Server Error';
 
 	console.error('[Error]', {
 		message,
@@ -81,6 +85,7 @@ export default function errorHandler(
 
 	res.status(status).json(payload);
 }
+
 export const catchAsync = (
 	fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
 ) => {

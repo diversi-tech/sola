@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { getUserByChannelId } from '../services/webhook.repository.js';
-import { syncUserCalendarIncremental } from '../services/meeting.service.js';
+import { getEmployeeByChannelId } from '../services/webhook.repository.js';
+import { syncEmployeeCalendarIncremental } from '../services/meeting.service.js';
 
 export const handleGoogleWebhook = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -20,17 +20,18 @@ export const handleGoogleWebhook = async (req: Request, res: Response, next: Nex
       return;
     }
 
-    const user = await getUserByChannelId(channelId);
+    const employee = await getEmployeeByChannelId(channelId);
 
-    if (!user) {
-      console.warn(`[Webhook] No user found for channel ${channelId}`);
+    if (!employee) {
+      console.warn(`[Webhook] No employee found for channel ${channelId}`);
       res.status(200).send('Unknown channel');
       return;
     }
+
     res.status(200).send('Notification received');
 
-    syncUserCalendarIncremental(user.id, user.refresh_token, user.sync_token).catch((err) => {
-      console.error(`[Webhook] Incremental sync failed for user ${user.id}:`, err);
+    syncEmployeeCalendarIncremental(employee.id, employee.refresh_token, employee.sync_token).catch((err) => {
+      console.error(`[Webhook] Incremental sync failed for employee ${employee.id}:`, err);
     });
 
   } catch (err: any) {
