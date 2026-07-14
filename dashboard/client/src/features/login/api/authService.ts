@@ -30,7 +30,16 @@ export const localAuthService = {
             localStorage.setItem('token', data.token);
         }
 
+        if (Array.isArray(data.permissions)) {
+            localStorage.setItem('permissions', JSON.stringify(data.permissions));
+        }
+
         return data;
+    },
+
+    logout: () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('permissions');
     },
 
     createEmployee: async (email: string, name: string, phoneNumber: string, permissionIds: number[] = []) => {
