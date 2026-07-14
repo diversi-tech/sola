@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useEmployeeData from '../features/employees/hooks/useEmployeeData';
 import { EmployeeRow } from '../features/employees/components/EmployeeRow';
@@ -25,22 +25,61 @@ export default function EmployeePage() {
 
 
   const CALENDAR_API = import.meta.env.VITE_CALENDAR_SERVICE_URL;
-  const [successMessage,setsuccessMessage] = useState<string | null>(null);
+  const [successMessage, setsuccessMessage] = useState<string | null>(null);
+  const [authStatuses, setAuthStatuses] = useState<Record<string, 'ACTIVE' | 'INACTIVE'>>({});
+  const [authStatusesLoaded, setAuthStatusesLoaded] = useState(false);
+
+
   const handleAuthSubmit = async (email: string) => {
-    const response = await fetch( `${CALENDAR_API}/api/calendar/auth/calendar-subscription`,{
-      method : 'POST',
+    const response = await fetch(`${CALENDAR_API}/api/calendar/auth/calendar-subscription`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ employee_email: email }),
     });
 
-    if(!response.ok){
+    if (!response.ok) {
       throw new Error('Error sending request');
     }
     setsuccessMessage('המייל נשלח לעובד בהצלחה!')
-    setTimeout(()=> setsuccessMessage(null), 3000);
+    setTimeout(() => setsuccessMessage(null), 3000);
   }
+
+  const handleRevokeAccess = async (email: string) => {
+    const response = await fetch(`${CALENDAR_API}/api/calendar/auth/revoke`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ employee_email: email }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Error revoking access');
+    }
+
+    setAuthStatuses((prev) => ({ ...prev, [email]: 'INACTIVE' }));
+    setsuccessMessage('הגישה בוטלה בהצלחה');
+    setTimeout(() => setsuccessMessage(null), 3000);
+  };
+
+  useEffect(() => {
+    if (employeesWithReports.length === 0) return;
+
+    const emails = employeesWithReports.map((item) => item.employee.email);
+    const query = encodeURIComponent(emails.join(','));
+
+    fetch(`${CALENDAR_API}/api/calendar/auth/statuses?emails=${query}`)
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch auth statuses');
+        return res.json();
+      })
+      .then((data) => setAuthStatuses(data))
+      .catch((err) => console.error('Error fetching auth statuses:', err))
+      .finally(() => setAuthStatusesLoaded(true));
+
+  }, [employeesWithReports, CALENDAR_API]);
 
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -71,7 +110,7 @@ export default function EmployeePage() {
     }
   };
 
-  if (loading) {
+  if (loading || !authStatusesLoaded) {
     return (
       <div className="flex flex-col justify-center items-center h-screen gap-4 bg-slate-50" style={{ direction: 'rtl' }}>
         <div className="relative">
@@ -176,18 +215,22 @@ export default function EmployeePage() {
 
           {filteredEmployees.length > 0 ? (
             <div className="divide-y divide-slate-50">
-              {filteredEmployees.map((item) => (
-                <EmployeeRow
-                  key={item.employee.id}
-                  employee={item.employee}
-                  rating={calculateEmployeeRating(item.reports)}
-                  reportCount={item.reports.length}
-                  latestReportDate={item.latest_report_date}
-                  onClick={() => handleSelectEmployee(item)}
-                  onViewMeetings={() => handleViewMeetings(item.employee)}
-                  onGoogleCalendarAuth ={() => handleAuthSubmit(item.employee.email)}
-                />
-              ))}
+              {filteredEmployees.map((item) => {
+                return (
+                  <EmployeeRow
+                    key={item.employee.id}
+                    employee={item.employee}
+                    rating={calculateEmployeeRating(item.reports)}
+                    reportCount={item.reports.length}
+                    latestReportDate={item.latest_report_date}
+                    onClick={() => handleSelectEmployee(item)}
+                    onViewMeetings={() => handleViewMeetings(item.employee)}
+                    onGoogleCalendarAuth={() => handleAuthSubmit(item.employee.email)}
+                    onRevokeAccess={() => handleRevokeAccess(item.employee.email)}
+                    calendarAuthStatus={authStatuses[item.employee.email]}
+                  />
+                );
+              })}
             </div>
           ) : (
             <div className="py-20 text-center text-slate-400 font-medium">
