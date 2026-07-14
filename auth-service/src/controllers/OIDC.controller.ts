@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 
 export const handleOauthCallback = (req: Request, res: Response) => {
-  res.redirect('http://localhost:5173/dashboard'); 
+  const frontendUrl = process.env.FRONTEND_URL;
+  if (!frontendUrl) {
+    return res.status(500).send("Server configuration error: FRONTEND_URL is missing.");
+  }
+  res.redirect(`${frontendUrl}/update-password`);
 };
 
 export const getProfile = (req: Request, res: Response) => {
