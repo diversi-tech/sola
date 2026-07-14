@@ -1,9 +1,12 @@
 import { supabase, supabaseAdmin } from '../config/supabase.js';
+import 'dotenv/config';
+
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 export const inviteEmployee = async (email: string, name: string, phoneNumber: string, permissionIds: number[]) => {
     
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-        redirectTo: 'http://localhost:5173/update-password'
+        redirectTo: `${FRONTEND_URL}/update-password`
     });
     
     if (authError) {
@@ -71,7 +74,7 @@ export const authenticateUser = async (email: string, password: string) => {
 
 export const sendPasswordReset = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'http://localhost:5173/update-password',
+        redirectTo: `${FRONTEND_URL}/update-password`,
     });
 
     if (error) {
