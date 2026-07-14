@@ -5,8 +5,8 @@ import { verifyAndFindOauthEmployee } from '../../services/OIDC.service.js';
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      clientID: process.env.AUTH_GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.AUTH_GOOGLE_CLIENT_SECRET || '',
       callbackURL: process.env.GOOGLE_CALLBACK_URL || '',
     },
     async (accessToken, refreshToken, profile, done) => {

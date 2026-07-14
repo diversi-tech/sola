@@ -1,0 +1,295 @@
+import React, { useState, useEffect, useMemo, ChangeEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Meeting } from '../features/employees/types/employee.types';
+import { employeeApi } from '../features/employees/api/employeeApi';
+
+function formatDateTime(dateStr: string | null): string {
+  if (!dateStr) return '—';
+  const date = new Date(dateStr);
+  return date.toLocaleString('he-IL', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+export default function AllMeetingsPage() {
+  const navigate = useNavigate();
+
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [filterMonth, setFilterMonth] = useState('');
+  const [filterType, setFilterType] = useState<string>('all');
+  const [filterTitle, setFilterTitle] = useState('');
+  const [filterAttendee, setFilterAttendee] = useState('');
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        const data = await employeeApi.fetchAllMeetings();
+        setMeetings(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setError((err as Error).message || 'שגיאה בטעינת הפגישות');
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  const availableTypes = useMemo(() => {
+    const types = new Set(meetings.map((m) => m.type).filter((t): t is string => !!t));
+    return Array.from(types);
+  }, [meetings]);
+
+  const filteredMeetings = useMemo(() => {
+    return meetings
+      .filter((m) => {
+        if (filterMonth && m.start_time) {
+          const meetingMonth = m.start_time.slice(0, 7);
+          if (meetingMonth !== filterMonth) return false;
+        }
+        if (filterType !== 'all' && m.type !== filterType) return false;
+        if (filterTitle.trim() && !(m.title ?? '').toLowerCase().includes(filterTitle.trim().toLowerCase())) {
+          return false;
+        }
+        if (filterAttendee.trim()) {
+          const attendees = m.attendees ?? [];
+          const match = attendees.some((a) =>
+            a.toLowerCase().includes(filterAttendee.trim().toLowerCase())
+          );
+          if (!match) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const ta = a.start_time ? new Date(a.start_time).getTime() : 0;
+        const tb = b.start_time ? new Date(b.start_time).getTime() : 0;
+        return tb - ta;
+      });
+  }, [meetings, filterMonth, filterType, filterTitle, filterAttendee]);
+
+  const totalMinutes = useMemo(() => {
+    return filteredMeetings.reduce((sum, m) => sum + (m.estimated_duration_minutes ?? 0), 0);
+  }, [filteredMeetings]);
+
+  const formattedTotalTime = useMemo(() => {
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (hours === 0) return `${minutes} דקות`;
+    if (minutes === 0) return `${hours} שעות`;
+    return `${hours} שעות ו-${minutes} דקות`;
+  }, [totalMinutes]);
+
+  const monthLabel = useMemo(() => {
+    if (!filterMonth) return null;
+    const [year, month] = filterMonth.split('-');
+    const monthNames = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
+    return `${monthNames[parseInt(month, 10) - 1]} ${year}`;
+  }, [filterMonth]);
+
+  const summaryParts = useMemo(() => {
+    const parts: JSX.Element[] = [];
+    if (filterType !== 'all') {
+      parts.push(
+        <span key="type"> מסוג "<span dir="ltr" className="inline-block">{filterType}</span>"</span>
+      );
+    }
+    if (filterTitle.trim()) {
+      parts.push(
+        <span key="title"> בנושא "<span dir="ltr" className="inline-block">{filterTitle.trim()}</span>"</span>
+      );
+    }
+    if (filterAttendee.trim()) {
+      parts.push(
+        <span key="attendee"> של עובד "<span dir="ltr" className="inline-block">{filterAttendee.trim()}</span>"</span>
+      );
+    }
+    if (monthLabel) {
+      parts.push(<span key="month"> בחודש {monthLabel}</span>);
+    }
+    return parts;
+  }, [filterType, filterTitle, filterAttendee, monthLabel]);
+
+  const resetFilters = () => {
+    setFilterMonth('');
+    setFilterType('all');
+    setFilterTitle('');
+    setFilterAttendee('');
+  };
+
+  const hasActiveFilters = filterMonth || filterType !== 'all' || filterTitle || filterAttendee;
+
+  if (loading) {
+    return (
+      <div className="flex flex-col justify-center items-center h-screen gap-4 bg-slate-50" style={{ direction: 'rtl' }}>
+        <div className="relative">
+          <div className="w-16 h-16 rounded-full border-4 border-indigo-100" />
+          <div className="w-16 h-16 rounded-full border-4 border-t-indigo-600 animate-spin absolute inset-0" />
+        </div>
+        <p className="text-slate-600 font-semibold">טוען פגישות...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-slate-50" style={{ direction: 'rtl' }}>
+        <div className="max-w-md w-full mx-4 bg-white border border-red-100 rounded-2xl p-8 text-center shadow-lg">
+          <h3 className="text-slate-900 text-lg font-bold mb-1">שגיאה בטעינת הפגישות</h3>
+          <p className="text-slate-500 text-sm">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50" style={{ direction: 'rtl' }}>
+      <div className="bg-white border-b border-slate-100 sticky top-0 z-20 shadow-sm">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <span className="font-bold text-slate-800 text-lg">כל הפגישות</span>
+          </div>
+
+          <button
+            onClick={() => navigate('/EmployeePage')}
+            className="flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+          >
+            <svg className="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+            </svg>
+            חזרה לעובדים
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="mb-6">
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">כל הפגישות</h1>
+          <p className="text-slate-500 text-sm">{filteredMeetings.length} פגישות מתוך {meetings.length}</p>
+          <p className="text-indigo-600 text-sm font-semibold mt-1">
+            ⏱️ סך הכל זמן שהושקע בפגישות{summaryParts}: {formattedTotalTime}
+          </p>
+      </div>
+
+        <div className="bg-white p-4 rounded-2xl border border-indigo-100 shadow-sm flex flex-col gap-4 mb-6">
+          <div className="flex items-center gap-2 text-indigo-800 font-bold text-sm">סינון פגישות:</div>
+          <div className="flex flex-wrap items-center gap-3">
+            <input
+              type="text"
+              value={filterTitle}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterTitle(e.target.value)}
+              placeholder="חיפוש לפי נושא..."
+              className="bg-slate-50 border border-slate-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 w-full sm:w-48"
+            />
+            <input
+              type="text"
+              value={filterAttendee}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterAttendee(e.target.value)}
+              placeholder="חיפוש לפי משתתף..."
+              className="bg-slate-50 border border-slate-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500 w-full sm:w-48"
+            />
+            <input
+              type="month"
+              value={filterMonth}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setFilterMonth(e.target.value)}
+              className="bg-slate-50 border border-slate-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500"
+            />
+            <select
+              value={filterType}
+              onChange={(e: ChangeEvent<HTMLSelectElement>) => setFilterType(e.target.value)}
+              className="bg-slate-50 border border-slate-200 text-sm rounded-xl px-4 py-2.5 focus:outline-none focus:border-indigo-500"
+            >
+              <option value="all">כל הסוגים</option>
+              {availableTypes.map((type) => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+            {hasActiveFilters && (
+              <button
+                onClick={resetFilters}
+                className="text-xs font-bold text-red-500 bg-red-50 px-3 py-2.5 rounded-xl"
+              >
+                איפוס
+              </button>
+            )}
+          </div>
+        </div>
+
+        {filteredMeetings.length > 0 ? (
+          <div className="relative border-r-2 border-indigo-100 pr-6 mr-8 space-y-8">
+            {filteredMeetings.map((meeting) => (
+              <div
+                key={meeting.meeting_id}
+                className="relative bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:border-indigo-200 group"
+              >
+                <div className="absolute -right-[35px] top-6 w-4 h-4 rounded-full bg-indigo-500 ring-4 ring-slate-50 group-hover:bg-indigo-600"></div>
+
+                <div className="flex justify-between items-center border-b border-gray-50 pb-4 mb-4 gap-4 flex-wrap">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <div className="bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-sm font-bold">
+                      {meeting.title ?? 'ללא כותרת'}
+                    </div>
+                    {meeting.type && (
+                      <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-100">
+                        {meeting.type}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-sm font-medium text-gray-500">
+                    📅 {formatDateTime(meeting.start_time)}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-slate-500 mb-3">
+                  <span><span className="font-semibold text-slate-600">התחלה: </span>{formatDateTime(meeting.start_time)}</span>
+                  <span><span className="font-semibold text-slate-600">סיום: </span>{formatDateTime(meeting.end_time)}</span>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {meeting.estimated_duration_minutes != null && (
+                    <span className="text-[10px] uppercase font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
+                      משך משוער: <span className="text-indigo-600">{meeting.estimated_duration_minutes} דק'</span>
+                    </span>
+                  )}
+                  {meeting.participants_count != null && (
+                    <span className="text-[10px] uppercase font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
+                      משתתפים: <span className="text-indigo-600">{meeting.participants_count}</span>
+                    </span>
+                  )}
+                </div>
+
+                {meeting.attendees && meeting.attendees.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {meeting.attendees.map((attendee, i) => (
+                      <span
+                        key={i}
+                        className="text-[11px] px-2 py-0.5 rounded-md bg-gray-50 border border-gray-200 text-gray-600"
+                      >
+                        {attendee}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">
+            <p className="text-slate-600 font-bold text-lg">לא נמצאו פגישות התואמות לסינון.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
