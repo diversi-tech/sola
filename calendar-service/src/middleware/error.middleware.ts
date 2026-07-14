@@ -1,4 +1,4 @@
-import { AuthErrorType } from '../types/authErrors.enum.js';
+import { AuthErrorType, authErrorStatusMap, HttpStatusCode } from '../types/authErrors.enum.js';
 import { Request, Response, NextFunction } from 'express';
 
 
@@ -25,7 +25,7 @@ export class BadRequestError extends Error {
 
 interface AppError extends Error {
 	status?: number;
-	statusCode?: number;
+	statusCode?: number | AuthErrorType;
 	details?: any;
 }
 
@@ -35,11 +35,19 @@ export default function errorHandler(
 	res: Response,
 	next: NextFunction
 ) {
-	const status = typeof err?.statusCode === 'number'
-		? err.statusCode
-		: typeof err?.status === 'number'
-			? err.status
-			: 500; const message = err?.message || 'Internal Server Error';
+	let status: number;
+
+	if (err instanceof CalendarServiceError) {
+		status = authErrorStatusMap[err.statusCode] ?? HttpStatusCode.INTERNAL_SERVER_ERROR;
+	} else if (typeof err?.statusCode === 'number') {
+		status = err.statusCode;
+	} else if (typeof err?.status === 'number') {
+		status = err.status;
+	} else {
+		status = HttpStatusCode.INTERNAL_SERVER_ERROR;
+	}
+
+	const message = err?.message || 'Internal Server Error';
 
 	console.error('[Error]', {
 		message,
@@ -62,6 +70,7 @@ export default function errorHandler(
 
 	res.status(status).json(payload);
 }
+
 export const catchAsync = (
 	fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
 ) => {

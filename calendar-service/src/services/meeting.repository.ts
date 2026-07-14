@@ -67,3 +67,39 @@ export async function getAllMeetings(): Promise<Meeting[]> {
 
   return data ?? [];
 }
+
+export async function getAuthStatusesByEmails(
+  emails: string[]
+): Promise<Record<string, 'ACTIVE' | 'INACTIVE'>> {
+  if (emails.length === 0) {
+    return {};
+  }
+
+  const { data, error } = await supabase
+    .from('Users')
+    .select('employee_email, status')
+    .in('employee_email', emails);
+
+  if (error) {
+    throw new Error(`Failed to fetch auth statuses: ${error.message}`);
+  }
+
+  const statusMap: Record<string, 'ACTIVE' | 'INACTIVE'> = {};
+  for (const row of data ?? []) {
+    statusMap[row.employee_email] = row.status;
+  }
+
+  return statusMap;
+}
+
+export async function revokeAuthByEmail(employeeEmail: string): Promise<void> {
+  const { error } = await supabase
+    .from('Users')
+    .update({ status: 'INACTIVE', refresh_token: null })
+    .eq('employee_email', employeeEmail)
+    .eq('status', 'ACTIVE');
+
+  if (error) {
+    throw new Error(`Failed to revoke access: ${error.message}`);
+  }
+}
