@@ -53,7 +53,15 @@ export const processAudioRequest = async (req: Request, res: Response): Promise<
 
   } catch (error: any) {
     console.error('Controller caught an error:', error);
+    
     const errorMessage = error?.message || 'Audio processing failed during transcription.';
+    
+    if (errorMessage.toLowerCase().includes('unexpected field')) {
+      const userFriendlyMessage = errorHandlerService.handleProcessResult(400, 'unexpected field', currentUserId || 'unknown');
+      res.status(400).json({ error: userFriendlyMessage });
+      return;
+    }
+
     const userFriendlyMessage = errorHandlerService.handleProcessResult(500, errorMessage, currentUserId || 'unknown');
     res.status(500).json({ error: userFriendlyMessage });
   }

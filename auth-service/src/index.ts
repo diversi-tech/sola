@@ -1,13 +1,13 @@
 import 'dotenv/config';
-import passport from './config/strategies/google.strategy.js'; 
-import oidc from './routes/oidc.routes.js';
+import oidc from './routes/OIDC.routes.js';
+import cors from 'cors';
 import express from 'express';
 import authRoutes from './routes/authorization.routes.js';
 import adminRoutes from './routes/admin.routes.js';
-import cors from 'cors'; 
 
 import { errorHandler } from './middlewares/errorHandler.js';
 import session from 'express-session';
+import passport from './config/strategies/passport.config.js'; 
 import localAuthRoutes from './routes/localAuth.routes.js';
 
 
@@ -18,11 +18,18 @@ app.use(cors({
   credentials: true
 }));
 const PORT = process.env.PORT;
+
+app.use(cors({
+  origin:process.env.FRONTEND_URL, 
+  credentials: true 
+}));
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'supersecret',
   resave: false,
   saveUninitialized: false,
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
