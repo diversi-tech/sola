@@ -20,7 +20,7 @@ export const UpdatePasswordPage: React.FC = () => {
       setAccessToken(token);
       setSessionReady(true);
     } else {
-      setError('קישור לא תקין או שפג תוקפו. בקש/י קישור חדש.');
+      setError('Invalid or expired link. Please request a new one.');
     }
   }, []);
 
@@ -29,18 +29,18 @@ export const UpdatePasswordPage: React.FC = () => {
     setError('');
 
     if (password.length < 6) {
-      setError('הסיסמה חייבת להכיל לפחות 6 תווים.');
+      setError('Password must be at least 6 characters.');
       return;
     }
     if (password !== confirmPassword) {
-      setError('הסיסמאות אינן תואמות.');
+      setError('Passwords do not match.');
       return;
     }
 
     try {
       await localAuthService.setNewPassword(password, accessToken);
     } catch (err: any) {
-      setError(err.message || 'שגיאה בעדכון הסיסמה.');
+      setError(err.message || 'Error updating the password.');
       return;
     }
 

@@ -1,10 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { supabase } from '../config/supabase.js';
 
-/**
- * Verifies the Supabase JWT sent as a Bearer token. Any request without a
- * valid, unexpired token is rejected before it can reach the data handlers.
- */
 export const requireAuth = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const authHeader = req.headers.authorization;

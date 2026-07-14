@@ -27,11 +27,7 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
     }
 };
 
-/**
- * Authorization guard. Must run after requireAuth (relies on res.locals.user).
- * Loads the employee tied to the authenticated auth user and verifies they
- * hold at least one of the required permissions.
- */
+// Must run after requireAuth — it relies on res.locals.user being set.
 export const requirePermission = (...requiredPermissions: string[]) => {
     return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
