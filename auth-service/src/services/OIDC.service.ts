@@ -8,7 +8,7 @@ export const verifyAndFindOauthEmployee = async (email: string) => {
   const { data: existingEmployee, error: searchError } = await supabase
     .from('Employees')
     .select('*')
-    .eq('Email', email) 
+    .eq('email', email) 
     .single();
 
   if (searchError && searchError.code !== 'PGRST116') {
