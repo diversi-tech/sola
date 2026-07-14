@@ -8,7 +8,7 @@ import categoryRoutes from './routes/category.routes.js';
 
 const app = express();
 app.use(cors({ 
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173' 
+  origin: process.env.FRONTEND_URL
 }));
 app.use(express.json());
 
