@@ -2,16 +2,17 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminData } from '../features/admin/hooks/useAdminData';
 import { PermissionsTable } from '../features/admin/components/PermissionsTable';
+import { AddEmployeeModal } from '../features/admin/components/AddEmployeeModal';
 import logo from '../assets/sola-logo.png';
 
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
-  const { employees, permissions, loading, error, togglePermission } = useAdminData();
+  const { employees, permissions, loading, error, addEmployee, togglePermission } = useAdminData();
 
-  // סטייט לשמירת מילת החיפוש
   const [searchQuery, setSearchQuery] = useState('');
 
-  // סינון העובדים לפי שורת החיפוש
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
   const filteredEmployees = useMemo(() => {
     if (!searchQuery.trim()) return employees;
 
@@ -60,8 +61,6 @@ const AdminPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50" style={{ direction: 'rtl' }}>
-
-      {/* ── Top bar ── */}
       <div className="bg-white border-b border-slate-100 sticky top-0 z-20 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -90,14 +89,11 @@ const AdminPage: React.FC = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-8">
-
-        {/* ── Page header ── */}
         <div className="mb-6">
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">ניהול הרשאות מערכת</h1>
           <p className="text-slate-500 text-sm">ניהול הרשאות וגישה לעובדים במערכת Sola</p>
         </div>
 
-        {/* ── Search Bar ── */}
         <div className="mb-8">
           <div className="relative max-w-md">
             <input
@@ -115,13 +111,23 @@ const AdminPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ── Permissions card ── */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
             <h2 className="font-bold text-slate-800">רשימת הרשאות</h2>
-            <span className="text-xs text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full font-medium">
-              {filteredEmployees.length} עובדים
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full font-medium">
+                {filteredEmployees.length} עובדים
+              </span>
+              <button
+                onClick={() => setIsAddModalOpen(true)}
+                className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                </svg>
+                הוספת עובד
+              </button>
+            </div>
           </div>
 
           {filteredEmployees.length > 0 ? (
@@ -139,6 +145,14 @@ const AdminPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {isAddModalOpen && (
+        <AddEmployeeModal
+          permissions={permissions}
+          onClose={() => setIsAddModalOpen(false)}
+          onCreate={addEmployee}
+        />
+      )}
     </div>
   );
 };

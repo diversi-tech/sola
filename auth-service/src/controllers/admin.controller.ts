@@ -22,7 +22,7 @@ export const adminController = {
     }
   },
 
-updatePermissions: async (req: Request<{ id: string }>, res: Response) => {
+  updatePermissions: async (req: Request<{ id: string }>, res: Response) => {
     try {
       const employeeId = parseInt(req.params.id, 10);
       const { permissions } = req.body;
