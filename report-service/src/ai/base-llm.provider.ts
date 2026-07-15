@@ -22,7 +22,7 @@ export abstract class baseLLMProvider {
         return promptTemplate;
     }
 
-    protected buildSchema(categories: string[]): any {
+   protected buildSchema(categories: string[]): any {
         const dynamicMetricProperties: Record<string, any> = {};
         categories.forEach(category => {
             dynamicMetricProperties[category] = { type: "integer", nullable: true };
@@ -31,14 +31,24 @@ export abstract class baseLLMProvider {
         return {
             type: "object",
             properties: {
-                metric_scores: { type: "object", properties: dynamicMetricProperties, required: categories },
-                text_summary: { type: "string" },
-                employee_name: { type: "string", nullable: true }
+                detected_language: { type: "string" },
+                employee_feedback: {
+                    type: "object",
+                    properties: {
+                        employee_name: { type: "string", nullable: true },
+                        summary: { type: "string" },
+                        metrics: { 
+                            type: "object", 
+                            properties: dynamicMetricProperties, 
+                            required: categories 
+                        }
+                    },
+                    required: ["employee_name", "summary", "metrics"]
+                }
             },
-            required: ["metric_scores", "text_summary", "employee_name"],
+            required: ["detected_language", "employee_feedback"],
         };
     }
-
     protected abstract getProviderName(): string;
 
     protected abstract callLlmApi(prompt: string, schema: any): Promise<string>;
