@@ -61,9 +61,17 @@ const handleTextMessage = async (userId: string, message: any, senderPhoneNumber
     let finalResponse = "";
     try {
         const reportsResponse: any = await sendToReports(reportData); 
+        // ==========================================
+        // הוספי את הבלוק הזה לדיבוג:
+        console.log("=== Debug: Response from Reports Service ===");
+        console.log("Original text sent:", textContent);
+        console.log("Full reports response:", JSON.stringify(reportsResponse, null, 2));
+        console.log("Detected language:", reportsResponse?.detected_language);
+        console.log("============================================");
+        // ==========================================
         
-        if (reportsResponse && reportsResponse.message) {
-            finalResponse = await translateForUser(reportsResponse.message, reportsResponse.detected_language);
+        if (reportsResponse && reportsResponse.data && reportsResponse.data.message) {
+            finalResponse = await translateForUser(reportsResponse.data.message, reportsResponse.data.detected_language);
             await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
             
             await updateMessageStatus(message.id, {
@@ -169,8 +177,8 @@ const handleAudioMessage = async (userId: string, message: any, senderPhoneNumbe
     try {
         const reportsResponse: any = await sendToReports(reportData);
         
-        if (reportsResponse && reportsResponse.message) {
-            finalResponse = await translateForUser(reportsResponse.message, reportsResponse.detected_language);
+        if (reportsResponse && reportsResponse.data && reportsResponse.data.message) {
+            finalResponse = await translateForUser(reportsResponse.data.message, reportsResponse.data.detected_language);
             await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
             
             await updateMessageStatus(message.id, {
