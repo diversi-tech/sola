@@ -54,8 +54,11 @@ export const authenticateUser = async (email: string, password: string) => {
         .eq('auth_id', authId)
         .single();
 
-    if (empError || !employee) {
+    if (empError) {
         throw { statusCode: 404, message: "Error: User exists in the authentication system but is not registered as an employee." };
+    }
+        if ( !employee) {
+        throw { statusCode: 404, message: "Error: User is not exists" };
     }
 
     const userPermissions = (employee.employee_permissions as any[]).map(ep => ep.permissions.name);
