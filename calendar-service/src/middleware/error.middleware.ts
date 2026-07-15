@@ -1,7 +1,6 @@
 import { AuthErrorType, authErrorStatusMap, HttpStatusCode } from '../types/authErrors.enum.js';
 import { Request, Response, NextFunction } from 'express';
 
-const DEFAULT_HTTP_STATUS = 500;
 
 export class CalendarServiceError extends Error {
 	public statusCode: AuthErrorType;
@@ -28,26 +27,6 @@ interface AppError extends Error {
 	status?: number;
 	statusCode?: number | AuthErrorType;
 	details?: any;
-}
-
-const AUTH_ERROR_HTTP_STATUS: Record<AuthErrorType, number> = {
-	[AuthErrorType.USER_DENIED]: 403,
-	[AuthErrorType.SECURITY_ERROR]: 400,
-	[AuthErrorType.GOOGLE_API_ERROR]: 502,
-	[AuthErrorType.NO_REFRESH_TOKEN]: 400,
-	[AuthErrorType.DB_SAVE_ERROR]: DEFAULT_HTTP_STATUS,
-};
-
-function resolveHttpStatus(rawStatus: unknown): number {
-	if (typeof rawStatus === 'number' && Number.isInteger(rawStatus)) {
-		return rawStatus;
-	}
-
-	if (typeof rawStatus === 'string' && rawStatus in AUTH_ERROR_HTTP_STATUS) {
-		return AUTH_ERROR_HTTP_STATUS[rawStatus as AuthErrorType];
-	}
-
-	return DEFAULT_HTTP_STATUS;
 }
 
 export default function errorHandler(
