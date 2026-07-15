@@ -30,16 +30,19 @@ export const localAuthService = {
             localStorage.setItem('token', data.token);
         }
 
-        if (Array.isArray(data.permissions)) {
-            localStorage.setItem('permissions', JSON.stringify(data.permissions));
-        }
-
         return data;
     },
 
     logout: () => {
         localStorage.removeItem('token');
-        localStorage.removeItem('permissions');
+        localStorage.removeItem('refresh_token');
+    },
+
+    getMyPermissions: async (): Promise<string[]> => {
+        const response = await fetch(`${API_BASE_URL}/me`, { headers: getAuthHeaders() });
+        if (!response.ok) throw new Error('Failed to load permissions');
+        const data = await response.json();
+        return Array.isArray(data.permissions) ? data.permissions : [];
     },
 
     createEmployee: async (email: string, name: string, phoneNumber: string, permissionIds: number[] = []) => {

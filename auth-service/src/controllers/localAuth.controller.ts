@@ -41,6 +41,16 @@ export const loginToDashboard = async (req: Request, res: Response, next: NextFu
     }
 };
 
+export const getMe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const authId = res.locals.user.id;
+        const permissions = await localAuthService.getEmployeePermissions(authId);
+        res.status(200).json({ permissions });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const requestPasswordReset = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { email } = req.body;

@@ -4,6 +4,7 @@ import EmployeePage from './pages/EmployeesPage';
 import AdminPage from './pages/AdminPage';
 import { UpdatePasswordPage } from './pages/UpdatePasswordPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AdminRoute } from './components/AdminRoute';
 
 import AllMeetingsPage from './pages/AllMeetingsPage';
 import './index.css';
@@ -12,7 +13,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/EmployeePage" element={<ProtectedRoute><EmployeePage /></ProtectedRoute>} />
-        <Route path="/admin" element={<ProtectedRoute requiredPermission="MANAGE_DASHBOARD"><AdminPage /></ProtectedRoute>} />
+        <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
         <Route path="/meetings" element={<ProtectedRoute><AllMeetingsPage /></ProtectedRoute>} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<Navigate to="/login" />} />
