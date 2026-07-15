@@ -18,7 +18,7 @@ const getOAuth2Client = () => {
 
 async function upsertAuthSession(employeeEmail: string, state: string): Promise<void> {
   const { data: existing, error: fetchError } = await supabase
-    .from('Users')
+    .from('Employee_token')
     .select('id, status')
     .eq('employee_email', employeeEmail)
     .maybeSingle();
@@ -40,7 +40,7 @@ async function upsertAuthSession(employeeEmail: string, state: string): Promise<
 
   if (existing) {
     const { error: updateError } = await supabase
-      .from('Users')
+      .from('Employee_token')
       .update({ state, status: 'INACTIVE' })
       .eq('employee_email', employeeEmail);
 
@@ -55,7 +55,7 @@ async function upsertAuthSession(employeeEmail: string, state: string): Promise<
   }
 
   const { error: insertError } = await supabase
-    .from('Users')
+    .from('Employee_token')
     .insert([
       {
         employee_email: employeeEmail,

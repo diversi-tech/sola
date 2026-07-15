@@ -4,7 +4,7 @@ import useEmployeeData from '../features/employees/hooks/useEmployeeData';
 import { EmployeeRow } from '../features/employees/components/EmployeeRow';
 import { EmployeeModal } from '../features/employees/components/EmployeeModal';
 import logo from '../assets/sola-logo.png';
-import { calculateEmployeeRating } from '../features/employees/api/employeeApi';
+import { calculateEmployeeRating } from '../features/employees/utils/rating';
 
 export default function EmployeePage() {
   const navigate = useNavigate();

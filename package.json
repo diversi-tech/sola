@@ -19,7 +19,7 @@
     "concurrently": "^8.2.2"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.110.2",
+    "@supabase/supabase-js": "^2.110.5",
     "multer": "^2.2.0",
     "streamifier": "^0.1.1"
   }
