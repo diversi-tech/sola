@@ -21,7 +21,6 @@ export const LoginPage: React.FC = () => {
     setError('');
     try {
       const response = await localAuthService.login(email, password);
-      alert(response.message);
       navigate('/EmployeePage'); 
     } catch (err: any) {
       setError(err.message || 'Login error');
