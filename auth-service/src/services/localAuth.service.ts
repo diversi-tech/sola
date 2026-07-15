@@ -72,6 +72,20 @@ export const authenticateUser = async (email: string, password: string) => {
     };
 };
 
+export const getEmployeePermissions = async (authId: string): Promise<string[]> => {
+    const { data: employee, error } = await supabaseAdmin
+        .from('Employees')
+        .select(`employee_permissions ( permissions ( name ) )`)
+        .eq('auth_id', authId)
+        .single();
+
+    if (error || !employee) {
+        throw { statusCode: 404, message: "Employee record not found." };
+    }
+
+    return (employee.employee_permissions as any[]).map(ep => ep.permissions.name);
+};
+
 export const sendPasswordReset = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${FRONTEND_URL}/update-password`,

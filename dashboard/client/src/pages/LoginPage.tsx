@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Input from '../features/login/components/Input';
 import logo from '../assets/sola-logo.png';
-import { connectWithGoogle, localAuthService } from '../features/login/api/authService'; 
+import { connectWithGoogle, localAuthService } from '../features/login/api/authService';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('error') === 'oauth') {
+      setError('Google sign-in failed. Your account may not be registered in the system.');
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
