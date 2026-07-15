@@ -8,6 +8,7 @@ export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,6 +44,24 @@ export const LoginPage: React.FC = () => {
     if (target.parentNode) {
       (target.parentNode as HTMLElement).innerHTML =
         '<span class="text-2xl font-black text-slate-800">sola<span style="color:#4f46e5">.</span></span>';
+    }
+  };
+
+  const handleForgotPassword = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMessage('');
+
+    if (!email) {
+      setError('Please enter your email address first in the email field.');
+      return;
+    }
+
+    try {
+      await localAuthService.requestPasswordReset(email);
+      setSuccessMessage('Password reset link sent successfully to your email!');
+    } catch (err: any) {
+      setError(err.message || 'Error sending password reset email');
     }
   };
 
@@ -112,7 +131,11 @@ export const LoginPage: React.FC = () => {
           </div>
 
           <div className="flex justify-end mb-6">
-            <a href="#" className="text-xs text-indigo-600 font-medium hover:text-indigo-700 hover:underline">
+            <a 
+              href="#" 
+              onClick={handleForgotPassword}
+              className="text-xs text-indigo-600 font-medium hover:text-indigo-700 hover:underline"
+            >
               Forgot password?
             </a>
           </div>
