@@ -37,19 +37,20 @@ export const handleIncomingFeedback = async (req: Request, res: Response) => {
     } catch (error: any) {
         console.error("Full Error Details:", error);
         const manager_id = req.body?.manager_id;
+        const detected_language = error.detected_language; // <-- שליפה חד-פעמית
 
         if (error.message?.includes("was not found") || error.message?.includes("could not identify")) {
-            return sendNotFoundResult(res, "Employee not found in the system");
+            return sendNotFoundResult(res, "Employee not found in the system", { manager_id, detected_language });
         }
 
         if (error.code === PgError.InvalidTextRepresentation || error.code === PgError.ForeignKeyViolation) {
-            return sendBadRequestResult(res, "Invalid manager ID");
+            return sendBadRequestResult(res, "Invalid manager ID", { manager_id, detected_language });
         }
 
         if (error.status === HttpStatusCode.SERVICE_UNAVAILABLE) {
-            return sendErrorResult(res, "Analysis service is currently unavailable", HttpStatusCode.SERVICE_UNAVAILABLE, { manager_id });
+            return sendErrorResult(res, "Analysis service is currently unavailable", HttpStatusCode.SERVICE_UNAVAILABLE, { manager_id, detected_language });
         }
 
-        return sendErrorResult(res, "Failed to save the report to the database.", HttpStatusCode.INTERNAL_SERVER_ERROR, { manager_id });
+        return sendErrorResult(res, "Failed to save the report to the database.", HttpStatusCode.INTERNAL_SERVER_ERROR, { manager_id, detected_language });
     }
 };

@@ -27,8 +27,8 @@ export const sendErrorResult = (res: Response, message: string, statusCode: Http
         return res.status(statusCode).json({ success: false, error: message });
 };
 
-export const sendBadRequestResult = (res: Response, message: string = 'Invalid or missing data') => {
-  return sendErrorResult(res, message, HttpStatusCode.BAD_REQUEST);
+export const sendBadRequestResult = (res: Response, message: string = 'Invalid or missing data', additionalData?: any) => {
+  return sendErrorResult(res, message, HttpStatusCode.BAD_REQUEST, additionalData);
 };
 
 export const sendUnauthorizedResult = (res: Response, message: string = 'Unauthorized, please log in again') => {
@@ -39,6 +39,6 @@ export const sendForbiddenResult = (res: Response, message: string = 'You do not
   return sendErrorResult(res, message, HttpStatusCode.FORBIDDEN);
 };
 
-export const sendNotFoundResult = (res: Response, message: string = 'The requested resource was not found') => {
-  return sendErrorResult(res, message, HttpStatusCode.NOT_FOUND);
+export const sendNotFoundResult = (res: Response, message: string = 'The requested resource was not found', additionalData?: any) => {
+  return sendErrorResult(res, message, HttpStatusCode.NOT_FOUND, additionalData);
 };
