@@ -7,7 +7,7 @@ export interface Meeting {
   participants_count: number;
   calendar_id: number;     
   start_time?: string;        
-  end_time?: string;          
+  end_time?: string;               
   attendees: string[];
     google_event_id?: string; 
 

@@ -3,8 +3,7 @@ import { EmployeeMetrics } from './EmployeeMetrics';
 import { EmployeeReports } from './EmployeeReports';
 import { EmployeeMeetings } from './EmployeeMeetings';
 import { Meeting, Employee } from '../types/employee.types';
-import { calculateEmployeeRating } from '../api/employeeApi';
-
+import { calculateEmployeeRating } from '../utils/rating';
 
 
 interface Report {

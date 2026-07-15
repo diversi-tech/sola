@@ -33,9 +33,18 @@ export const loginToDashboard = async (req: Request, res: Response, next: NextFu
         const loginData = await localAuthService.authenticateUser(email, password);
 
         res.status(200).json({
-            message: "You have successfully logged in to the dashboard.",
             ...loginData
         });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getMe = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const authId = res.locals.user.id;
+        const permissions = await localAuthService.getEmployeePermissions(authId);
+        res.status(200).json({ permissions });
     } catch (error) {
         next(error);
     }
@@ -62,14 +71,19 @@ export const requestPasswordReset = async (req: Request, res: Response, next: Ne
 
 export const setNewPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const { newPassword } = req.body;
+        const { newPassword, accessToken } = req.body;
 
         if (!newPassword || newPassword.length < 6) {
             res.status(400).json({ message: "Please enter a password with at least 6 characters." });
             return;
         }
 
-        const user = await localAuthService.updatePassword(newPassword);
+        if (!accessToken) {
+            res.status(400).json({ message: "Missing password reset token." });
+            return;
+        }
+
+        const user = await localAuthService.updatePassword(accessToken, newPassword);
 
         res.status(200).json({ 
             message: "The password has been updated successfully! You can now log in with it.",

@@ -1,27 +1,27 @@
 import { supabase } from '../config/supabase.js';
 import { Meeting } from '../models/meeting.model.js';
 
-export async function validateUserAndToken(
-  user_id: number,
+export async function validateEmployeeAndToken(
+  employee_id: number,
   refreshToken: string
 ): Promise<{ valid: boolean; error?: string }> {
-  const { data: user, error: userError } = await supabase
-    .from('Users')
+  const { data: employee, error: employeeError } = await supabase
+    .from('Employee_token')
     .select('id, refresh_token')
-    .eq('id', user_id)
+    .eq('id', employee_id)
     .single();
 
-  if (userError || !user) {
+  if (employeeError || !employee) {
     return {
       valid: false,
-      error: `User with ID ${user_id} does not exist in the system.`,
+      error: `Employee with ID ${employee_id} does not exist in the system.`,
     };
   }
 
-  if (user.refresh_token !== refreshToken) {
+  if (employee.refresh_token !== refreshToken) {
     return {
       valid: false,
-      error: `Provided refresh token does not match the system record for this user.`,
+      error: `Provided refresh token does not match the system record for this employee.`,
     };
   }
 
@@ -42,20 +42,21 @@ export async function saveMeetings(meetings: Meeting[]): Promise<void> {
   }
 }
 
-export async function getAllActiveUsers(): Promise<
+export async function getAllActiveEmployees(): Promise<
   Array<{ id: number; employee_email: string; refresh_token: string }>
 > {
-  const { data: users, error } = await supabase
-    .from('Users')
+  const { data: employees, error } = await supabase
+    .from('Employee_token')
     .select('id, employee_email, refresh_token')
     .not('refresh_token', 'is', null);
 
   if (error) {
-    throw new Error(`Failed to fetch users: ${error.message}`);
+    throw new Error(`Failed to fetch employees: ${error.message}`);
   }
   
-  return users ?? [];
+  return employees ?? [];
 }
+ 
 export async function getAllMeetings(): Promise<Meeting[]> {
   const { data, error } = await supabase
     .from('Meeting')

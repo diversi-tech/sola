@@ -1,15 +1,15 @@
-import { Request,Response } from "express"
-import { syncAllActiveUsers, syncUserCalendar, getAllMeetings } from "../services/meeting.service.js"
+import { Request, Response } from "express"
+import { syncAllActiveEmployees, syncEmployeeCalendar, getAllMeetings } from "../services/meeting.service.js"
 export async function syncCalendar(req: Request, res: Response) {
-  const user_id = Number(req.query.userID);
+  const employee_id = Number(req.query.userID);
   const refresh_token = req.body.refresh_token;
 
-  await syncUserCalendar(user_id, refresh_token);
+  await syncEmployeeCalendar(employee_id, refresh_token);
   res.json({ message: 'success' });
 }
 
-export async function syncActiveUsers(req: Request, res: Response) {
-  await syncAllActiveUsers();
+export async function syncActiveEmployees(req: Request, res: Response) {
+  await syncAllActiveEmployees();
   res.json({ message: 'success' });
 }
 export async function getMeetings(req: Request, res: Response) {
