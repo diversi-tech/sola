@@ -35,21 +35,20 @@ export const getEmployeesWithReports = async () => {
 const aiProvider = LLMFactory.getProvider();
 
 export const processAndSaveFeedback = async (manager_id: number, text: string) => {
+    let detectedLanguage: string | undefined;
+
     try {
         const categories = await getActiveCategories();
-
         const llmResult = await aiProvider.analyzeFeedback(text, categories);
-
-        const detectedLanguage = llmResult.detected_language;
+        detectedLanguage = llmResult.detected_language;
         const feedbackData = llmResult.employee_feedback;
         const extractedName = feedbackData.employee_name;
+
         if (!extractedName) {
             throw new Error("The AI could not identify an employee name in the text.");
         }
 
-
         const THRESHOLD = 0.6;
-
         const { data: matchedEmployees, error: matchError } = await supabase
             .rpc('match_employee_name', {
                 search_name: extractedName,
@@ -66,7 +65,8 @@ export const processAndSaveFeedback = async (manager_id: number, text: string) =
         }
 
         const employeeId = matchedEmployees[0].id;
-        console.log(`Matched extracted name "${extractedName}" to DB Employee ID: ${employeeId} (Name: ${matchedEmployees[0].name})`);   
+        console.log(`Matched extracted name "${extractedName}" to DB Employee ID: ${employeeId} (Name: ${matchedEmployees[0].name})`);
+
         const realData = {
             employee_id: employeeId,
             manager_id: manager_id || null,
@@ -87,8 +87,9 @@ export const processAndSaveFeedback = async (manager_id: number, text: string) =
             savedReport: data,
             detected_language: detectedLanguage
         };
-        
-    } catch (error) {
+
+    } catch (error: any) {
+        error.detected_language = detectedLanguage;
         throw error;
     }
 };
