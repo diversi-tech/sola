@@ -33,7 +33,6 @@ export const loginToDashboard = async (req: Request, res: Response, next: NextFu
         const loginData = await localAuthService.authenticateUser(email, password);
 
         res.status(200).json({
-            message: "You have successfully logged in to the dashboard.",
             ...loginData
         });
     } catch (error) {

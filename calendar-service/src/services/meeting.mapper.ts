@@ -39,7 +39,7 @@ function extractAttendees(event: any): string[] {
   return (event.attendees ?? []).map((att: any) => att.email);
 }
 
-export function mapEventToMeeting(event: any, user_id: number): Meeting | null {
+export function mapEventToMeeting(event: any, employee_id: number): Meeting | null {
   if (!event.start?.dateTime || !event.end?.dateTime) return null;
 
   const participantsCount = getParticipantsCount(event);
@@ -52,16 +52,16 @@ export function mapEventToMeeting(event: any, user_id: number): Meeting | null {
     created_at:                 event.created ?? new Date().toISOString(),
     estimated_duration_minutes: estimatedMinutes,
     participants_count:         participantsCount,
-    calendar_id:                user_id,
+    calendar_id:                employee_id,
     start_time:                 event.start.dateTime,
     end_time:                   event.end.dateTime,
     attendees:                  extractAttendees(event),
   };
 }
 
-export function mapEventsToMeetings(events: any[], user_id: number): Meeting[] {
+export function mapEventsToMeetings(events: any[], employee_id: number): Meeting[] {
   return events
-    .map((event) => mapEventToMeeting(event, user_id))
+    .map((event) => mapEventToMeeting(event, employee_id))
     .filter((meeting): meeting is Meeting => meeting !== null);
 }
 

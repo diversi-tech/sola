@@ -1,15 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
-import { supabase, supabaseAdmin } from '../config/supabase.js';
+import { supabaseAdmin } from '../config/supabase.js';
 
 export const verifyAndFindOauthEmployee = async (email: string) => {
   if (!email) {
     throw new Error("No email address provided.");
   }
 
-  const { data: existingEmployee, error: searchError } = await supabase
+  const { data: existingEmployee, error: searchError } = await supabaseAdmin
     .from('Employees')
     .select('*')
-    .eq('email', email) 
+    .eq('email', email)
     .single();
 
   if (searchError && searchError.code !== 'PGRST116') {
@@ -24,7 +24,7 @@ export const verifyAndFindOauthEmployee = async (email: string) => {
 };
 
 export const getEmployeeById = async (id: number) => { 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('Employees')
     .select('*')
     .eq('id', id)
