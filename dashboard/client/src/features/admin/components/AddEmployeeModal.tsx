@@ -27,11 +27,11 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ permissions,
     e.preventDefault();
 
     if (!name.trim()) {
-      setError('שם העובד הוא שדה חובה');
+      setError('Employee name is required.');
       return;
     }
     if (!email.trim()) {
-      setError('אימייל הוא שדה חובה');
+      setError('Email is required.');
       return;
     }
 
@@ -46,7 +46,7 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({ permissions,
       });
       onClose();
     } catch (err) {
-      setError('שגיאה בהוספת העובד. אנא נסה שוב.');
+      setError('Failed to add employee. Please try again.');
       console.error('Failed to create employee:', err);
     } finally {
       setSaving(false);
