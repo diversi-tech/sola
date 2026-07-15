@@ -2,7 +2,7 @@ import { google } from 'googleapis';
 import { Meeting } from '../models/meeting.model.js';
 import { decryptToken } from '../utils/crypto.util.js';
 import { mapEventsToMeetings, getLastWeekDate, getNextMonthDate } from './meeting.mapper.js';
-import { validateEmployeeAndToken, saveMeetings, getAllActiveEmployees } from './meeting.repository.js';
+import { validateEmployeeAndToken, saveMeetings, getAllActiveEmployees, getAllMeetings as getAllMeetingsFromDb } from './meeting.repository.js';
 import { saveSyncToken } from './webhook.repository.js';
 
 const oauth2Client = new google.auth.OAuth2(
@@ -197,4 +197,7 @@ export async function syncEmployeeCalendarIncremental(
   if (nextSyncToken) {
     await saveSyncToken(employee_id, nextSyncToken);
   }
+}
+export async function getAllMeetings(): Promise<Meeting[]> {
+  return await getAllMeetingsFromDb();
 }

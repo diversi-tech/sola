@@ -1,7 +1,14 @@
 import { supabase, supabaseAdmin } from '../config/supabase.js';
+import 'dotenv/config';
+
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 export const inviteEmployee = async (email: string, name: string, phoneNumber: string, permissionIds: number[]) => {
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email);
+    
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+        redirectTo: `${FRONTEND_URL}/update-password`
+    });
+    
     if (authError) {
         throw { statusCode: 400, message: `Error creating and inviting the user: ${authError.message}` };
     }
@@ -47,8 +54,11 @@ export const authenticateUser = async (email: string, password: string) => {
         .eq('auth_id', authId)
         .single();
 
-    if (empError || !employee) {
+    if (empError) {
         throw { statusCode: 404, message: "Error: User exists in the authentication system but is not registered as an employee." };
+    }
+        if ( !employee) {
+        throw { statusCode: 404, message: "Error: User is not exists" };
     }
 
     const userPermissions = (employee.employee_permissions as any[]).map(ep => ep.permissions.name);
@@ -67,7 +77,7 @@ export const authenticateUser = async (email: string, password: string) => {
 
 export const sendPasswordReset = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'http://localhost:5173/update-password',
+        redirectTo: `${FRONTEND_URL}/update-password`,
     });
 
     if (error) {
@@ -76,8 +86,13 @@ export const sendPasswordReset = async (email: string) => {
     }
 };
 
-export const updatePassword = async (newPassword: string) => {
-    const { data, error } = await supabase.auth.updateUser({ password: newPassword });
+export const updatePassword = async (accessToken: string, newPassword: string) => {
+    const { data: userData, error: userError } = await supabaseAdmin.auth.getUser(accessToken);
+    if (userError || !userData.user) {
+        throw { statusCode: 401, message: "Invalid or expired password reset link. Please request a new one." };
+    }
+
+    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(userData.user.id, { password: newPassword });
     if (error) {
         throw { statusCode: 400, message: `Error updating the password: ${error.message}` };
     }

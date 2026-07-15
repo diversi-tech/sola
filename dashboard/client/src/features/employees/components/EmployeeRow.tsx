@@ -1,10 +1,5 @@
 import React from 'react';
-
-interface Employee {
-  id: string | number;
-  name: string;
-  is_active: boolean;
-}
+import { Employee } from '../types/employee.types';
 
 interface EmployeeRowProps {
   employee: Employee;
@@ -13,6 +8,8 @@ interface EmployeeRowProps {
   latestReportDate: string;
   onClick: () => void;
   onViewMeetings: () => void;
+    onGoogleCalendarAuth : () => void;
+
 }
 
 const AVATAR_GRADIENTS = [
@@ -24,7 +21,7 @@ const AVATAR_GRADIENTS = [
 ];
 
 export const EmployeeRow: React.FC<EmployeeRowProps> = ({
-  employee, rating, reportCount, latestReportDate, onClick, onViewMeetings,
+  employee, rating, reportCount, latestReportDate, onClick, onViewMeetings,onGoogleCalendarAuth 
 }) => {
   const formattedDate = latestReportDate
     ? new Date(latestReportDate).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -61,14 +58,24 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
       </div>
 
       <div className="flex items-center gap-3 shrink-0">
+         <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onGoogleCalendarAuth ();
+          }}
+          className="px-3 py-1.5 text-xs bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 border border-blue-200 font-medium transition-colors duration-200"
+          title="אישור גישה ליומן Google"
+        >
+          שלח בקשת אישור גישה ליומן
+        </button>
+
      
 
         <div className="flex items-center gap-0.5 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 group-hover:bg-indigo-50/50 transition-colors duration-300">
           {[...Array(5)].map((_, i) => (
             <svg
               key={i}
-              className={`w-4 h-4 transition-all duration-300 ${
-                i < rating
+              className={`w-4 h-4 transition-all duration-300 ${i < rating
                   ? 'text-amber-400 fill-amber-400 drop-shadow-sm group-hover:scale-110'
                   : 'text-gray-200 fill-gray-200'
               }`}

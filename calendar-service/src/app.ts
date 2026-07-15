@@ -8,6 +8,7 @@ import calendarRoutes from './routes/calendar.route.js';
 import calendarAuthRoutes from './routes/calendarAuth.route.js';
  import webhookRoutes from './routes/webhook.route.js';
 import errorHandler from './middleware/error.middleware.js';
+import employeeRoutes from './routes/employee.route.js';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
@@ -15,13 +16,11 @@ if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
 const app = express();
 app.use(express.json());
 
-const corsOptions = {
-  origin: [ process.env.FRONTEND_URL || ''],
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
-};
-
-app.use(cors(corsOptions));
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 app.get('/', (req, res) => res.send('Server is up and running!'));
 
@@ -29,6 +28,8 @@ app.use('/api/calendar/auth', calendarAuthRoutes);
 app.use('/auth', calendarRoutes);
 app.use('/api/meetings', router);
 app.use('/webhooks', webhookRoutes);
+app.use('/api/employees', employeeRoutes);
+
 app.use(errorHandler);
 app.use((req, res) => {
     console.log(`[404] Route not found: ${req.method} ${req.originalUrl}`);

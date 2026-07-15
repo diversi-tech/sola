@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 
-export const handleGoogleCallback = (req: Request, res: Response) => {
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
-  res.redirect('http://localhost:5173/dashboard'); 
+export const handleOauthCallback = (req: Request, res: Response) => {
+  res.redirect(`${FRONTEND_URL}/EmployeePage`);
 };
 
 export const getProfile = (req: Request, res: Response) => {
-  res.json({ user: req.user });
+  res.json({ employee: req.user });
 };
 
 export const logout = (req: Request, res: Response, next: any) => {

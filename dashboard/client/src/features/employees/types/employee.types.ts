@@ -2,6 +2,7 @@ export interface Employee {
   id: number;
   name: string;
   is_active: boolean;
+  email: string;
 }
 
 export interface Meeting {

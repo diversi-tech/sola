@@ -56,3 +56,15 @@ export async function getAllActiveEmployees(): Promise<
   
   return employees ?? [];
 }
+ 
+export async function getAllMeetings(): Promise<Meeting[]> {
+  const { data, error } = await supabase
+    .from('Meeting')
+    .select('*');
+
+  if (error) {
+    throw new Error(`Failed to fetch meetings: ${error.message}`);
+  }
+
+  return data ?? [];
+}

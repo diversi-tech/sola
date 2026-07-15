@@ -4,6 +4,7 @@ import { sendToReports } from './reports.service';
 import { transcribeAudioFile } from './speech-to-text.service';
 import { ReportIncomingData } from '../types/reports.types';
 import { translateForUser } from './translator.service'; 
+import { insertIncomingMessage, updateMessageStatus } from '../repositories/whatsapp-messages.repository';
 import axios from 'axios';
 import fs from 'fs';
 
@@ -40,25 +41,62 @@ export const checkVerifyToken = (mode: string, token: string): boolean => {
 
 const handleTextMessage = async (userId: string, message: any, senderPhoneNumber: string) => {
     console.log("Message type is text.");
+    const textContent = message.text?.body || '';
+
+    await insertIncomingMessage({
+        whatsapp_message_id: message.id,
+        employee_phone_number: senderPhoneNumber,
+        incoming_message_format: 'text',
+        received_text_content: textContent,
+        handling_finish_status: 'PENDING'
+    });
+
     const reportData: ReportIncomingData = {
         manager_id: userId,
-        text: message.text?.body || '',
+        text: textContent,
         messageId: message.id,
         timestamp: String(message.timestamp)
     };
 
-  const reportsResponse: any = await sendToReports(reportData); 
-    
-    if (reportsResponse && reportsResponse.message) {
- 
-        const translatedMessage = await translateForUser(reportsResponse.message, reportsResponse.detected_language);
-        await sendWhatsAppMessage(senderPhoneNumber, translatedMessage);
-    } else if (reportsResponse) {
+    let finalResponse = "";
+    try {
+        const reportsResponse: any = await sendToReports(reportData); 
         
-        await sendWhatsAppMessage(senderPhoneNumber, "The report was received successfully! Thank you for the update");
-    } else {
+        if (reportsResponse && reportsResponse.message) {
+            finalResponse = await translateForUser(reportsResponse.message, reportsResponse.detected_language);
+            await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
+            
+            await updateMessageStatus(message.id, {
+                handling_finish_status: 'SUCCESS',
+                bot_final_response_text: finalResponse
+            });
+        } else if (reportsResponse) {
+            finalResponse = "The report was received successfully! Thank you for the update";
+            await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
+            
+            await updateMessageStatus(message.id, {
+                handling_finish_status: 'SUCCESS',
+                bot_final_response_text: finalResponse
+            });
+        } else {
+            finalResponse = "Sorry, an error occurred while processing the report. Please try again.";
+            await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
+            
+            await updateMessageStatus(message.id, {
+                handling_finish_status: 'FAILED',
+                bot_final_response_text: finalResponse,
+                internal_error_log: "Reports service returned empty or null response"
+            });
+        }
+    } catch (error: any) {
+        finalResponse = "Sorry, an error occurred while processing the report. Please try again.";
+        await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
         
-        await sendWhatsAppMessage(senderPhoneNumber, "Sorry, an error occurred while processing the report. Please try again.");
+        await updateMessageStatus(message.id, {
+            handling_finish_status: 'FAILED',
+            bot_final_response_text: finalResponse,
+            internal_error_log: error.message
+        });
     }
 };
 
@@ -66,20 +104,37 @@ const handleAudioMessage = async (userId: string, message: any, senderPhoneNumbe
     console.log("Message type is audio. Starting media download...");
     const mediaId = message.audio?.id;
 
+    await insertIncomingMessage({
+        whatsapp_message_id: message.id,
+        employee_phone_number: senderPhoneNumber,
+        incoming_message_format: 'audio',
+        handling_finish_status: 'PENDING'
+    });
+
     if (!mediaId) {
-        console.error("Audio message received but no media ID found.");
+        const errLog = "Audio message received but no media ID found.";
+        console.error(errLog);
+        await updateMessageStatus(message.id, { 
+            handling_finish_status: 'FAILED', 
+            internal_error_log: errLog 
+        });
         return;
     }
 
     const filePath = await downloadAudioFile(mediaId);
 
     if (!filePath) {
-        await sendWhatsAppMessage(senderPhoneNumber, "Sorry, we couldn't download your audio file.");
+        const finalResponse = "Sorry, we couldn't download your audio file.";
+        await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
+        await updateMessageStatus(message.id, {
+            handling_finish_status: 'FAILED',
+            bot_final_response_text: finalResponse,
+            internal_error_log: "Failed to download audio file via mediaService"
+        });
         return;
     }
 
-
-    const transcribedText = await transcribeAudioFile(filePath,userId);
+    const transcribedText = await transcribeAudioFile(filePath, userId);
 
     try {
         fs.unlinkSync(filePath);
@@ -89,29 +144,66 @@ const handleAudioMessage = async (userId: string, message: any, senderPhoneNumbe
     }
 
     if (!transcribedText) {
-        await sendWhatsAppMessage(senderPhoneNumber, "Sorry, we couldn't transcribe your audio file.");
+        const finalResponse = "Sorry, we couldn't transcribe your audio file.";
+        await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
+        await updateMessageStatus(message.id, {
+            handling_finish_status: 'FAILED',
+            bot_final_response_text: finalResponse,
+            internal_error_log: "STT Service returned empty transcription"
+        });
         return;
     }
 
+    await updateMessageStatus(message.id, {
+        received_text_content: transcribedText
+    });
+
     const reportData: ReportIncomingData = {
        manager_id: userId,
-       text: transcribedText || '',
+       text: transcribedText,
        messageId: message.id,
        timestamp: String(message.timestamp)
     };
 
-  const reportsResponse: any = await sendToReports(reportData);
-    
-    if (reportsResponse && reportsResponse.message) {
+    let finalResponse = "";
+    try {
+        const reportsResponse: any = await sendToReports(reportData);
         
-        const translatedMessage = await translateForUser(reportsResponse.message, reportsResponse.detected_language);
-        await sendWhatsAppMessage(senderPhoneNumber, translatedMessage);
-    } else if (reportsResponse) {
-   
-        await sendWhatsAppMessage(senderPhoneNumber, "The voice report was received and processed successfully!");
-    } else {
-       
-        await sendWhatsAppMessage(senderPhoneNumber, "The voice report was received, but an error occurred while saving it to the system.");
+        if (reportsResponse && reportsResponse.message) {
+            finalResponse = await translateForUser(reportsResponse.message, reportsResponse.detected_language);
+            await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
+            
+            await updateMessageStatus(message.id, {
+                handling_finish_status: 'SUCCESS',
+                bot_final_response_text: finalResponse
+            });
+        } else if (reportsResponse) {
+            finalResponse = "The voice report was received and processed successfully!";
+            await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
+            
+            await updateMessageStatus(message.id, {
+                handling_finish_status: 'SUCCESS',
+                bot_final_response_text: finalResponse
+            });
+        } else {
+            finalResponse = "The voice report was received, but an error occurred while saving it to the system.";
+            await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
+            
+            await updateMessageStatus(message.id, {
+                handling_finish_status: 'FAILED',
+                bot_final_response_text: finalResponse,
+                internal_error_log: "Reports service returned null for audio report data"
+            });
+        }
+    } catch (error: any) {
+        finalResponse = "The voice report was received, but an error occurred while saving it to the system.";
+        await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
+        
+        await updateMessageStatus(message.id, {
+            handling_finish_status: 'FAILED',
+            bot_final_response_text: finalResponse,
+            internal_error_log: error.message
+        });
     }
 };
 const isCountryCodePrefix = (phoneNumber: string): boolean => {

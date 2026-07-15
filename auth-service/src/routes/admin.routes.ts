@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import { adminController } from '../controllers/admin.controller.js';
+import { requireAuth, requirePermission } from '../middlewares/auth.middleware.js';
 
 const router = Router();
+
+router.use(requireAuth, requirePermission('MANAGE_DASHBOARD'));
 
 router.get('/permissions', adminController.getPermissions);
 
