@@ -58,7 +58,7 @@ export const LoginPage: React.FC = () => {
 
     try {
       await localAuthService.requestPasswordReset(email);
-      setSuccessMessage('Password reset link sent successfully to your email!');
+      setSuccessMessage('A password reset link has been sent. Please check your email inbox.');
     } catch (err: any) {
       setError(err.message || 'Error sending password reset email');
     }
@@ -84,6 +84,15 @@ export const LoginPage: React.FC = () => {
           <p className="text-sm text-slate-500 mb-8">Welcome back! Enter your details to continue.</p>
 
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
+          {successMessage && (
+            <div className="flex items-start gap-2 bg-green-50 border border-green-100 text-green-700 text-sm rounded-lg px-4 py-3 mb-4">
+              <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>{successMessage}</span>
+            </div>
+          )}
 
           <div className="flex flex-col gap-3 mb-6">
             <button
