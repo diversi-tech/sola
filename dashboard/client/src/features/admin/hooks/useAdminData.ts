@@ -19,7 +19,7 @@ export const useAdminData = () => {
         setEmployees(employeesData);
         setPermissions(permissionsData);
       } catch (err) {
-        setError('שגיאה בטעינת הנתונים. אנא נסה שוב.');
+        setError('Error loading data. Please try again.');
         console.error('Failed to load admin data:', err);
       } finally {
         setLoading(false);
@@ -28,6 +28,11 @@ export const useAdminData = () => {
 
     loadData();
   }, []);
+
+  const addEmployee = async (employee: { name: string; email: string; phoneNumber?: string; permissionIds: number[] }) => {
+    const created = await adminApi.createEmployee(employee);
+    setEmployees(prev => [...prev, { ...created, permissions: employee.permissionIds }]);
+  };
 
   const togglePermission = async (employeeId: number, permissionId: number) => {
     const employee = employees.find(e => e.id === employeeId);
@@ -57,6 +62,7 @@ export const useAdminData = () => {
     permissions,
     loading,
     error,
+    addEmployee,
     togglePermission,
   };
 };

@@ -15,8 +15,10 @@ export const UpdatePasswordPage: React.FC = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
     const token = params.get('access_token');
+    const type = params.get('type');
 
-    if (token && params.get('type') === 'recovery') {
+    // 'recovery' = forgot-password flow, 'invite' = new employee setting their first password.
+    if (token && (type === 'recovery' || type === 'invite')) {
       setAccessToken(token);
       setSessionReady(true);
     } else {

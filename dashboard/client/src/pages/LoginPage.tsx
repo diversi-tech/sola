@@ -8,6 +8,7 @@ export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,7 +22,6 @@ export const LoginPage: React.FC = () => {
     setError('');
     try {
       const response = await localAuthService.login(email, password);
-      alert(response.message);
       navigate('/EmployeePage'); 
     } catch (err: any) {
       setError(err.message || 'Login error');
@@ -46,6 +46,24 @@ export const LoginPage: React.FC = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMessage('');
+
+    if (!email) {
+      setError('Please enter your email address first in the email field.');
+      return;
+    }
+
+    try {
+      await localAuthService.requestPasswordReset(email);
+      setSuccessMessage('A password reset link has been sent. Please check your email inbox.');
+    } catch (err: any) {
+      setError(err.message || 'Error sending password reset email');
+    }
+  };
+
   return (
     <div className="flex min-h-screen font-sans">
       <div className="flex flex-col w-full lg:w-[46%] bg-white px-8 py-10 lg:px-14">
@@ -66,6 +84,15 @@ export const LoginPage: React.FC = () => {
           <p className="text-sm text-slate-500 mb-8">Welcome back! Enter your details to continue.</p>
 
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
+          {successMessage && (
+            <div className="flex items-start gap-2 bg-green-50 border border-green-100 text-green-700 text-sm rounded-lg px-4 py-3 mb-4">
+              <svg className="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>{successMessage}</span>
+            </div>
+          )}
 
           <div className="flex flex-col gap-3 mb-6">
             <button
@@ -112,7 +139,11 @@ export const LoginPage: React.FC = () => {
           </div>
 
           <div className="flex justify-end mb-6">
-            <a href="#" className="text-xs text-indigo-600 font-medium hover:text-indigo-700 hover:underline">
+            <a 
+              href="#" 
+              onClick={handleForgotPassword}
+              className="text-xs text-indigo-600 font-medium hover:text-indigo-700 hover:underline"
+            >
               Forgot password?
             </a>
           </div>

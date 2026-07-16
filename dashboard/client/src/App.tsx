@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { LoginPage } from './pages/LoginPage';
 import EmployeePage from './pages/EmployeesPage';
 import AdminPage from './pages/AdminPage';
+import  './index.css';
 import { UpdatePasswordPage } from './pages/UpdatePasswordPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminRoute } from './components/AdminRoute';
