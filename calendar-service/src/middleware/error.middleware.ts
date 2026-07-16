@@ -1,7 +1,6 @@
-import { AuthErrorType } from '../types/authErrors.enum.js';
+import { AuthErrorType, authErrorStatusMap, HttpStatusCode } from '../types/authErrors.enum.js';
 import { Request, Response, NextFunction } from 'express';
 
-const DEFAULT_HTTP_STATUS = 500;
 
 export class CalendarServiceError extends Error {
 	public statusCode: AuthErrorType;
@@ -30,37 +29,23 @@ interface AppError extends Error {
 	details?: any;
 }
 
-const AUTH_ERROR_HTTP_STATUS: Record<AuthErrorType, number> = {
-	[AuthErrorType.USER_DENIED]: 403,
-	[AuthErrorType.SECURITY_ERROR]: 400,
-	[AuthErrorType.GOOGLE_API_ERROR]: 502,
-	[AuthErrorType.NO_REFRESH_TOKEN]: 400,
-	[AuthErrorType.DB_SAVE_ERROR]: DEFAULT_HTTP_STATUS,
-};
-
-function resolveHttpStatus(rawStatus: unknown): number {
-	if (typeof rawStatus === 'number' && Number.isInteger(rawStatus)) {
-		return rawStatus;
-	}
-
-	if (typeof rawStatus === 'string' && rawStatus in AUTH_ERROR_HTTP_STATUS) {
-		return AUTH_ERROR_HTTP_STATUS[rawStatus as AuthErrorType];
-	}
-
-	return DEFAULT_HTTP_STATUS;
-}
-
 export default function errorHandler(
 	err: AppError | any,
 	req: Request,
 	res: Response,
 	next: NextFunction
 ) {
-	const status = typeof err?.statusCode === 'number'
-		? err.statusCode
-		: typeof err?.status === 'number'
-			? err.status
-			: DEFAULT_HTTP_STATUS;
+	let status: number;
+
+	if (err instanceof CalendarServiceError) {
+		status = authErrorStatusMap[err.statusCode] ?? HttpStatusCode.INTERNAL_SERVER_ERROR;
+	} else if (typeof err?.statusCode === 'number') {
+		status = err.statusCode;
+	} else if (typeof err?.status === 'number') {
+		status = err.status;
+	} else {
+		status = HttpStatusCode.INTERNAL_SERVER_ERROR;
+	}
 
 	const message = err?.message || 'Internal Server Error';
 

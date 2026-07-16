@@ -8,7 +8,10 @@ interface EmployeeRowProps {
   latestReportDate: string;
   onClick: () => void;
   onViewMeetings: () => void;
-    onGoogleCalendarAuth : () => void;
+  onGoogleCalendarAuth: () => void;
+  onRevokeAccess: () => void;
+  calendarAuthStatus?: 'ACTIVE' | 'INACTIVE';
+
 
 }
 
@@ -21,7 +24,7 @@ const AVATAR_GRADIENTS = [
 ];
 
 export const EmployeeRow: React.FC<EmployeeRowProps> = ({
-  employee, rating, reportCount, latestReportDate, onClick, onViewMeetings,onGoogleCalendarAuth 
+  employee, rating, reportCount, latestReportDate, onClick, onViewMeetings, onGoogleCalendarAuth, onRevokeAccess, calendarAuthStatus
 }) => {
   const formattedDate = latestReportDate
     ? new Date(latestReportDate).toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' })
@@ -46,7 +49,7 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
           <span className="font-semibold text-slate-800 text-sm group-hover:text-indigo-700 transition-colors truncate">
             {employee.name}
           </span>
-      
+
         </div>
         <div className="flex items-center gap-3 text-xs text-slate-400">
           <span>#{employee.id}</span>
@@ -58,27 +61,43 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
       </div>
 
       <div className="flex items-center gap-3 shrink-0">
-         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onGoogleCalendarAuth ();
-          }}
-          className="px-3 py-1.5 text-xs bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 border border-blue-200 font-medium transition-colors duration-200"
-          title="אישור גישה ליומן Google"
-        >
-          שלח בקשת אישור גישה ליומן
-        </button>
+        {calendarAuthStatus === 'ACTIVE' ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRevokeAccess();
+            }}
+            className="px-3 py-1.5 text-xs bg-red-50 text-red-600 rounded-lg hover:bg-red-100 border border-red-200 font-medium transition-colors duration-200"
+            title="ביטול גישה ליומן Google"
+          >
+            ביטול גישה ליומן
+          </button>
+        ) : (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onGoogleCalendarAuth();
+            }}
+            className={
+              calendarAuthStatus === 'INACTIVE'
+                ? "px-3 py-1.5 text-xs bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100 border border-orange-200 font-medium transition-colors duration-200"
+                : "px-3 py-1.5 text-xs bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 border border-blue-200 font-medium transition-colors duration-200"
+            }
+            title="אישור גישה ליומן Google"
+          >
+            {calendarAuthStatus === 'INACTIVE' ? 'שלח שוב בקשת אישור' : 'שלח בקשת אישור גישה ליומן'}
+          </button>
+        )}
 
-     
 
         <div className="flex items-center gap-0.5 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100 group-hover:bg-indigo-50/50 transition-colors duration-300">
           {[...Array(5)].map((_, i) => (
             <svg
               key={i}
               className={`w-4 h-4 transition-all duration-300 ${i < rating
-                  ? 'text-amber-400 fill-amber-400 drop-shadow-sm group-hover:scale-110'
-                  : 'text-gray-200 fill-gray-200'
-              }`}
+                ? 'text-amber-400 fill-amber-400 drop-shadow-sm group-hover:scale-110'
+                : 'text-gray-200 fill-gray-200'
+                }`}
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
             >
