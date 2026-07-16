@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, ChangeEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Meeting } from '../features/employees/types/employee.types';
 import { employeeApi } from '../features/employees/api/employeeApi';
+import { OverviewTabs } from '../components/OverviewTabs';
+import { ManageButton } from '../components/ManageButton';
 
 function formatDateTime(dateStr: string | null): string {
   if (!dateStr) return '—';
@@ -16,8 +17,6 @@ function formatDateTime(dateStr: string | null): string {
 }
 
 export default function AllMeetingsPage() {
-  const navigate = useNavigate();
-
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +33,7 @@ export default function AllMeetingsPage() {
         const data = await employeeApi.fetchAllMeetings();
         setMeetings(Array.isArray(data) ? data : []);
       } catch (err) {
-        setError((err as Error).message || 'שגיאה בטעינת הפגישות');
+        setError((err as Error).message || 'Error loading meetings');
       } finally {
         setLoading(false);
       }
@@ -155,27 +154,21 @@ export default function AllMeetingsPage() {
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <span className="font-bold text-slate-800 text-lg">כל הפגישות</span>
+            <span className="font-bold text-slate-800 text-lg">HR Dashboard</span>
           </div>
 
-          <button
-            onClick={() => navigate('/EmployeePage')}
-            className="flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
-          >
-            <svg className="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-            </svg>
-            חזרה לעובדים
-          </button>
+          <ManageButton />
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-6 py-8">
+        <OverviewTabs active="meetings" />
         <div className="mb-6">
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">כל הפגישות</h1>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">פגישות</h1>
           <p className="text-slate-500 text-sm">{filteredMeetings.length} פגישות מתוך {meetings.length}</p>
           <p className="text-indigo-600 text-sm font-semibold mt-1">
             ⏱️ סך הכל זמן שהושקע בפגישות{summaryParts}: {formattedTotalTime}
