@@ -178,7 +178,7 @@ export default function AllMeetingsPage() {
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">כל הפגישות</h1>
           <p className="text-slate-500 text-sm">{filteredMeetings.length} פגישות מתוך {meetings.length}</p>
           <p className="text-indigo-600 text-sm font-semibold mt-1">
-            ⏱️ סך הכל זמן שהושקע בפגישות{summaryParts}: {formattedTotalTime}
+             סך הכל זמן שהושקע בפגישות{summaryParts}: {formattedTotalTime}
           </p>
       </div>
 

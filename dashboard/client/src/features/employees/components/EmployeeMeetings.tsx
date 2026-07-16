@@ -145,7 +145,7 @@ export const EmployeeMeetings: React.FC<EmployeeMeetingsProps> = ({ meetings, lo
       </div>
 
       <p className="text-indigo-600 text-sm font-semibold mt-3 mb-2">
-        ⏱️ סך הכל זמן שהושקע בפגישות{summaryParts}: {formattedTotalTime}
+         סך הכל זמן שהושקע בפגישות{summaryParts}: {formattedTotalTime}
       </p>
 
       {filteredMeetings.length > 0 ? (
