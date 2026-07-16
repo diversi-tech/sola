@@ -4,9 +4,9 @@ import { requireAuth } from '../middlewares/auth.middleware.js';
 
 const router = express.Router();
 
-router.post('/', createNewCategory);
+router.post('/', requireAuth, createNewCategory);
 
-router.put('/:id', editExistingCategory);
+router.put('/:id', requireAuth, editExistingCategory);
 
 router.get('/', requireAuth, fetchAllCategories);
 

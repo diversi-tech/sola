@@ -34,7 +34,7 @@ export default function useEmployeeData(): UseEmployeeDataReturn {
         const data = await employeeApi.fetchEmployeesWithReports();
         setEmployeesWithReports(Array.isArray(data) ? data : []);
       } catch (err) {
-        setError((err as Error).message || 'שגיאה בטעינת הנתונים');
+        setError((err as Error).message || 'Error loading data');
       } finally {
         setLoading(false);
       }

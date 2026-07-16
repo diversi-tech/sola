@@ -3,14 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { useAdminData } from '../features/admin/hooks/useAdminData';
 import { PermissionsTable } from '../features/admin/components/PermissionsTable';
 import { AddEmployeeModal } from '../features/admin/components/AddEmployeeModal';
+import { CategoryManager } from '../features/categories/components/CategoryManager';
 import logo from '../assets/sola-logo.png';
+
+type AdminTab = 'employees' | 'permissions' | 'categories';
+
+const TABS: { key: AdminTab; label: string }[] = [
+  { key: 'employees', label: 'עובדים' },
+  { key: 'permissions', label: 'הרשאות' },
+  { key: 'categories', label: 'מדדים' },
+];
 
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
   const { employees, permissions, loading, error, addEmployee, togglePermission } = useAdminData();
 
+  const [activeTab, setActiveTab] = useState<AdminTab>('employees');
   const [searchQuery, setSearchQuery] = useState('');
-
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const filteredEmployees = useMemo(() => {
@@ -90,60 +99,108 @@ const AdminPage: React.FC = () => {
 
       <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">ניהול הרשאות מערכת</h1>
-          <p className="text-slate-500 text-sm">ניהול הרשאות וגישה לעובדים במערכת Sola</p>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-1">ניהול</h1>
+          <p className="text-slate-500 text-sm">ניהול עובדים, הרשאות ומדדים למעקב במערכת Sola</p>
         </div>
 
-        <div className="mb-8">
-          <div className="relative max-w-md">
-            <input
-              type="text"
-              placeholder="חיפוש עובד לפי שם..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-slate-200 text-sm rounded-xl pl-4 pr-11 py-3 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-sm transition-all"
-            />
-            <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none">
-              <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+        <div className="flex gap-1 mb-8 bg-white border border-slate-100 rounded-xl p-1 w-fit shadow-sm">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`px-5 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                activeTab === tab.key
+                  ? 'bg-indigo-600 text-white'
+                  : 'text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'employees' && (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h2 className="font-bold text-slate-800">רשימת עובדים</h2>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full font-medium">
+                  {employees.length} עובדים
+                </span>
+                <button
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  הוספת עובד
+                </button>
+              </div>
             </div>
+
+            {employees.length > 0 ? (
+              <div className="divide-y divide-slate-100">
+                {employees.map((employee) => (
+                  <div key={employee.id} className="px-6 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm font-bold">
+                        {employee.name.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-sm font-medium text-slate-800">{employee.name}</span>
+                    </div>
+                    <span className="text-xs text-slate-400">{employee.permissions.length} הרשאות</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-20 text-center text-slate-400 font-medium">אין עדיין עובדים במערכת.</div>
+            )}
           </div>
-        </div>
+        )}
 
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="font-bold text-slate-800">רשימת הרשאות</h2>
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full font-medium">
-                {filteredEmployees.length} עובדים
-              </span>
-              <button
-                onClick={() => setIsAddModalOpen(true)}
-                className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                </svg>
-                הוספת עובד
-              </button>
+        {activeTab === 'permissions' && (
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <h2 className="font-bold text-slate-800">ניהול הרשאות</h2>
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="חיפוש עובד לפי שם..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-56 bg-white border border-slate-200 text-sm rounded-lg pl-4 pr-10 py-2 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </div>
+                </div>
+                <span className="text-xs text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full font-medium whitespace-nowrap">
+                  {filteredEmployees.length} עובדים
+                </span>
+              </div>
             </div>
+
+            {filteredEmployees.length > 0 ? (
+              <div className="p-6">
+                <PermissionsTable
+                  employees={filteredEmployees}
+                  permissions={permissions}
+                  onTogglePermission={togglePermission}
+                />
+              </div>
+            ) : (
+              <div className="py-20 text-center text-slate-400 font-medium">
+                לא נמצאו עובדים התואמים לחיפוש שלך.
+              </div>
+            )}
           </div>
+        )}
 
-          {filteredEmployees.length > 0 ? (
-            <div className="p-6">
-              <PermissionsTable
-                employees={filteredEmployees}
-                permissions={permissions}
-                onTogglePermission={togglePermission}
-              />
-            </div>
-          ) : (
-            <div className="py-20 text-center text-slate-400 font-medium">
-              לא נמצאו עובדים התואמים לחיפוש שלך.
-            </div>
-          )}
-        </div>
+        {activeTab === 'categories' && <CategoryManager />}
       </div>
 
       {isAddModalOpen && (

@@ -19,7 +19,7 @@ export const useAdminData = () => {
         setEmployees(employeesData);
         setPermissions(permissionsData);
       } catch (err) {
-        setError('שגיאה בטעינת הנתונים. אנא נסה שוב.');
+        setError('Error loading data. Please try again.');
         console.error('Failed to load admin data:', err);
       } finally {
         setLoading(false);
