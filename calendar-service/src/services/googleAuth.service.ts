@@ -95,7 +95,7 @@ export const getAuthStatuses = async (
 
 export const revokeCalendarAccess = async (employeeEmail: string): Promise<void> => {
   const { data: existing, error: fetchError } = await supabase
-    .from('Users')
+    .from('Employee_token')
     .select('status')
     .eq('employee_email', employeeEmail)
     .maybeSingle();

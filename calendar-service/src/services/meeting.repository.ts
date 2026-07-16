@@ -77,7 +77,7 @@ export async function getAuthStatusesByEmails(
   }
 
   const { data, error } = await supabase
-    .from('Users')
+    .from('Employee_token')
     .select('employee_email, status')
     .in('employee_email', emails);
 
@@ -95,7 +95,7 @@ export async function getAuthStatusesByEmails(
 
 export async function revokeAuthByEmail(employeeEmail: string): Promise<void> {
   const { error } = await supabase
-    .from('Users')
+    .from('Employee_token')
     .update({ status: 'INACTIVE', refresh_token: null })
     .eq('employee_email', employeeEmail)
     .eq('status', 'ACTIVE');
