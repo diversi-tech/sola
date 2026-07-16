@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useCategories } from '../hooks/useCategories';
+import { ConfirmDialog } from '../../../components/ConfirmDialog';
 
 export const CategoryManager: React.FC = () => {
-  const { categories, loading, error, addCategory } = useCategories();
+  const { categories, loading, error, addCategory, removeCategory } = useCategories();
 
   const [newName, setNewName] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ id: number; name: string } | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +34,22 @@ export const CategoryManager: React.FC = () => {
       console.error('Failed to create category:', err);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+
+    setDeleting(true);
+    setFormError(null);
+    try {
+      await removeCategory(pendingDelete.id);
+      setPendingDelete(null);
+    } catch (err) {
+      setFormError('שגיאה במחיקת המדד. אנא נסה שוב.');
+      console.error('Failed to delete category:', err);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -85,15 +104,38 @@ export const CategoryManager: React.FC = () => {
               {categories.map((category) => (
                 <span
                   key={category.id}
-                  className="inline-flex items-center bg-indigo-50 text-indigo-700 border border-indigo-100 text-sm font-medium px-3.5 py-1.5 rounded-full"
+                  className="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 border border-indigo-100 text-sm font-medium pr-3.5 pl-1.5 py-1.5 rounded-full"
                 >
                   {category.name}
+                  <button
+                    type="button"
+                    onClick={() => setPendingDelete({ id: category.id, name: category.name })}
+                    title="מחיקת מדד"
+                    aria-label={`מחיקת המדד ${category.name}`}
+                    className="text-indigo-400 hover:text-red-500 hover:bg-red-50 rounded-full p-0.5 transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </span>
               ))}
             </div>
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="מחיקת מדד"
+        message={`האם למחוק את המדד "${pendingDelete?.name ?? ''}"? פעולה זו אינה ניתנת לשחזור.`}
+        confirmLabel="מחיקה"
+        cancelLabel="ביטול"
+        destructive
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 };

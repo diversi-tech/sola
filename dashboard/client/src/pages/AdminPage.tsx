@@ -122,7 +122,7 @@ const AdminPage: React.FC = () => {
         {activeTab === 'employees' && (
           <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-              <h2 className="font-bold text-slate-800">רשימת עובדים</h2>
+              <h2 className="font-bold text-slate-800">רשימת דיווחים</h2>
               <div className="flex items-center gap-3">
                 <span className="text-xs text-slate-400 bg-slate-50 border border-slate-100 px-3 py-1 rounded-full font-medium">
                   {employees.length} עובדים

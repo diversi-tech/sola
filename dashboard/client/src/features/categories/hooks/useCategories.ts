@@ -34,5 +34,10 @@ export const useCategories = () => {
     return created;
   }, []);
 
-  return { categories, loading, error, addCategory };
+  const removeCategory = useCallback(async (id: number) => {
+    await categoryApi.deleteCategory(id);
+    setCategories((prev) => prev.filter((c) => c.id !== id));
+  }, []);
+
+  return { categories, loading, error, addCategory, removeCategory };
 };

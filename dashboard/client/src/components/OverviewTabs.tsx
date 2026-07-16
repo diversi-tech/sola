@@ -6,7 +6,7 @@ interface OverviewTabsProps {
 }
 
 const TABS = [
-  { key: 'employees' as const, label: 'עובדים', path: '/EmployeePage' },
+  { key: 'employees' as const, label: 'דיווחים', path: '/EmployeePage' },
   { key: 'meetings' as const, label: 'פגישות', path: '/meetings' },
 ];
 

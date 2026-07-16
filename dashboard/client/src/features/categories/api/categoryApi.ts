@@ -42,4 +42,12 @@ export const categoryApi = {
     const result = await response.json();
     return result.data ?? result;
   },
+
+  deleteCategory: async (id: number): Promise<void> => {
+    const response = await fetch(`${BASE_URL}/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error('Failed to delete category');
+  },
 };
