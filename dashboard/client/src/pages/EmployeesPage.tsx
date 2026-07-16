@@ -6,6 +6,7 @@ import logo from '../assets/sola-logo.png';
 import { calculateEmployeeRating } from '../features/employees/utils/rating';
 import { OverviewTabs } from '../components/OverviewTabs';
 import { ManageButton } from '../components/ManageButton';
+import { UserMenu } from '../features/login/components/Usermenu';
 
 export default function EmployeePage() {
 
@@ -101,7 +102,11 @@ export default function EmployeePage() {
 
   return (
     <div className="min-h-screen bg-slate-50" style={{ direction: 'rtl' }}>
-      <div className="bg-white border-b border-slate-100 sticky top-0 z-20 shadow-sm">
+      <div className="bg-white border-b border-slate-100 sticky top-0 z-20 shadow-sm relative">
+        <div className="absolute top-1/2 -translate-y-1/2 right-4 z-30">
+          <UserMenu />
+        </div>
+
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
