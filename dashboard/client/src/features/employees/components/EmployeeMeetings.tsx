@@ -67,7 +67,7 @@ export const EmployeeMeetings: React.FC<EmployeeMeetingsProps> = ({ meetings, lo
   const summaryParts = useMemo(() => {
     const parts: JSX.Element[] = [];
     if (filterType !== 'all') {
-      parts.push(
+      parts.push( 
         <span key="type"> מסוג "<span dir="ltr" className="inline-block">{filterType}</span>"</span>
       );
     }
