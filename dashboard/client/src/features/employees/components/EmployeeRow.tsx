@@ -51,7 +51,7 @@ export const EmployeeRow: React.FC<EmployeeRowProps> = ({
         <div className="flex items-center gap-3 text-xs text-slate-400">
           <span>#{employee.id}</span>
           <span className="w-1 h-1 rounded-full bg-slate-200" />
-          <span>{reportCount} דוחות</span>
+          <span>{reportCount} דייוחים</span>
           <span className="w-1 h-1 rounded-full bg-slate-200" />
           <span>עודכן {formattedDate}</span>
         </div>
