@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabase.js';
+import { supabaseAdmin } from '../config/supabase.js';
 
 let whatsappPermissionId: number | null = null;
 
@@ -6,41 +6,49 @@ const getWhatsappPermissionId = async (): Promise<number | null> => {
   if (whatsappPermissionId !== null) {
     return whatsappPermissionId; 
   }
-
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('permissions')
     .select('id')
     .eq('name', 'SEND_WHATSAPP_MESSAGES')
-    .single();
-
+    .maybeSingle();
   if (error) throw new Error(`Failed to fetch permission ID: ${error.message}`);
-  
-  whatsappPermissionId = data.id; 
+
+  whatsappPermissionId = data?.id ?? null;
   return whatsappPermissionId;
 };
 
 export const getEmployeeByPhoneNumber = async (phone_number: string) => {
-  const { data: employee, error: empError } = await supabase
+  const { data: employees, error: empError } = await supabaseAdmin
     .from('Employees')
     .select('id, name')
-    .eq('Phone number', phone_number)
-    .maybeSingle();
+    .eq('phone_number', phone_number);
 
   if (empError) throw new Error(`Employee query error: ${empError.message}`);
-  if (!employee) return null;
+  if (!employees || employees.length === 0) return null;
+
+  // A phone number must map to exactly one employee. If it maps to several we
+  // can't tell who is authenticating, so we refuse and flag it for cleanup
+  // rather than authorizing an arbitrary match.
+  if (employees.length > 1) {
+    console.error(
+      `Multiple employees share phone number ${phone_number} (ids: ${employees.map((e) => e.id).join(', ')}). Denying authorization until the duplicate is resolved.`
+    );
+    return null;
+  }
+
+  const employee = employees[0];
 
   const permissionId = await getWhatsappPermissionId();
+  if (permissionId === null) return null;
 
-  const { data: hasPermission, error: permError } = await supabase
+  const { data: hasPermission, error: permError } = await supabaseAdmin
     .from('employee_permissions')
-    .select('id')
+    .select('employee_id')
     .eq('employee_id', employee.id)
-    .eq('permission_id', permissionId)
-    .maybeSingle();
-
+    .eq('permission_id', permissionId);
   if (permError) throw new Error(`Permission query error: ${permError.message}`);
 
-  return hasPermission ? employee : null;
+  return hasPermission && hasPermission.length > 0 ? employee : null;
 };
 
 export const authenticateUser = async (phone_number: string) => {
