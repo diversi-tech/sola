@@ -6,7 +6,7 @@ import { LLMFactory } from '../ai/llm.factory.js';
 export const getEmployeesWithReports = async () => {
   const { data, error } = await supabase
     .from('Reports')
-    .select('*, Employees(*)')
+    .select('*, employee:Employees!employee_id(*)')
     .order('created_at', { ascending: false });
 
   if (error) throw new Error(`Failed to fetch reports with employees: ${error.message}`);
@@ -14,7 +14,7 @@ export const getEmployeesWithReports = async () => {
   const employeeMap = new Map<number, { employee: any; reports: any[]; latest_report_date: string }>();
 
   for (const row of data ?? []) {
-    const { Employees: employee, ...report } = row;
+    const { employee, ...report } = row;
     if (!employee) continue;
 
     if (!employeeMap.has(employee.id)) {
