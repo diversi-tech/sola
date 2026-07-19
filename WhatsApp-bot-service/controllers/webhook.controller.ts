@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
 import { checkVerifyToken, processWebhookEvent, sendWhatsAppMessage } from '../services/webhook.services';
 
-const handleUnauthorizedAccess = async (res: Response, phoneNumber: string) => {
+const handleUnauthorizedAccess = async (phoneNumber: string) => {
     await sendWhatsAppMessage(phoneNumber, "Sorry, you are not authorized to use this bot.");
-    return res.status(200).send('EVENT_RECEIVED');
 };
 
 export const verifyMetaWebhook = (req: Request, res: Response) => {
@@ -27,18 +26,16 @@ export const verifyMetaWebhook = (req: Request, res: Response) => {
 
 
 export const receiveWebhookEvent = async (req: Request, res: Response) => {
+   res.status(200).send('EVENT_RECEIVED');
     try {
         const body = req.body;
 
         const authResult = await processWebhookEvent(body);
 
         if (authResult && authResult.isAuthorized === false && authResult.phoneNumber) {
-            return await handleUnauthorizedAccess(res, authResult.phoneNumber);
-        }
+             await handleUnauthorizedAccess(authResult.phoneNumber);        }
 
-        return res.status(200).send('EVENT_RECEIVED');
     } catch (error) {
         console.error("Error processing webhook event:", error);
-        return res.status(200).send('EVENT_RECEIVED'); 
     }
 };

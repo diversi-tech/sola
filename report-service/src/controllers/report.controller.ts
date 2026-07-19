@@ -29,7 +29,7 @@ export const handleIncomingFeedback = async (req: Request, res: Response) => {
         const { savedReport, detected_language } = await processAndSaveFeedback(manager_id, text);
 
         return sendCreatedResult(res, {
-            message: "Report successfully processed and saved!",
+            message: "Report received and saved successfully",
             manager_id: manager_id,
             savedReport: savedReport,
             detected_language: detected_language
@@ -37,7 +37,7 @@ export const handleIncomingFeedback = async (req: Request, res: Response) => {
     } catch (error: any) {
         console.error("Full Error Details:", error);
         const manager_id = req.body?.manager_id;
-        const detected_language = error.detected_language; // <-- שליפה חד-פעמית
+        const detected_language = error.detected_language; 
 
         if (error.message?.includes("was not found") || error.message?.includes("could not identify")) {
             return sendNotFoundResult(res, "Employee not found in the system", { manager_id, detected_language });

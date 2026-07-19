@@ -59,37 +59,53 @@ const handleTextMessage = async (userId: string, message: any, senderPhoneNumber
     };
 
     let finalResponse = "";
-    try {
+  try {
         const reportsResponse: any = await sendToReports(reportData); 
         
-        if (reportsResponse && reportsResponse.message) {
-            finalResponse = await translateForUser(reportsResponse.message, reportsResponse.detected_language);
+        console.log("=== Debug: Response from Reports Service ===");
+        console.log("Original text sent:", textContent);
+        console.log("Full reports response:", JSON.stringify(reportsResponse, null, 2));
+        console.log("Detected language:", reportsResponse?.data?.detected_language);
+        console.log("============================================");
+        
+        if (reportsResponse && reportsResponse.success === true && reportsResponse.data && reportsResponse.data.message) {
+            finalResponse = await translateForUser(reportsResponse.data.message, reportsResponse.data.detected_language);
             await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
             
             await updateMessageStatus(message.id, {
                 handling_finish_status: 'SUCCESS',
                 bot_final_response_text: finalResponse
             });
-        } else if (reportsResponse) {
-            finalResponse = "The report was received successfully! Thank you for the update";
-            await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
+        } 
+        else if (reportsResponse && reportsResponse.success === false) {
+            const userLang = reportsResponse.data?.detected_language || 'en';
+            let errorMsg = "A system error occurred, please try again later.";
             
-            await updateMessageStatus(message.id, {
-                handling_finish_status: 'SUCCESS',
-                bot_final_response_text: finalResponse
-            });
-        } else {
-            finalResponse = "Sorry, an error occurred while processing the report. Please try again.";
+            if (reportsResponse.error && (reportsResponse.error.includes("not found") || reportsResponse.error.includes("Failed to save")||reportsResponse.error.includes("Invalid manager ID"))) {
+                errorMsg = "The employee you specified was not found in the system. Please ensure the name is spelled correctly and try again.";
+            }
+            
+            finalResponse = await translateForUser(errorMsg, userLang);
             await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
             
             await updateMessageStatus(message.id, {
                 handling_finish_status: 'FAILED',
                 bot_final_response_text: finalResponse,
-                internal_error_log: "Reports service returned empty or null response"
+                internal_error_log: reportsResponse.error
+            });
+        } 
+        else {
+            finalResponse = "An unexpected error occurred while processing the report. Please try again.";
+            await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
+            
+            await updateMessageStatus(message.id, {
+                handling_finish_status: 'FAILED',
+                bot_final_response_text: finalResponse,
+                internal_error_log: "Reports service returned invalid format or null"
             });
         }
     } catch (error: any) {
-        finalResponse = "Sorry, an error occurred while processing the report. Please try again.";
+        finalResponse = "Sorry, an unexpected error occurred. Please try again later.";
         await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
         
         await updateMessageStatus(message.id, {
@@ -169,34 +185,44 @@ const handleAudioMessage = async (userId: string, message: any, senderPhoneNumbe
     try {
         const reportsResponse: any = await sendToReports(reportData);
         
-        if (reportsResponse && reportsResponse.message) {
-            finalResponse = await translateForUser(reportsResponse.message, reportsResponse.detected_language);
+        if (reportsResponse && reportsResponse.success === true && reportsResponse.data && reportsResponse.data.message) {
+            finalResponse = await translateForUser(reportsResponse.data.message, reportsResponse.data.detected_language);
             await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
             
             await updateMessageStatus(message.id, {
                 handling_finish_status: 'SUCCESS',
                 bot_final_response_text: finalResponse
             });
-        } else if (reportsResponse) {
-            finalResponse = "The voice report was received and processed successfully!";
-            await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
+        } 
+        else if (reportsResponse && reportsResponse.success === false) {
+            const userLang = reportsResponse.data?.detected_language || 'en';
+            let errorMsg = "A system error occurred, please try again later.";
             
-            await updateMessageStatus(message.id, {
-                handling_finish_status: 'SUCCESS',
-                bot_final_response_text: finalResponse
-            });
-        } else {
-            finalResponse = "The voice report was received, but an error occurred while saving it to the system.";
+            if (reportsResponse.error && (reportsResponse.error.includes("not found") || reportsResponse.error.includes("Failed to save")||reportsResponse.error.includes("Invalid manager ID"))) {
+                errorMsg = "The employee you specified was not found in the system. Please ensure the name is spelled correctly and try again.";
+            }
+            
+            finalResponse = await translateForUser(errorMsg, userLang);
             await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
             
             await updateMessageStatus(message.id, {
                 handling_finish_status: 'FAILED',
                 bot_final_response_text: finalResponse,
-                internal_error_log: "Reports service returned null for audio report data"
+                internal_error_log: reportsResponse.error
+            });
+        } 
+        else {
+            finalResponse = "An unexpected error occurred while processing the voice report. Please try again.";
+            await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
+            
+            await updateMessageStatus(message.id, {
+                handling_finish_status: 'FAILED',
+                bot_final_response_text: finalResponse,
+                internal_error_log: "Reports service returned invalid format or null"
             });
         }
     } catch (error: any) {
-        finalResponse = "The voice report was received, but an error occurred while saving it to the system.";
+        finalResponse = "Sorry, an unexpected error occurred while processing the voice report. Please try again later.";
         await sendWhatsAppMessage(senderPhoneNumber, finalResponse);
         
         await updateMessageStatus(message.id, {
@@ -229,7 +255,7 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
 
                 const authPayload = { "phone_number": formattedPhone };
                 if (process.env.USE_MOCK_AUTH === 'true') {
-                   const mockUserId = process.env.MOCK_USER_ID || "123e4567-e89b-12d3-a456-426614174000";
+                   const mockUserId = process.env.MOCK_USER_ID || "6";
                    authResult = { isAuthorized: true, userId: mockUserId, message: "Dev bypass" };
                 } else {
                     authResult = await verifyUserAuth(authPayload);
@@ -249,7 +275,10 @@ export const processWebhookEvent = async (body: any): Promise<{ isAuthorized: bo
                     await handleAudioMessage(userId, message, senderPhoneNumber);
                 } else {
                     console.log(`Unknown message type received: ${messageType}`);
+                    const unsupportedMsg = "Sorry, I currently only support text and voice messages.";
+                    await sendWhatsAppMessage(senderPhoneNumber, unsupportedMsg);
                 }
+                
 
                 return { isAuthorized: true, phoneNumber: senderPhoneNumber };
             }
