@@ -7,7 +7,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
   family: 4,
-});
+} as nodemailer.TransportOptions);
 
 export const sendCalendarAuthEmail = async (
   employeeEmail: string,
