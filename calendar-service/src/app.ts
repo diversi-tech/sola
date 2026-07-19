@@ -12,12 +12,17 @@ import employeeRoutes from './routes/employee.route.js';
 import { assertEmailConfig } from './services/email.service.js';
 
 assertEmailConfig();
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, '../public')));
 
 app.use(cors({
   origin: process.env.FRONTEND_URL,

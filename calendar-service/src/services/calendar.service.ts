@@ -26,17 +26,30 @@ export const processGoogleCallback = async (code: string, state: string, error?:
         );
     }
 
-    const { data: authRecord, error: dbError } = await supabase
+     const { data: authRecord, error: dbError } = await supabase
         .from('Employee_token')
         .select('*')
         .eq('state', state)
-        .eq('status', 'INACTIVE')
-        .single();
+        .maybeSingle();
 
-    if (dbError || !authRecord) {
+    if (dbError) {
+        throw new CalendarServiceError(
+            'Database error while validating the request.',
+            AuthErrorType.DB_SAVE_ERROR
+        );
+    }
+
+    if (!authRecord) {
         throw new CalendarServiceError(
             'Security error: The request is invalid or has expired.',
             AuthErrorType.SECURITY_ERROR
+        );
+    }
+
+    if (authRecord.status === 'ACTIVE') {
+        throw new CalendarServiceError(
+            'This calendar access has already been approved.',
+            AuthErrorType.USER_ALREADY_ACTIVE
         );
     }
 
@@ -66,7 +79,6 @@ export const processGoogleCallback = async (code: string, state: string, error?:
         .update({
             refresh_token: encryptedToken,
             status: 'ACTIVE',
-            state: null,
             updated_at: new Date().toISOString(),
         })
         .eq('id', authRecord.id);
