@@ -1,8 +1,8 @@
-import { supabase } from '../config/supabase.js';
+import { supabaseAdmin } from '../config/supabase.js';
 
 export const adminService = {
   getAllPermissions: async () => {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('permissions')
       .select('id, name, description');
       
@@ -11,7 +11,7 @@ export const adminService = {
   },
 
   getEmployeesWithPermissions: async () => {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('Employees')
       .select(`
         id,
@@ -28,12 +28,11 @@ export const adminService = {
       name: emp.name,
       permissions: emp.employee_permissions.map((ep: any) => ep.permission_id)
     }));
-
     return formattedData;
   },
 
   updateEmployeePermissions: async (employeeId: number, permissionIds: number[]) => {
-    const { error: deleteError } = await supabase
+    const { error: deleteError } = await supabaseAdmin
       .from('employee_permissions')
       .delete()
       .eq('employee_id', employeeId);
@@ -46,7 +45,7 @@ export const adminService = {
         permission_id: permissionId
       }));
 
-      const { error: insertError } = await supabase
+      const { error: insertError } = await supabaseAdmin
         .from('employee_permissions')
         .insert(insertData);
 

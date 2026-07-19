@@ -44,3 +44,12 @@ export const getAllCategories = async () => {
     if (error) throw error;
     return data;
 };
+
+export const deleteCategory = async (id: number | string) => {
+    const { error } = await supabase
+        .from('ReportCategory')
+        .delete()
+        .eq('id', id);
+
+    if (error) throw error;
+};

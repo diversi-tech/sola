@@ -1,0 +1,48 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background: #f8fafc;
+}
+
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    max-width: 400px;
+}
+
+.icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    font-size: 32px;
+    line-height: 64px;
+    margin: 0 auto 16px;
+}
+
+.icon.success {
+    background: #16a34a1a;
+    color: #16a34a;
+}
+
+.icon.error {
+    background: #dc26261a;
+    color: #dc2626;
+}
+
+h1 {
+    color: #1e293b;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+p {
+    color: #64748b;
+    font-size: 14px;
+}
