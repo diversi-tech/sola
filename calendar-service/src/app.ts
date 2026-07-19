@@ -10,10 +10,10 @@ import calendarAuthRoutes from './routes/calendarAuth.route.js';
 import errorHandler from './middleware/error.middleware.js';
 import employeeRoutes from './routes/employee.route.js';
 import { assertEmailConfig } from './services/email.service.js';
-
-assertEmailConfig();
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+assertEmailConfig();
 
 if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
 const __filename = fileURLToPath(import.meta.url);

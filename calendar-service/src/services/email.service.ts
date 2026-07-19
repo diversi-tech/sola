@@ -26,7 +26,6 @@ const getGmailClient = () => {
   return google.gmail({ version: 'v1', auth: oauth2Client });
 };
 
-// RFC 2047 encoded-word so non-ASCII (Hebrew) subjects are transmitted correctly.
 const encodeSubject = (subject: string): string =>
   `=?UTF-8?B?${Buffer.from(subject, 'utf-8').toString('base64')}?=`;
 
@@ -41,6 +40,7 @@ const buildRawMessage = (to: string, subject: string, html: string): string => {
     '',
     Buffer.from(html, 'utf-8').toString('base64').replace(/(.{76})/g, '$1\r\n'),
   ].join('\r\n');
+
 
   return Buffer.from(message, 'utf-8')
     .toString('base64')
