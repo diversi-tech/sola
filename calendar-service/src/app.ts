@@ -9,6 +9,9 @@ import calendarAuthRoutes from './routes/calendarAuth.route.js';
  import webhookRoutes from './routes/webhook.route.js';
 import errorHandler from './middleware/error.middleware.js';
 import employeeRoutes from './routes/employee.route.js';
+import { assertEmailConfig } from './services/email.service.js';
+
+assertEmailConfig();
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 if (dns?.setDefaultResultOrder) dns.setDefaultResultOrder('ipv4first');
