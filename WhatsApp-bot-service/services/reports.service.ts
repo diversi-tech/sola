@@ -20,6 +20,7 @@ export const sendToReports = async (data: ReportIncomingData): Promise<any> => {
       } catch (error: any) {
         if (error.response) {
             console.error("Error from Reports Service:", error.response.data);
+            return error.response.data;
         } else {
             console.error("Failed to send data to Reports Service:", error.message);
         }        return null;
