@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+export const htmlTemplate = `<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8" />
@@ -12,4 +12,4 @@
         <p>{{MESSAGE}}</p>
     </div>
 </body>
-</html>
+</html>`;

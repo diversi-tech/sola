@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { htmlTemplate } from '../views/calendarAuthStatus.template.js';
+
 import { processGoogleCallback } from '../services/calendar.service.js';
 import { CalendarServiceError } from '../middleware/error.middleware.js'; 
 import { AuthErrorType } from '../types/authErrors.enum.js'; 
@@ -16,11 +15,6 @@ import {
   CalendarAuthGenericErrorPage,
 } from '../views/calendarAuthTemplates.js'; 
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const templatePath = path.join(__dirname, '../views/calendarAuthStatus.html');
-const htmlTemplate = fs.readFileSync(templatePath, 'utf-8');
 
 function renderStatusPage(res: Response, data: StatusPageData) {
   const html = htmlTemplate
