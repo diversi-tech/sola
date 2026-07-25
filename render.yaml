@@ -10,8 +10,8 @@ services:
     repo: https://github.com/diversi-tech/sola
     branch: main
     rootDir: ./auth-service
-    buildCommand: npm install && npm run build
-    startCommand: npm start
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: npm run start:prod
     autoDeploy: true
     envVars:
       - key: NODE_ENV
@@ -27,8 +27,8 @@ services:
     plan: free
     repo: https://github.com/diversi-tech/sola
     branch: main
-    rootDir: ./speach-to-text-service          
-    buildCommand: npm install && npm run build       
+    rootDir: ./speach-to-text-service
+    buildCommand: npm install --include=dev && npm run build
     startCommand:  NODE_ENV=production npm start
     autoDeploy: true                                  
     envVars: 
@@ -43,15 +43,13 @@ services:
     plan: free
     repo: https://github.com/diversi-tech/sola
     branch: main
-    rootDir: ./report-service          
-    buildCommand: npm install && npm run build       
+    rootDir: ./report-service
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     autoDeploy: true                                  
     envVars:
       - key: NODE_ENV
         value: production
-      - key: AUTH_SERVICE_URL
-        sync: false
       - fromGroup: sola-project         
 
 # ==========================================
@@ -63,8 +61,8 @@ services:
     plan: free
     repo: https://github.com/diversi-tech/sola
     branch: main
-    rootDir: ./calendar-service          
-    buildCommand: npm install && npm run build       
+    rootDir: ./calendar-service
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     autoDeploy: true                                  
     envVars:

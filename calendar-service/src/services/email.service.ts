@@ -1,14 +1,14 @@
 import { google } from 'googleapis';
-const clientId = process.env.GOOGLE_CLIENT_ID;
-const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-const sender = process.env.GMAIL_SENDER || process.env.EMAIL_USER;
+const clientId = process.env.CALENDAR_GOOGLE_CLIENT_ID;
+const clientSecret = process.env.CALENDAR_GOOGLE_CLIENT_SECRET;
+const sender = process.env.GMAIL_SENDER;
 const refreshToken = process.env.GMAIL_REFRESH_TOKEN;
 
 export const assertEmailConfig = (): void => {
   const missing = [
-    ['GOOGLE_CLIENT_ID', clientId],
-    ['GOOGLE_CLIENT_SECRET', clientSecret],
-    ['GMAIL_SENDER (or EMAIL_USER)', sender],
+    ['CALNEDAR_GOOGLE_CLIENT_ID', clientId],
+    ['CALNEDAR_GOOGLE_CLIENT_SECRET', clientSecret],
+    ['GMAIL_SENDER', sender],
     ['GMAIL_REFRESH_TOKEN', refreshToken],
   ]
     .filter(([, value]) => !value)
