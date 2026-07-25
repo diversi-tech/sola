@@ -5,9 +5,9 @@ import { AuthErrorType } from '../types/authErrors.enum.js';
 import { getAuthStatusesByEmails, revokeAuthByEmail } from './meeting.repository.js';
 
 
-const clientId = process.env.GOOGLE_CLIENT_ID;
-const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-const redirectUri = process.env.GOOGLE_REDIRECT_URI;
+const clientId = process.env.CALENDAR_GOOGLE_CLIENT_ID;
+const clientSecret = process.env.CALENDAR_GOOGLE_CLIENT_SECRET;
+const redirectUri = process.env.CALENDAR_GOOGLE_REDIRECT_URI;
 
 const getOAuth2Client = () => {
   if (!clientId || !clientSecret || !redirectUri) {

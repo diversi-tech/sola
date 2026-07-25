@@ -4,9 +4,9 @@ import { decryptToken } from '../utils/crypto.util.js';
 import { saveWebhookChannel, getExpiringChannels } from './webhook.repository.js';
 
 const oauth2Client = new google.auth.OAuth2(
-  process.env.CALNEDAR_GOOGLE_CLIENT_ID,
-  process.env.CALNEDAR_GOOGLE_CLIENT_SECRET,
-  process.env.CALNEDAR_GOOGLE_REDIRECT_URI
+  process.env.CALENDAR_GOOGLE_CLIENT_ID,
+  process.env.CALENDAR_GOOGLE_CLIENT_SECRET,
+  process.env.CALENDAR_GOOGLE_REDIRECT_URI
 );
 
 const WEBHOOK_CALLBACK_URL = process.env.WEBHOOK_CALLBACK_URL as string;

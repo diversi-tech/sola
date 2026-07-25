@@ -6,9 +6,9 @@ import { AuthErrorType } from '../types/authErrors.enum.js'
 import { registerWebhookChannel } from './webhook.service.js';
 
 const oauth2Client = new google.auth.OAuth2(
-    process.env.CALNEDAR_GOOGLE_CLIENT_ID,
-    process.env.CALNEDAR_GOOGLE_CLIENT_SECRET,
-    process.env.CALNEDAR_GOOGLE_REDIRECT_URI
+    process.env.CALENDAR_GOOGLE_CLIENT_ID,
+    process.env.CALENDAR_GOOGLE_CLIENT_SECRET,
+    process.env.CALENDAR_GOOGLE_REDIRECT_URI
 );
 
 export const processGoogleCallback = async (code: string, state: string, error?: string) => {

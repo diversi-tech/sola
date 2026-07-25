@@ -26,9 +26,6 @@ export const getEmployeeByPhoneNumber = async (phone_number: string) => {
   if (empError) throw new Error(`Employee query error: ${empError.message}`);
   if (!employees || employees.length === 0) return null;
 
-  // A phone number must map to exactly one employee. If it maps to several we
-  // can't tell who is authenticating, so we refuse and flag it for cleanup
-  // rather than authorizing an arbitrary match.
   if (employees.length > 1) {
     console.error(
       `Multiple employees share phone number ${phone_number} (ids: ${employees.map((e) => e.id).join(', ')}). Denying authorization until the duplicate is resolved.`

@@ -4,9 +4,6 @@ import 'dotenv/config';
 const FRONTEND_URL = process.env.FRONTEND_URL;
 
 export const inviteEmployee = async (email: string, name: string, phoneNumber: string, permissionIds: number[]) => {
-
-    // Reject a duplicate phone number up front, before creating the auth user,
-    // so we don't leave an orphaned Supabase Auth user behind on conflict.
     if (phoneNumber) {
         const { data: existingByPhone, error: phoneCheckError } = await supabaseAdmin
             .from('Employees')

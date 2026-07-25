@@ -6,8 +6,8 @@ const refreshToken = process.env.GMAIL_REFRESH_TOKEN;
 
 export const assertEmailConfig = (): void => {
   const missing = [
-    ['CALNEDAR_GOOGLE_CLIENT_ID', clientId],
-    ['CALNEDAR_GOOGLE_CLIENT_SECRET', clientSecret],
+    ['CALENDAR_GOOGLE_CLIENT_ID', clientId],
+    ['CALENDAR_GOOGLE_CLIENT_SECRET', clientSecret],
     ['GMAIL_SENDER', sender],
     ['GMAIL_REFRESH_TOKEN', refreshToken],
   ]
