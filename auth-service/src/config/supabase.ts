@@ -4,13 +4,12 @@ import dotenv from 'dotenv';
 dotenv.config(); 
 
 const supabaseUrl = process.env.SUPABASE_URL || 'https://mock-project.supabase.co';
-const supabaseKey = process.env.SUPABASE_ANON_KEY || 'mock-anon-key';
-const serviceRole = process.env.SERVICE_ROLE as string
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || 'mock-anon-key';
+const supabaseKey = process.env.SUPABASE_KEY as string;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+export const supabaseAdmin = createClient(supabaseUrl, supabaseKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false
