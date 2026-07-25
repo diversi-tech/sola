@@ -1,5 +1,5 @@
 import { baseLLMProvider } from './base-llm.provider.js';
-import { genAI } from './gemini.client.js';
+import { getGenAiClient } from './gemini.client.js';
 import { Schema } from '@google/generative-ai';
 import fs from 'fs';
 import path from 'path';
@@ -38,7 +38,7 @@ export class GeminiProvider extends baseLLMProvider {
     }
 
     protected async callLlmApi(prompt: string, schema: any): Promise<string> {
-        const model = genAI.getGenerativeModel({
+        const model = getGenAiClient().getGenerativeModel({
             model: this.modelName,
             generationConfig: {
                 responseMimeType: "application/json",

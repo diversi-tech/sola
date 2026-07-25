@@ -1,5 +1,5 @@
 import { baseLLMProvider } from './base-llm.provider.js';
-import { openaiClient } from './openai.client.js';
+import { getOpenAiClient } from './openai.client.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -37,7 +37,7 @@ export class OpenAiProvider extends baseLLMProvider {
     }
 
     protected async callLlmApi(prompt: string, schema: any): Promise<string> {
-        const response = await openaiClient.chat.completions.create({
+        const response = await getOpenAiClient().chat.completions.create({
             model: this.modelName,
             temperature: this.temperature,
             response_format: { type: "json_object" },
